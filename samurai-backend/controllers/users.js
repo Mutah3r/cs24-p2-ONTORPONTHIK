@@ -61,7 +61,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
   try {
-      const user = await userModel.findOne({_id:userId});
+      const user = await userModel.findOne({_id:userId},{ name: 1, email: 1, role: 1 });
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }

@@ -113,10 +113,10 @@ const sendResetEmail = async (email, token) => {
         from: '"EcoSync" <EcoSync@gmail.com>', // sender address
         to: email, // recipient address
         subject: 'Password Reset for EcoSync', // Subject line
-        html: `<p>Click <a href="http://localhost:8000/reset-password/confirm?token=${token}">here</a> to reset your password.</p>`,
+        html: `<p>Click <a href="http://localhost:5173/reset-password?token=${token}">here</a> to reset your password.</p>`,
     });
 
-    console.log('Password reset email sent:', info.response);
+    //console.log('Password reset email sent:', info.response);
 };
 
 exports.initiatePasswordReset = async (req, res) => {
@@ -133,7 +133,7 @@ exports.initiatePasswordReset = async (req, res) => {
         const token = generateResetToken(email);
         await sendResetEmail(email, token);
 
-        res.status(200).json({ message: 'Password reset initiated. Check your email for further instructions.' });
+        res.status(200).json({ message: 'Password reset initiated. Check your email for further instructions.',token:token });
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -144,7 +144,7 @@ exports.confirmPasswordReset = async (req, res) => {
         const { token, newPassword } = req.body;
 
         // Verify and decode the token
-        jwt.verify(token, process.env.JWT_RESET_SECRET, async (err, decoded) => {
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ message: 'Invalid or expired token' });
             }
