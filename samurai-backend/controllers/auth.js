@@ -8,10 +8,14 @@ exports.Login = async(req,res)=>{
     const { email, password } = req.body;
     let pass = "";
     let role = "";
+    let isFirstTime = false;
+    let userId="";
     await userModel.findOne({ email:email })
       .then((result) => {
         pass = result.password;
         role = result.role;
+        isFirstTime = result.isLogin
+        userId=result._id;
       })
       .catch((err) => {
         //console.log(pass)
@@ -19,6 +23,7 @@ exports.Login = async(req,res)=>{
     if (pass == "") {
       res.status(401).json({message:"Email is wrong!"});
     } else {
+      await userModel.findByIdAndUpdate(userId, { $set: { isLogin: true } });
       bcrypt.compare(password, pass, function (err, result) {
         if (err) console.log(err);
         if (result) {
@@ -27,7 +32,7 @@ exports.Login = async(req,res)=>{
             process.env.jwt_secret_key,
             { expiresIn: "30d" }
           );
-          res.status(200).json({ token: token,role:role });
+          res.status(200).json({ token: token, role:role, isFirstTime:isFirstTime });
         } else {
           res.status(401).json({message:"Password is wrong!"});
         }
