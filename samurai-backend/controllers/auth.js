@@ -96,7 +96,7 @@ exports.changePassword = async (req, res) => {
 
 // Function to generate a password reset token
 const generateResetToken = (email) => {
-    return jwt.sign({ email }, process.env.JWT_RESET_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ email }, process.env.jwt_secret_key, { expiresIn: '5m' });
 };
 
 // Function to send the password reset email
@@ -113,7 +113,7 @@ const sendResetEmail = async (email, token) => {
         from: '"EcoSync" <EcoSync@gmail.com>', // sender address
         to: email, // recipient address
         subject: 'Password Reset for EcoSync', // Subject line
-        html: `<p>Click <a href="http://yourwebsite.com/reset-password/confirm?token=${token}">here</a> to reset your password.</p>`,
+        html: `<p>Click <a href="http://localhost:8000/reset-password/confirm?token=${token}">here</a> to reset your password.</p>`,
     });
 
     console.log('Password reset email sent:', info.response);
