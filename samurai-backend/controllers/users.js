@@ -44,15 +44,17 @@ exports.Registration = async(req,res)=>{
 
 
 
+
 // GET method for listing all users (System Admin access)
 exports.getAllUsers = async (req, res) => {
   try {
-      const users = await userModel.find();
+      const users = await userModel.find({}, { name: 1, email: 1, role: 1 });
       res.status(200).json(users);
   } catch (error) {
       res.status(500).json({ message: error.message });
   }
 };
+
 
 // GET method for retrieving a specific user's details
 exports.getUserById = async (req, res) => {
