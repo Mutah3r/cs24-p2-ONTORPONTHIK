@@ -1,4 +1,5 @@
 const userModel = require('../models/user_accounts')
+const Role = require("../models/role")
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 
@@ -60,33 +61,34 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
   try {
-      const user = await userModel.findById(userId);
+      const user = await userModel.findOne({_id:userId});
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }
       res.status(200).json(user);
   } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: "User not found" });
   }
 };
 
 // PUT method for updating a user's details (restricted to own details or System Admin access)
 exports.updateUser = async (req, res) => {
   const userId = req.params.userId;
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, loguser } = req.body;
   try {
       let user = await userModel.findById(userId);
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }
       // Check if the request is made by the user or a system admin
-      if (user._id.toString() !== req.user._id.toString() && req.user.role !== "System Admin") {
+      if (user._id.toString() !== loguser._id.toString() && loguser.role !== "System admin") {
           return res.status(403).json({ message: "Unauthorized" });
       }
       // Update user details
       user.name = name;
       user.email = email;
-      user.password = password;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
       user.role = role;
       await user.save();
       res.status(200).json({ message: "User updated successfully" });
@@ -98,12 +100,16 @@ exports.updateUser = async (req, res) => {
 // DELETE method for deleting a user (System Admin access)
 exports.deleteUser = async (req, res) => {
   const userId = req.params.userId;
+  const { loguser } = req.body;
   try {
       const user = await userModel.findById(userId);
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }
-      await user.remove();
+      if (loguser.role !== "System admin" || user.role=="System admin") {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      await userModel.deleteOne({_id:userId});
       res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
       res.status(500).json({ message: error.message });
