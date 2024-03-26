@@ -147,3 +147,32 @@ exports.updateUserRoles = async (req, res) => {
       res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
+
+
+
+router.post('/roles', async (req, res) => {
+    try {
+        // Extract the role name from the request body
+        const { name } = req.body;
+
+        // Create a new role instance
+        const role = new Role({ name });
+
+        // Save the role to the database
+        await role.save();
+
+        // Respond with a success message
+        res.status(201).json({ message: 'Role created successfully', role });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Export the router
+module.exports = router;
+
