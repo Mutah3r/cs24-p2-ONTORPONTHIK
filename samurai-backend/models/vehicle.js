@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 
 // Define schema
 const vehicleSchema = new mongoose.Schema({
-    vehicle_id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     registration_number: {
         type: String,
         required: true,
