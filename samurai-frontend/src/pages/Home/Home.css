@@ -1,0 +1,10 @@
+.home-hero-container {
+  background: url("../../assets/hero-bg-1.jpg"),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  background-blend-mode: overlay;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-width: 100vw;
+  min-height: 100vh;
+}
