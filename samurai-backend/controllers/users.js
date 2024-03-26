@@ -129,18 +129,18 @@ exports.getAllRoles = async (req, res) => {
 // PUT method for updating a user's roles (System Admin access)
 exports.updateUserRoles = async (req, res) => {
   const userId = req.params.userId;
-  const { roles } = req.body;
+  const { roles,loguser } = req.body;
   try {
       let user = await userModel.findById(userId);
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }
       // Check if the user is a system admin
-      if (req.user.role !== "System Admin") {
+      if (loguser.role !== "System admin") {
           return res.status(403).json({ message: "Unauthorized" });
       }
       // Update user roles
-      user.roles = roles;
+      user.role = roles;
       await user.save();
       res.status(200).json({ message: "User roles updated successfully" });
   } catch (error) {
@@ -154,7 +154,7 @@ exports.updateUserRoles = async (req, res) => {
 
 
 
-router.post('/roles', async (req, res) => {
+exports.postRoles = async (req, res) => {
     try {
         // Extract the role name from the request body
         const { name } = req.body;
@@ -171,8 +171,5 @@ router.post('/roles', async (req, res) => {
         // Handle errors
         res.status(500).json({ message: error.message });
     }
-});
-
-// Export the router
-module.exports = router;
+};
 
