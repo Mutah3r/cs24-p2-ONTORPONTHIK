@@ -35,11 +35,11 @@ exports.getUserDetails = async (req, res) => {
 
 exports.updateUserDetails = async (req, res) => {
     try {
-      const { name, email, oldEmail } = req.body;
+      const { name, email, token } = req.body;
   
       // Find the user by old email and update the details
       const updatedUser = await userModel.findOneAndUpdate(
-        { email: oldEmail },
+        { token:token },
         { $set: { name: name, email: email } },
         { new: true }
       );
