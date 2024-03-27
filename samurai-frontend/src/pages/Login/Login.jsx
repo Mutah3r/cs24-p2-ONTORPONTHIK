@@ -1,25 +1,40 @@
 import Logo from "../../components/Logo/Logo";
 import axios from "axios";
+import { useState } from "react";
 import { IoLogIn } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+
+import ClipLoader from "react-spinners/ClipLoader";
 
 const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
   const signIn = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    const response = await axios.post("http://localhost:8000/auth/login", {
-      email: email,
-      password: password,
-    });
+    try {
+      const response = await axios.post("http://localhost:8000/auth/login", {
+        email: email,
+        password: password,
+      });
 
-    console.log(response.data);
-
-    if (response.data.role === "Unassigned") {
-      // logout user because unassigned users cannot login
-    } else {
-      localStorage.setItem("user", JSON.stringify(response.data));
+      if (response?.data?.role === "Unassigned") {
+        localStorage.removeItem("user");
+        setIsLoading(false);
+      } else {
+        localStorage.setItem("user", JSON.stringify(response.data.token));
+        setIsLoading(false);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      alert("email or password is incorrect");
+      return;
     }
   };
   return (
@@ -78,8 +93,24 @@ const Login = () => {
         </div>
         {/* Login Button */}
         <div>
-          <button className="w-full justify-center mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-green-700 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200">
-            Login <IoLogIn />
+          <button
+            disabled={isLoading}
+            className="w-full justify-center mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-green-700 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200"
+          >
+            {!isLoading && (
+              <>
+                Login <IoLogIn />
+              </>
+            )}
+            {
+              <ClipLoader
+                color={"#FFF"}
+                loading={isLoading}
+                size={30}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            }
           </button>
         </div>
       </form>
