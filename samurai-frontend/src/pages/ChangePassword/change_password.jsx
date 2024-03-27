@@ -32,7 +32,7 @@ const Login = () => {
         <div className="flex justify-center">
           <Logo bgWhite={true} />
         </div>
-        {/* Email Field */}
+        {/* Old Password Field */}
         <div>
           <label className="input input-bordered flex items-center gap-2">
             <svg
@@ -45,10 +45,10 @@ const Login = () => {
               <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
             </svg>
             <input
-              name="email"
-              type="email"
-              className="grow"
-              placeholder="Email"
+               name="password"
+               type="password"
+               className="grow"
+               placeholder="Old Password"
             />
           </label>
         </div>
@@ -72,14 +72,14 @@ const Login = () => {
               name="password"
               type="password"
               className="grow"
-              placeholder="Password"
+              placeholder="New Password"
             />
           </label>
         </div>
-        {/* Login Button */}
+        {/* Change Password Button */}
         <div>
           <button className="w-full justify-center mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-green-700 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200">
-            Login <IoLogIn />
+            Change Password <IoLogIn />
           </button>
         </div>
       </form>
