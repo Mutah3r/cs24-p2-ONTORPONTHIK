@@ -69,8 +69,25 @@ exports.Login = async (req, res) => {
 
 
 exports.Logout = async (req, res) => {
-  // Clear user session or token
-  res.status(200).json({ message: "Logout successful" });
+  try {
+    const { email } = req.body;
+
+    // Find the user by email and update the token
+    const user = await userModel.findOneAndUpdate(
+      { email: email },
+      { $set: { token: 'Nothing' } }, // or { $set: { token: '' } } if you prefer an empty string
+      { new: true }
+    );
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res.status(200).json({ message: "Logout successful" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 
