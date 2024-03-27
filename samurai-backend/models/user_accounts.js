@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
     isLogin: {
         type: Boolean,
         default: false
+    },
+    token: {
+        type: String
     }
 });
 

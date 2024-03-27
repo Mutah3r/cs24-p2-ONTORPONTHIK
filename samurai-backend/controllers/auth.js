@@ -3,43 +3,60 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
 
-exports.Login = async(req,res)=>{
+exports.Login = async (req, res) => {
   try {
     const { email, password } = req.body;
     let pass = "";
     let role = "";
     let isFirstTime = false;
-    let userId="";
-    await userModel.findOne({ email:email })
+    let userId = "";
+
+    await userModel.findOne({ email: email })
       .then((result) => {
-        pass = result.password;
-        role = result.role;
-        isFirstTime = result.isLogin
-        userId=result._id;
+        if (result) {
+          pass = result.password;
+          role = result.role;
+          isFirstTime = result.isLogin;
+          userId = result._id;
+        } else {
+          res.status(401).json({ message: "Email is wrong!" });
+        }
       })
       .catch((err) => {
-        //console.log(pass)
+        console.log(err);
+        res.status(500).json({ message: "Internal Server Error" });
       });
-    if (pass == "") {
-      res.status(401).json({message:"Email is wrong!"});
-    } else {
-      await userModel.findByIdAndUpdate(userId, { $set: { isLogin: true } });
+
+    if (pass !== "") {
       bcrypt.compare(password, pass, function (err, result) {
-        if (err) console.log(err);
+        if (err) {
+          console.log(err);
+          res.status(500).json({ message: "Internal Server Error" });
+        }
         if (result) {
           const token = jwt.sign(
-            { email:email },
+            { email: email },
             process.env.jwt_secret_key,
             { expiresIn: "30d" }
           );
-          res.status(200).json({ token: token, role:role, isFirstTime:isFirstTime });
+
+          // Update token field in the user model
+          userModel.findByIdAndUpdate(userId, { $set: { isLogin: true, token: token } }, { new: true })
+            .then(updatedUser => {
+              res.status(200).json({ token: token, role: role, isFirstTime: isFirstTime });
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(500).json({ message: "Internal Server Error" });
+            });
         } else {
-          res.status(401).json({message:"Password is wrong!"});
+          res.status(401).json({ message: "Password is wrong!" });
         }
       });
     }
   } catch (error) {
-    res.status(404).json({message:"Some Error Occured"});
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
