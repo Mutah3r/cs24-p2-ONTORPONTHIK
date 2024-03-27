@@ -1,10 +1,33 @@
 import Logo from "../../components/Logo/Logo";
+import axios from "axios";
 import { IoLogIn } from "react-icons/io5";
 
 const Login = () => {
+  const signIn = async (event) => {
+    event.preventDefault();
+
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+
+    const response = await axios.post("http://localhost:8000/auth/login", {
+      email: email,
+      password: password,
+    });
+
+    console.log(response.data);
+
+    if (response.data.role === "Unassigned") {
+      // logout user because unassigned users cannot login
+    } else {
+      localStorage.setItem("user", JSON.stringify(response.data));
+    }
+  };
   return (
     <div className="min-h-[100vh] min-w-[100vw] bg-gradient-to-b from-green-400 to-green-700 flex items-center">
-      <form className="bg-white max-w-xl mx-auto p-4 rounded-md flex gap-4 flex-col">
+      <form
+        onSubmit={signIn}
+        className="bg-white max-w-xl mx-auto p-4 rounded-md flex gap-4 flex-col"
+      >
         {/* Logo */}
         <div className="flex justify-center">
           <Logo bgWhite={true} />
@@ -21,7 +44,12 @@ const Login = () => {
               <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
               <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
             </svg>
-            <input type="text" className="grow" placeholder="Email" />
+            <input
+              name="email"
+              type="email"
+              className="grow"
+              placeholder="Email"
+            />
           </label>
         </div>
         {/* Password Field */}
@@ -40,7 +68,12 @@ const Login = () => {
               />
             </svg>
 
-            <input type="password" className="grow" placeholder="Password" />
+            <input
+              name="password"
+              type="password"
+              className="grow"
+              placeholder="Password"
+            />
           </label>
         </div>
         {/* Login Button */}
