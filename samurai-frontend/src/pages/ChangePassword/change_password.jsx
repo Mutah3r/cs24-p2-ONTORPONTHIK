@@ -9,7 +9,7 @@ const Login = () => {
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    const response = await axios.post("http://localhost:8000/auth/login", {
+    const response = await axios.post("http://localhost:8000/auth/change_password", {
       email: email,
       password: password,
     });
