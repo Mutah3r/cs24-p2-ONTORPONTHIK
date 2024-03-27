@@ -9,6 +9,5 @@ router.get('/:userId',authController.getUserById)
 router.put('/:userId/roles',authController.updateUserRoles)
 router.put('/:userId',authController.updateUser)
 router.delete('/:userId',authController.deleteUser)
-router.post('/roles',authController.postRoles)
 
 module.exports = router;
