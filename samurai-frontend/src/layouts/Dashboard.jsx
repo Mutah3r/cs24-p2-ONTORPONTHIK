@@ -47,7 +47,6 @@ const Dashboard = () => {
                   >
                     <RxHamburgerMenu />
                   </label>
-
                   <h1 className="text-[24px]">Welcome Moylar Ma 👋</h1>
                 </div>
                 <div className="dropdown dropdown-hover dropdown-left">
@@ -59,7 +58,7 @@ const Dashboard = () => {
                     className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                   >
                     <li className="flex gap-2 justify-center">
-                      <Link to="/profile">
+                      <Link to="/dashboard/profile">
                         <FaUser /> <span>Profile</span>
                       </Link>
                     </li>
@@ -71,6 +70,7 @@ const Dashboard = () => {
                   </ul>
                 </div>
               </div>
+              <Outlet />
             </div>
           </div>
           <div className="drawer-side">
@@ -94,7 +94,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <Outlet />
     </div>
   );
 };
