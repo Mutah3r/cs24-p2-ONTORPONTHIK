@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const UserManagement = () => {
+  const [refetch, setRefetch] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([
     "Unassigned",
@@ -18,8 +22,9 @@ const UserManagement = () => {
     axios.get("http://localhost:8000/users").then((res) => {
       console.log(res.data);
       setUsers(res.data);
+      setIsLoading(false);
     });
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
     axios
@@ -44,6 +49,8 @@ const UserManagement = () => {
   };
 
   const handleAddNewUser = () => {
+    setIsLoading(true);
+
     const newName = document.getElementById("swal-input-name").value;
     const newEmail = document.getElementById("swal-input-email").value;
     const newPassword = document.getElementById("swal-input-password").value;
@@ -52,12 +59,14 @@ const UserManagement = () => {
     // Validate input fields
     if (!newName || !newEmail || !newPassword || !newRole) {
       throwErrorPopup("Please fill out all required fields");
+      setIsLoading(false);
       return;
     }
 
     // validate name
     if (newName.length < 2) {
       throwErrorPopup("Please Enter a valid name");
+      setIsLoading(false);
       return;
     }
 
@@ -65,12 +74,14 @@ const UserManagement = () => {
     const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
     if (!emailRegex.test(newEmail)) {
       throwErrorPopup("Please enter a valid email");
+      setIsLoading(false);
       return;
     }
 
     // validate password
-    if (newPassword.length < 6) {
-      throwErrorPopup("Password must be atleast 6 characters long");
+    if (newPassword.length < 4) {
+      throwErrorPopup("Password must be atleast 4 characters long");
+      setIsLoading(false);
       return;
     }
 
@@ -82,7 +93,42 @@ const UserManagement = () => {
       newRole,
     });
 
-    // refetch users
+    axios
+      .post("http://localhost:8000/users", {
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        role: newRole,
+        token: JSON.parse(localStorage.getItem("user")),
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data?.message === "Registration successful") {
+          Swal.fire({
+            title: "Success!",
+            text: "New user created!",
+            icon: "success",
+          });
+
+          //   refetch all users
+          setRefetch(!refetch);
+          setIsLoading(false);
+        } else {
+          throwErrorPopup("Unable to create new user!");
+          setIsLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error?.response?.data?.message === "Email already exists") {
+          throwErrorPopup("Email already exist!");
+          setIsLoading(false);
+          return;
+        }
+
+        throwErrorPopup("Error occurred! Please try again later.");
+        setIsLoading(false);
+      });
 
     // Close the popup
     Swal.close();
@@ -93,6 +139,7 @@ const UserManagement = () => {
       <h1 className="text-2xl font-semibold mb-4">User Management</h1>
 
       <button
+        disabled={isLoading}
         onClick={() =>
           Swal.fire({
             title: "Add User",
@@ -119,45 +166,58 @@ const UserManagement = () => {
       <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
         All User Information
       </h2>
-      <div className="overflow-x-auto">
-        <table className="table table-zebra">
-          {/* head */}
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* rows */}
-            {users.map((user, idx) => (
-              <tr key={user._id}>
-                <th>{idx + 1}</th>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td className="flex gap-2 items-center">
-                  <button
-                    onClick={() => handleUserEdit(user._id)}
-                    className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
-                  >
-                    <MdEdit className="text-[20px]" />
-                  </button>
-                  <button
-                    onClick={() => handleUserDelete(user._id)}
-                    className="p-1 flex gap-2 items-center bg-red-500 text-white hover:bg-red-200 hover:text-red-500 text-xl rounded-md transition-all duration-200"
-                  >
-                    <MdDeleteForever className="text-[20px]" />
-                  </button>
-                </td>
+      {isLoading && (
+        <div className="flex items-center w-full justify-center py-3">
+          <ClipLoader
+            color={"#22C55E"}
+            loading={isLoading}
+            size={50}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      )}
+      {!isLoading && (
+        <div className="overflow-x-auto">
+          <table className="table table-zebra">
+            {/* head */}
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {/* rows */}
+              {users.map((user, idx) => (
+                <tr key={user._id}>
+                  <th>{idx + 1}</th>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td className="flex gap-2 items-center">
+                    <button
+                      onClick={() => handleUserEdit(user._id)}
+                      className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
+                    >
+                      <MdEdit className="text-[20px]" />
+                    </button>
+                    <button
+                      onClick={() => handleUserDelete(user._id)}
+                      className="p-1 flex gap-2 items-center bg-red-500 text-white hover:bg-red-200 hover:text-red-500 text-xl rounded-md transition-all duration-200"
+                    >
+                      <MdDeleteForever className="text-[20px]" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
