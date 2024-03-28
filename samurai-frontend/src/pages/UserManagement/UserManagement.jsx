@@ -32,8 +32,50 @@ const UserManagement = () => {
       .then((res) => setRoles(res.data.roles));
   }, []);
 
-  const handleUserEdit = (userId) => {
-    alert("edit user " + userId);
+  window.togglePasswordInput = (checkbox) => {
+    const passwordDiv = document.getElementById("passwordDiv");
+    if (checkbox.checked) {
+      passwordDiv.style.display = "block";
+    } else {
+      passwordDiv.style.display = "none";
+    }
+  };
+
+  const handleUserEdit = (userId, role) => {
+    setIsLoading(true);
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    // change user info
+    axios
+      .put(`http://localhost:8000/users/${userId}`, {
+        name,
+        email,
+        password: password || null,
+        role,
+        token: JSON.parse(localStorage.getItem("user")),
+      })
+      .then((response) => {
+        if (response.data?.message === "User updated successfully") {
+          Swal.fire({
+            title: "Success!",
+            text: "User information has been updated!",
+            icon: "success",
+          });
+          // refetch users
+          setRefetch(!refetch);
+          setIsLoading(false);
+        } else {
+          throwErrorPopup("User information was not updated!");
+          setIsLoading(false);
+        }
+      })
+      .catch(() => {
+        throwErrorPopup("User information was not updated!");
+        setIsLoading(false);
+      });
   };
 
   const handleUserDelete = (userId) => {
@@ -200,7 +242,24 @@ const UserManagement = () => {
                   <td>{user.role}</td>
                   <td className="flex gap-2 items-center">
                     <button
-                      onClick={() => handleUserEdit(user._id)}
+                      onClick={() =>
+                        Swal.fire({
+                          title: "Enter User Information",
+                          html:
+                            `<input id="name" class="swal2-input" value="${user.name}" placeholder="Name">` +
+                            `<input id="email" class="swal2-input" value="${user.email}" placeholder="Email">` +
+                            `<div id="passwordDiv" style="text-align:center; margin-top:10px; display:none;">
+                                <input id="password" type="password" class="swal2-input" placeholder="Password">
+                            </div>` +
+                            `<br><input id="passwordCheckbox" style="margin-top:16px" type="checkbox" class="swal2-checkbox" onclick="togglePasswordInput(this)"> Update Password`,
+                          showCancelButton: true,
+                          confirmButtonText: "Update",
+                          cancelButtonText: "Cancel",
+                          preConfirm: () => {
+                            handleUserEdit(user._id, user.role);
+                          },
+                        })
+                      }
                       className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
                     >
                       <MdEdit className="text-[20px]" />
