@@ -102,29 +102,72 @@ exports.getUserById = async (req, res) => {
 
 // PUT method for updating a user's details (restricted to own details or System Admin access)
 exports.updateUser = async (req, res) => {
-  const userId = req.params.userId;
-  const { name, email, password, role, loguser } = req.body;
-  try {
-      let user = await userModel.findById(userId);
+    const userId = req.params.userId;
+    const { name, email, password, role, token } = req.body;
+  
+    try {
+      // Check if the token exists in user_account
+      const user = await userModel.findOne({ token });
+  
       if (!user) {
-          return res.status(404).json({ message: "User not found" });
+        return res.status(401).json({ message: "Invalid token" });
       }
-      // Check if the request is made by the user or a system admin
-      if (user._id.toString() !== loguser._id.toString() && loguser.role !== "System admin") {
+  
+      // Verify the token
+      jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: "Invalid token" });
+        }
+  
+        // Check if the user's role is system admin
+        if (user.role !== "System admin") {
           return res.status(403).json({ message: "Unauthorized" });
-      }
-      // Update user details
-      user.name = name;
-      user.email = email;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
-      user.role = role;
-      await user.save();
-      res.status(200).json({ message: "User updated successfully" });
-  } catch (error) {
-      res.status(500).json({ message: error.message });
-  }
-};
+        }
+  
+        // Proceed with updating user details
+        let userToUpdate = await userModel.findById(userId);
+        if (!userToUpdate) {
+          return res.status(404).json({ message: "User not found" });
+        }
+  
+        // Update user details
+        userToUpdate.name = name;
+        userToUpdate.email = email;
+        
+        // Check if password is provided
+        if (password) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          userToUpdate.password = hashedPassword;
+          const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.USER,
+                    pass: process.env.PASS,
+                },
+            });
+
+            await transporter.sendMail({
+                from: '"EcoSync" <EcoSync@gmail.com>', // sender address
+                to: email, // list of receivers
+                subject: "Password Change in EcoSync", // Subject line
+                text: "Password Change in EcoSync",
+                html: `<div>
+                            <p>Your New Password is: ${password}</p>
+                            <p>System admin changed your password. Please change your password after login.</p>
+                        </div>`,
+            });
+        }
+        
+        userToUpdate.role = role;
+        await userToUpdate.save();
+        
+        res.status(200).json({ message: "User updated successfully" });
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
 
 // DELETE method for deleting a user (System Admin access)
 exports.deleteUser = async (req, res) => {
