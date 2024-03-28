@@ -4,6 +4,7 @@ import Login from "../pages/Login/Login";
 import Dashboard from "../layouts/Dashboard";
 import DashboardHome from "../components/DashboardHome/DashboardHome";
 import Profile from "../pages/Profile/Profile";
+import UserManagement from "../pages/UserManagement/UserManagement";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "users",
+        element: <UserManagement />,
       },
     ],
   },
