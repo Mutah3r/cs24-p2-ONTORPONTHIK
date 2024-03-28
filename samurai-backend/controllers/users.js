@@ -171,22 +171,47 @@ exports.updateUser = async (req, res) => {
 
 // DELETE method for deleting a user (System Admin access)
 exports.deleteUser = async (req, res) => {
-  const userId = req.params.userId;
-  const { loguser } = req.body;
-  try {
-      const user = await userModel.findById(userId);
+    const userId = req.params.userId;
+    const { token } = req.body;
+  
+    try {
+      // Check if the token exists in user_account
+      const user = await userModel.findOne({ token });
+  
       if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+  
+      // Verify the token
+      jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: "Invalid token" });
+        }
+  
+        // Check if the user's role is system admin
+        if (user.role !== "System admin") {
+          return res.status(403).json({ message: "Unauthorized" });
+        }
+  
+        // Proceed with deleting user
+        const userToDelete = await userModel.findById(userId);
+        if (!userToDelete) {
           return res.status(404).json({ message: "User not found" });
-      }
-      if (loguser.role !== "System admin" || user.role=="System admin") {
-        return res.status(403).json({ message: "Unauthorized" });
-      }
-      await userModel.deleteOne({_id:userId});
-      res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
-      res.status(500).json({ message: error.message });
-  }
-};
+        }
+  
+        // Check if the user to delete is a system admin
+        if (userToDelete.role === "System admin") {
+          return res.status(403).json({ message: "Cannot delete a system admin user" });
+        }
+  
+        await userModel.deleteOne({ _id: userId });
+        res.status(200).json({ message: "User deleted successfully" });
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
 
 // GET method for listing all available roles
 exports.getAllRoles = async (req, res) => {
