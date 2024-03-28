@@ -98,21 +98,30 @@ exports.Logout = async (req, res) => {
 
 
 exports.changePassword = async (req, res) => {
-  const { email, newPassword } = req.body;
+  const { token, newPassword } = req.body;
 
   try {
-    const user = await userModel.findOne({ email });
+    // Check if the token exists in user_account
+    const user = await userModel.findOne({ token });
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(401).json({ message: "Invalid token" });
     }
 
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    // Verify the token
+    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
 
-    user.password = hashedNewPassword;
+      // Proceed with changing password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedNewPassword;
 
-    await user.save();
+      await user.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
+      res.status(200).json({ message: "Password updated successfully" });
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
