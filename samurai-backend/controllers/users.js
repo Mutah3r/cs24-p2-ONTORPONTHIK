@@ -2,43 +2,72 @@ const userModel = require('../models/user_accounts')
 const Role = require("../models/role")
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken")
 
-exports.Registration = async(req,res)=>{
-    const {name,email,password,role} = req.body
-    const hashedPassword = await bcrypt.hash(password, 10);
-    userModel.findOne({email:email})
-    .then(async user=>{
-        if(user)return res.status(401).json({message: "Email already exists"})
-        else{
-            userModel.create({
-                name:name,
-                email:email,
-                password:hashedPassword,
-                role:role
-            })
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                  user: process.env.USER,
-                  pass: process.env.PASS,
-                },
-              });
-            const info = await transporter.sendMail({
-                from: '"EcoSync" <EcoSync@gmail.com>', // sender address
-                to: email, // list of receivers
-                subject: "Login Credential for EcoSync", // Subject line
-                text: "Login Credential for EcoSync",
-                html:
-                  `<div>
-                            <p>Your Password is: ` +
-                  password +
-                  `</p><p>Please change your password after login.</p>
-                        </div>`,
-              });
-            return res.status(200).json({message:"Registration successfull"});
+exports.Registration = async (req, res) => {
+    try {
+        const { name, email, password, role, token } = req.body;
+
+        // Check if the token exists in user_account
+        const user = await userModel.findOne({ token });
+
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
         }
-    })
-}
+
+        // Verify the token
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ message: "Invalid token" });
+            }
+
+            // Check if the user role is system admin
+            const userRole = user.role;
+            if (userRole !== 'System admin') {
+                return res.status(403).json({ message: "User is not a system admin" });
+            }
+
+            // Proceed with registration
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const existingUser = await userModel.findOne({ email: email });
+
+            if (existingUser) {
+                return res.status(401).json({ message: "Email already exists" });
+            } else {
+                await userModel.create({
+                    name: name,
+                    email: email,
+                    password: hashedPassword,
+                    role: role
+                });
+
+                const transporter = nodemailer.createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: process.env.USER,
+                        pass: process.env.PASS,
+                    },
+                });
+
+                await transporter.sendMail({
+                    from: '"EcoSync" <EcoSync@gmail.com>', // sender address
+                    to: email, // list of receivers
+                    subject: "Login Credential for EcoSync", // Subject line
+                    text: "Login Credential for EcoSync",
+                    html: `<div>
+                                <p>Your Password is: ${password}</p>
+                                <p>Please change your password after login.</p>
+                            </div>`,
+                });
+
+                return res.status(200).json({ message: "Registration successful" });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
 
 
 
