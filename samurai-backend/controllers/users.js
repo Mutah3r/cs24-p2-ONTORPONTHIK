@@ -226,22 +226,42 @@ exports.getAllRoles = async (req, res) => {
 // PUT method for updating a user's roles (System Admin access)
 exports.updateUserRoles = async (req, res) => {
   const userId = req.params.userId;
-  const { roles,loguser } = req.body;
+  const { roles, token } = req.body;
+
   try {
-      let user = await userModel.findById(userId);
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
+    // Check if the token exists in user_account
+    const user = await userModel.findOne({ token });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    // Verify the token
+    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
       }
-      // Check if the user is a system admin
-      if (loguser.role !== "System admin") {
-          return res.status(403).json({ message: "Unauthorized" });
+
+      // Check if the user's role is system admin
+      if (user.role !== "System admin") {
+        return res.status(403).json({ message: "Unauthorized" });
       }
+
+      // Proceed with updating user roles
+      let userToUpdate = await userModel.findById(userId);
+      if (!userToUpdate) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
       // Update user roles
-      user.role = roles;
-      await user.save();
+      userToUpdate.role = roles;
+      await userToUpdate.save();
+
       res.status(200).json({ message: "User roles updated successfully" });
+    });
   } catch (error) {
-      res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
