@@ -32,9 +32,14 @@ exports.getSTSInformation = async (req, res) => {
         // Fetch the name of the assigned manager for each STS
         const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
             // Find the manager by their MongoDB ID
-            const manager = await userModel.findById(sts.assigned_managers_id);
-            // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
-            const managerName = manager ? manager.name : 'Unassigned';
+            let managerName = 'Unassigned'
+            
+            if (sts.assigned_managers_id !== "-1")
+            {
+                const manager = await userModel.findById(sts.assigned_managers_id);
+                // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
+                managerName = manager ? manager.name : 'Unassigned';
+            }
 
             // Return an object containing STS information along with assigned manager name
             return {
@@ -123,9 +128,15 @@ exports.getLandfillInformation = async (req, res) => {
         // Fetch the name of the assigned manager for each Landfill
         const landfillsWithManager = await Promise.all(landfillInfo.map(async (landfill) => {
             // Find the manager by their MongoDB ID
-            const manager = await userModel.findById(landfill.assigned_managers_id);
-            // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
-            const managerName = manager ? manager.name : 'Unassigned';
+
+            let managerName = 'Unassigned'
+            if (landfill.assigned_managers_id !== "-1")
+            {
+                const manager = await userModel.findById(landfill.assigned_managers_id);
+                // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
+                managerName = manager ? manager.name : 'Unassigned';
+            }
+            
 
             // Return an object containing Landfill information along with assigned manager name
             return {
