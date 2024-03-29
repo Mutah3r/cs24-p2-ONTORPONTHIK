@@ -3,20 +3,24 @@ import { MdEdit } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
 import Swal from "sweetalert2";
 import ClipLoader from "react-spinners/ClipLoader";
 
+// TODO: make roles list dynamic
 const UserManagement = () => {
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([
-    "Unassigned",
-    "System admin",
-    "STS manager",
-    "Landfill manager",
-  ]);
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/users/roles").then((response) => {
+      const rolesArray = response.data.map((item) => item.name);
+      setRoles(rolesArray);
+    });
+  }, []);
 
   useEffect(() => {
     axios.get("http://localhost:8000/users").then((res) => {
@@ -31,6 +35,37 @@ const UserManagement = () => {
       .get("http://localhost:8000/rbac/roles")
       .then((res) => setRoles(res.data.roles));
   }, []);
+
+  const handleUpdateRole = async (previousRole) => {
+    const inputOptions = {};
+
+    roles.forEach((name) => {
+      inputOptions[name] = name;
+    });
+
+    const { value: role } = await Swal.fire({
+      title: "Set Role",
+      input: "select",
+      inputOptions: inputOptions,
+      inputValue: previousRole,
+      inputPlaceholder: "Select a role",
+      showCancelButton: true,
+      inputValidator: (value) => {
+        return new Promise((resolve) => {
+          if (value !== "") {
+            resolve();
+          } else {
+            resolve("You need to select a role");
+          }
+        });
+      },
+    });
+
+    if (role) {
+      // Handle the selected role here and make an API call
+      console.log("Selected role:", role);
+    }
+  };
 
   window.togglePasswordInput = (checkbox) => {
     const passwordDiv = document.getElementById("passwordDiv");
@@ -239,7 +274,15 @@ const UserManagement = () => {
                   <th>{idx + 1}</th>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
-                  <td>{user.role}</td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <span>{user.role}</span>{" "}
+                      <IoMdSettings
+                        onClick={() => handleUpdateRole(user.role)}
+                        className="text-green-500 text-lg cursor-pointer hover:animate-spin"
+                      />
+                    </div>
+                  </td>
                   <td className="flex gap-2 items-center">
                     <button
                       onClick={() =>
