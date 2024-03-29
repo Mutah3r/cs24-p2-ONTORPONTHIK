@@ -2,10 +2,30 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import Swal from "sweetalert2";
+import { renderToString } from "react-dom/server";
 
 const FacilityManagement = () => {
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
   const [availabeSts, setAvailableSts] = useState([]);
   const [availabeLandfills, setAvailableLandfills] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("http://localhost:8000/users");
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     axios
@@ -131,6 +151,49 @@ const FacilityManagement = () => {
     return isValidNumber(value);
   };
 
+  const handleAssignStsManager = (stsID) => {
+    Swal.fire({
+      title: "Select STS Manager",
+      html: loading
+        ? "Loading..."
+        : renderToString(
+            <select className="swal2-select" id="stsManagerDropdown">
+              {users.map(
+                (user) =>
+                  user.role === "STS manager" && (
+                    <option key={user._id} value={user._id}>
+                      {user.name}
+                    </option>
+                  )
+              )}
+            </select>
+          ),
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const selectedValue =
+          document.getElementById("stsManagerDropdown").value;
+        return selectedValue;
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log("Selected value:", result.value);
+        axios
+          .post("http://localhost:8000/facilities/stsManage", {
+            user_id: result.value,
+            token: JSON.parse(localStorage.getItem("user")),
+            sts_id: stsID,
+          })
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    });
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Facilities Management</h1>
@@ -219,7 +282,10 @@ const FacilityManagement = () => {
                   <td>
                     <div className="flex gap-2 items-center">
                       <span>{sts.assigned_manager_name}</span>
-                      <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
+                      <button
+                        onClick={() => handleAssignStsManager(sts._id)}
+                        className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
+                      >
                         <MdEdit className="text-[20px]" />
                       </button>
                     </div>
