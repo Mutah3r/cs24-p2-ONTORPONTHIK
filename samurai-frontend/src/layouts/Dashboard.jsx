@@ -59,9 +59,13 @@ const Dashboard = () => {
   const handleLogout = () => {
     axios
       .post("http://localhost:8000/auth/logout", {
-        email: JSON.parse(localStorage.getItem("user")),
+        token: JSON.parse(localStorage.getItem("user")),
       })
       .then(() => {
+        localStorage.removeItem("user");
+        navigate("/login");
+      })
+      .catch(() => {
         localStorage.removeItem("user");
         navigate("/login");
       });
@@ -106,7 +110,9 @@ const Dashboard = () => {
                       onClick={handleLogout}
                       className="flex gap-2 justify-center"
                     >
-                      <IoLogOut /> <span>Logout</span>
+                      <span>
+                        <IoLogOut /> <span>Logout</span>
+                      </span>
                     </li>
                   </ul>
                 </div>

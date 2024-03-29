@@ -34,6 +34,10 @@ const Profile = () => {
       .then(() => {
         localStorage.removeItem("user");
         navigate("/login");
+      })
+      .catch(() => {
+        localStorage.removeItem("user");
+        navigate("/login");
       });
   };
 
