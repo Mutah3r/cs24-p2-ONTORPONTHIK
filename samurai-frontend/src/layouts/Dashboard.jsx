@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaUserFriends } from "react-icons/fa";
@@ -13,6 +13,8 @@ import axios from "axios";
 const Dashboard = () => {
   const [user, setUser] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   const adminRoutes = [
     {
@@ -54,6 +56,17 @@ const Dashboard = () => {
       });
   }, []);
 
+  const handleLogout = () => {
+    axios
+      .post("http://localhost:8000/auth/logout", {
+        email: JSON.parse(localStorage.getItem("user")),
+      })
+      .then(() => {
+        localStorage.removeItem("user");
+        navigate("/login");
+      });
+  };
+
   return (
     <div>
       <div>
@@ -89,10 +102,11 @@ const Dashboard = () => {
                         <FaUser /> <span>Profile</span>
                       </Link>
                     </li>
-                    <li className="flex gap-2 justify-center">
-                      <Link to="/logout">
-                        <IoLogOut /> <span>Logout</span>
-                      </Link>
+                    <li
+                      onClick={handleLogout}
+                      className="flex gap-2 justify-center"
+                    >
+                      <IoLogOut /> <span>Logout</span>
                     </li>
                   </ul>
                 </div>

@@ -29,7 +29,7 @@ const Profile = () => {
   const logoutUser = () => {
     axios
       .post("http://localhost:8000/auth/logout", {
-        email: userData?.email,
+        email: JSON.parse(localStorage.getItem("user")),
       })
       .then(() => {
         localStorage.removeItem("user");
