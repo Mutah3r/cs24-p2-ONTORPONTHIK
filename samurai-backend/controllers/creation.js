@@ -219,7 +219,7 @@ exports.assignManagerToSTS = async (req, res) => {
             return res.status(404).json({ message: 'STS not found' });
         }
 
-        sts.assigned_manager_id = user_id;
+        sts.assigned_managers_id = user_id;
         await sts.save();
 
         res.status(200).json({ message: 'Manager assigned to STS successfully' });
@@ -271,7 +271,7 @@ exports.assignManagerToLandfill = async (req, res) => {
             return res.status(404).json({ message: 'Landfill not found' });
         }
 
-        landfill.assigned_manager_id = user_id;
+        landfill.assigned_managers_id = user_id;
         await landfill.save();
 
         res.status(200).json({ message: 'Manager assigned to Landfill successfully' });
