@@ -10,9 +10,36 @@ import ClipLoader from "react-spinners/ClipLoader";
 const UserManagement = () => {
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [selectedFilter, setSelectedFilter] = useState("All users");
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  const handleUserFiltering = (event) => {
+    setSelectedFilter(event.target.value);
+    setIsLoading(true);
+
+    axios
+      .get("http://localhost:8000/users")
+      .then((response) => {
+        let filteredUsers;
+
+        if (event.target.value === "All users") {
+          filteredUsers = response.data;
+        } else {
+          filteredUsers = response.data.filter(
+            (user) => user.role === event.target.value
+          );
+        }
+
+        setUsers(filteredUsers);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        throwErrorPopup("An Error Occurred!");
+        setIsLoading(false);
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     axios.get("http://localhost:8000/users/roles").then((response) => {
@@ -73,6 +100,7 @@ const UserManagement = () => {
               icon: "success",
             });
             setRefetch(!refetch);
+            setSelectedFilter("All users");
           } else {
             throwErrorPopup("Role was not updated!");
           }
@@ -117,6 +145,7 @@ const UserManagement = () => {
           });
           // refetch users
           setRefetch(!refetch);
+          setSelectedFilter("All users");
           setIsLoading(false);
         } else {
           throwErrorPopup("User information was not updated!");
@@ -154,6 +183,7 @@ const UserManagement = () => {
                   icon: "success",
                 });
                 setRefetch(!refetch);
+                setSelectedFilter("All users");
                 setIsLoading(false);
               } else {
                 throwErrorPopup("Error! Please try again later.");
@@ -224,14 +254,6 @@ const UserManagement = () => {
       return;
     }
 
-    // Handle submission
-    console.log("Submitting data:", {
-      newName,
-      newEmail,
-      newPassword,
-      newRole,
-    });
-
     axios
       .post("http://localhost:8000/users", {
         name: newName,
@@ -250,6 +272,7 @@ const UserManagement = () => {
 
           //   refetch all users
           setRefetch(!refetch);
+          setSelectedFilter("All users");
           setIsLoading(false);
         } else {
           throwErrorPopup("Unable to create new user!");
@@ -275,30 +298,49 @@ const UserManagement = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">User Management</h1>
 
-      <button
-        disabled={isLoading}
-        onClick={() =>
-          Swal.fire({
-            title: "Add User",
-            html:
-              `<input type="text" id="swal-input-name" placeholder="Name"  class="swal2-input" required>` +
-              `<input type="email" id="swal-input-email" placeholder="Email"  class="swal2-input" required>` +
-              `<input type="password" id="swal-input-password" placeholder="Password"  class="swal2-input" required>` +
-              `<select id="swal-select-role" class="swal2-select" required>${roles
-                .map((role) => `<option value="${role}">${role}</option>`)
-                .join("")}</select>`,
-            showCancelButton: true,
-            confirmButtonText: "Add",
-            cancelButtonText: "Cancel",
-            preConfirm: () => {
-              handleAddNewUser();
-            },
-          })
-        }
-        className="mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 px-4 py-2 text-md rounded-md transition-all duration-200"
-      >
-        <FaPlus /> Add New User
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          disabled={isLoading}
+          onClick={() =>
+            Swal.fire({
+              title: "Add User",
+              html:
+                `<input type="text" id="swal-input-name" placeholder="Name"  class="swal2-input" required>` +
+                `<input type="email" id="swal-input-email" placeholder="Email"  class="swal2-input" required>` +
+                `<input type="password" id="swal-input-password" placeholder="Password"  class="swal2-input" required>` +
+                `<select id="swal-select-role" class="swal2-select" required>${roles
+                  .map((role) => `<option value="${role}">${role}</option>`)
+                  .join("")}</select>`,
+              showCancelButton: true,
+              confirmButtonText: "Add",
+              cancelButtonText: "Cancel",
+              preConfirm: () => {
+                handleAddNewUser();
+              },
+            })
+          }
+          className="mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 px-4 py-2 text-md rounded-md transition-all duration-200"
+        >
+          <FaPlus /> Add New User
+        </button>
+        <div className="flex gap-3 items-center">
+          <label htmlFor="filter" className="block text-sm font-semibold">
+            Filter
+          </label>
+          <select
+            id="filter"
+            className="select select-bordered w-md"
+            value={selectedFilter}
+            onChange={handleUserFiltering}
+          >
+            <option value="All users">All users</option>
+            <option value="System admin">System admin</option>
+            <option value="Landfill manager">Landfill manager</option>
+            <option value="STS manager">STS manager</option>
+            <option value="Unassigned">Unassigned</option>
+          </select>
+        </div>
+      </div>
 
       <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
         All User Information
