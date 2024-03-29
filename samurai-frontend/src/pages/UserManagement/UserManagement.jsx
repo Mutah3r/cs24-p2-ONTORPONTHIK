@@ -160,8 +160,15 @@ const UserManagement = () => {
                 setIsLoading(false);
               }
             })
-            .catch(() => {
-              throwErrorPopup("Error! Please try again later.");
+            .catch((error) => {
+              if (
+                error.response?.data.message ===
+                "Cannot delete a system admin user"
+              ) {
+                throwErrorPopup("Cannot delete a system admin user");
+              } else {
+                throwErrorPopup("Error! Please try again later.");
+              }
               setIsLoading(false);
             });
         }
