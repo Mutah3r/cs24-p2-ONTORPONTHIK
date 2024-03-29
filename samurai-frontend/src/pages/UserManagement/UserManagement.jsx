@@ -334,10 +334,11 @@ const UserManagement = () => {
             onChange={handleUserFiltering}
           >
             <option value="All users">All users</option>
-            <option value="System admin">System admin</option>
-            <option value="Landfill manager">Landfill manager</option>
-            <option value="STS manager">STS manager</option>
-            <option value="Unassigned">Unassigned</option>
+            {roles.map((role, idx) => (
+              <option key={idx} value={role}>
+                {role}
+              </option>
+            ))}
           </select>
         </div>
       </div>

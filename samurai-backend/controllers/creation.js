@@ -322,7 +322,6 @@ exports.addVehicle = async (req, res) => {
         }
 
 
-
         // Create a new vehicle instance
         const newVehicle = new Vehicle({
             registration_number,
@@ -378,3 +377,46 @@ exports.checkUserAssignment = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+
+
+
+exports.stsLog = (async (req, res) => {
+    const { 
+        token, 
+        registration_number, 
+        type, 
+        capacity, 
+        time_of_arrival, 
+        time_of_departure 
+    } = req.body;
+  
+    
+    const userId = await userModel.findOne({ token });
+  
+    try {
+     
+      const stsDocument = await STS.findOne({ assigned_managers_id: userId });
+  
+      if (!stsDocument) {
+        return res.status(404).send({ message: 'STS not found for the given manager' });
+      }
+  
+     
+      const newSTSEntry = new STSEntry({
+        sts_id: stsDocument._id, 
+        vehicle_registration: registration_number,
+        weight_of_waste: capacity,
+        time_of_arrival: new Date(time_of_arrival),
+        time_of_departure: new Date(time_of_departure)
+      });
+  
+      await newSTSEntry.save();
+  
+      res.status(201).send({ message: 'STSEntry created successfully', data: newSTSEntry });
+    } catch (error) {
+      console.error('Error creating STSEntry:', error);
+      res.status(500).send({ message: 'Error creating STSEntry', error: error.toString() });
+    }
+});
+

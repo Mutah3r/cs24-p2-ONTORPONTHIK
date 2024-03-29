@@ -7,6 +7,7 @@ import { FaUser } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { FaTruck } from "react-icons/fa";
+import { FaKey } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -26,6 +27,11 @@ const Dashboard = () => {
       title: "User & Role Management",
       icon: FaUserFriends,
       to: "users",
+    },
+    {
+      title: "Roles & Permissions",
+      icon: FaKey,
+      to: "roles",
     },
     {
       title: "Facility Management",
