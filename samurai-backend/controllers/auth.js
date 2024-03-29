@@ -70,11 +70,11 @@ exports.Login = async (req, res) => {
 
 exports.Logout = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { token } = req.body;
 
     // Find the user by email and update the token
     const user = await userModel.findOneAndUpdate(
-      { email: email },
+      { token:token },
       { $set: { token: 'Nothing' } }, // or { $set: { token: '' } } if you prefer an empty string
       { new: true }
     );
