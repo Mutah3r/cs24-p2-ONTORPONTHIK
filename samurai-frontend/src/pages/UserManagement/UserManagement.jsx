@@ -23,7 +23,6 @@ const UserManagement = () => {
 
   useEffect(() => {
     axios.get("http://localhost:8000/users").then((res) => {
-      console.log(res.data);
       setUsers(res.data);
       setIsLoading(false);
     });
@@ -35,7 +34,7 @@ const UserManagement = () => {
       .then((res) => setRoles(res.data.roles));
   }, []);
 
-  const handleUpdateRole = async (previousRole) => {
+  const handleUpdateRole = async (previousRole, userID) => {
     const inputOptions = {};
 
     roles.forEach((name) => {
@@ -61,8 +60,26 @@ const UserManagement = () => {
     });
 
     if (role) {
-      // Handle the selected role here and make an API call
-      console.log("Selected role:", role);
+      axios
+        .put(`http://localhost:8000/users/${userID}/roles`, {
+          roles: role,
+          token: JSON.parse(localStorage.getItem("user")),
+        })
+        .then((res) => {
+          if (res.data?.message === "User roles updated successfully") {
+            Swal.fire({
+              title: "Success!",
+              text: "Role updated successfully!",
+              icon: "success",
+            });
+            setRefetch(!refetch);
+          } else {
+            throwErrorPopup("Role was not updated!");
+          }
+        })
+        .catch(() => {
+          throwErrorPopup("Role was not updated!");
+        });
     }
   };
 
@@ -112,8 +129,47 @@ const UserManagement = () => {
       });
   };
 
-  const handleUserDelete = (userId) => {
-    alert("delete user " + userId);
+  const handleUserDelete = (userId, userEmail) => {
+    setIsLoading(true);
+    axios
+      .get(
+        `http://localhost:8000/profile?token=${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((response) => {
+        if (response.data?.email && response.data?.email == userEmail) {
+          throwErrorPopup("Cannot delete your own profile!");
+          setIsLoading(false);
+        } else {
+          axios
+            .delete(`http://localhost:8000/users/${userId}`, {
+              data: { token: JSON.parse(localStorage.getItem("user")) },
+            })
+            .then((res) => {
+              if (res.data?.message === "User deleted successfully") {
+                Swal.fire({
+                  title: "Success!",
+                  text: "User has been deleted!",
+                  icon: "success",
+                });
+                setRefetch(!refetch);
+                setIsLoading(false);
+              } else {
+                throwErrorPopup("Error! Please try again later.");
+                setIsLoading(false);
+              }
+            })
+            .catch(() => {
+              throwErrorPopup("Error! Please try again later.");
+              setIsLoading(false);
+            });
+        }
+      })
+      .catch(() => {
+        throwErrorPopup("Error! Please try again later.");
+        setIsLoading(false);
+      });
   };
 
   const throwErrorPopup = (errorMsg) => {
@@ -178,7 +234,6 @@ const UserManagement = () => {
         token: JSON.parse(localStorage.getItem("user")),
       })
       .then((res) => {
-        console.log(res.data);
         if (res.data?.message === "Registration successful") {
           Swal.fire({
             title: "Success!",
@@ -195,7 +250,6 @@ const UserManagement = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
         if (error?.response?.data?.message === "Email already exists") {
           throwErrorPopup("Email already exist!");
           setIsLoading(false);
@@ -277,7 +331,7 @@ const UserManagement = () => {
                     <div className="flex items-center gap-2">
                       <span>{user.role}</span>{" "}
                       <IoMdSettings
-                        onClick={() => handleUpdateRole(user.role)}
+                        onClick={() => handleUpdateRole(user.role, user._id)}
                         className="text-green-500 text-lg cursor-pointer hover:animate-spin"
                       />
                     </div>
@@ -307,7 +361,7 @@ const UserManagement = () => {
                       <MdEdit className="text-[20px]" />
                     </button>
                     <button
-                      onClick={() => handleUserDelete(user._id)}
+                      onClick={() => handleUserDelete(user._id, user.email)}
                       className="p-1 flex gap-2 items-center bg-red-500 text-white hover:bg-red-200 hover:text-red-500 text-xl rounded-md transition-all duration-200"
                     >
                       <MdDeleteForever className="text-[20px]" />
