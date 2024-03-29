@@ -2,7 +2,6 @@ import { Link, Outlet } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaUserFriends } from "react-icons/fa";
-import { GoPasskeyFill } from "react-icons/go";
 import { FaWarehouse } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
@@ -16,14 +15,9 @@ const Dashboard = () => {
       to: "/dashboard",
     },
     {
-      title: "User Management",
+      title: "User & Role Management",
       icon: FaUserFriends,
       to: "users",
-    },
-    {
-      title: "Role Management",
-      icon: GoPasskeyFill,
-      to: "roles",
     },
     {
       title: "Facility Management",
