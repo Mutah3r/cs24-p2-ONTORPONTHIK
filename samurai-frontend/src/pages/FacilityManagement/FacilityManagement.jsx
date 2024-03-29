@@ -47,6 +47,53 @@ const FacilityManagement = () => {
     });
   };
 
+  const handleAddLandfill = () => {
+    Swal.fire({
+      title: "Add New Landfill Site",
+      html: `
+        <input id="capacity" class="swal2-input" placeholder="Capacity (in Tonnes)">
+        <input id="operationalTimespan" class="swal2-input" placeholder="Operational Timespan">
+        <input id="latitude" class="swal2-input" placeholder="Latitude">
+        <input id="longitude" class="swal2-input" placeholder="Longitude">
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const capacity = document.getElementById("capacity").value;
+        const operationalTimespan = document.getElementById(
+          "operationalTimespan"
+        ).value;
+        const latitude = document.getElementById("latitude").value;
+        const longitude = document.getElementById("longitude").value;
+
+        // Validate capacity, operational timespan, latitude, and longitude inputs
+        if (
+          !isValidNumber(capacity) ||
+          operationalTimespan.trim() === "" ||
+          !isValidCoordinate(latitude) ||
+          !isValidCoordinate(longitude)
+        ) {
+          Swal.showValidationMessage(
+            "Invalid input. Please enter valid values."
+          );
+          return false;
+        }
+
+        return {
+          capacity: parseFloat(capacity),
+          operationalTimespan: operationalTimespan.trim(),
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+        };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log("New Landfill site details:", result.value);
+        // Here you can handle saving the new Landfill site details
+      }
+    });
+  };
+
   const isValidNumber = (value) => {
     return !isNaN(parseFloat(value)) && isFinite(value);
   };
@@ -65,7 +112,10 @@ const FacilityManagement = () => {
         >
           Create STS
         </button>
-        <button className="btn btn-wide btn-outline grow">
+        <button
+          className="btn btn-wide btn-outline grow"
+          onClick={handleAddLandfill}
+        >
           Create Landfill
         </button>
       </div>
