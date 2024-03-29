@@ -5,8 +5,8 @@ const stsEntrySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    vehicle_id: {
-        type: Number,
+    vehicle_registration: {
+        type: String,
         required: true
     },
     weight_of_waste: {
