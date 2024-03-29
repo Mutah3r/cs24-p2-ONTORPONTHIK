@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import Swal from "sweetalert2";
 import { renderToString } from "react-dom/server";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const FacilityManagement = () => {
+  const [showSpinner, setShowSpinner] = useState(true);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-
+  const [refetch, setRefetch] = useState(false);
   const [availabeSts, setAvailableSts] = useState([]);
   const [availabeLandfills, setAvailableLandfills] = useState([]);
 
@@ -21,6 +23,7 @@ const FacilityManagement = () => {
         console.error("Error fetching users:", error);
       } finally {
         setLoading(false);
+        setShowSpinner(false);
       }
     };
 
@@ -37,7 +40,7 @@ const FacilityManagement = () => {
       .then((response) => {
         setAvailableSts(response.data);
       });
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
     axios
@@ -49,7 +52,7 @@ const FacilityManagement = () => {
       .then((response) => {
         setAvailableLandfills(response.data);
       });
-  }, []);
+  }, [refetch]);
 
   const handleAddSTS = () => {
     Swal.fire({
@@ -177,7 +180,7 @@ const FacilityManagement = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log("Selected value:", result.value);
+        setShowSpinner(true);
         axios
           .post("http://localhost:8000/facilities/stsManage", {
             user_id: result.value,
@@ -185,10 +188,29 @@ const FacilityManagement = () => {
             sts_id: stsID,
           })
           .then((res) => {
-            console.log(res.data);
+            if (res.data?.message === "Manager assigned to STS successfully") {
+              Swal.fire({
+                title: "Good job!",
+                text: "STS manager updated successfully!",
+                icon: "success",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "STS manager was not updated!",
+              });
+            }
+            setRefetch(!refetch);
+            setShowSpinner(false);
           })
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "STS manager was not updated!",
+            });
+            setShowSpinner(false);
           });
       }
     });
@@ -216,85 +238,115 @@ const FacilityManagement = () => {
         <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
           Available Landfill Sites
         </h2>
-        <div className="overflow-x-auto mb-3">
-          <table className="table table-zebra">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Capacity</th>
-                <th>Operational Time-span</th>
-                <th>GPS coordinates</th>
-                <th>Manager</th>
-              </tr>
-            </thead>
-            <tbody>
-              {availabeLandfills.map((landfill, idx) => (
-                <tr key={landfill._id}>
-                  <th>{idx + 1}</th>
-                  <td>{landfill.name}</td>
-                  <td>{landfill.capacity}</td>
-                  <td>undefined</td>
-                  <td className="flex flex-col justify-center gap-2">
-                    <span>Latitude: {landfill.latitude}</span>
-                    <span>Longitude: {landfill.longitude}</span>
-                  </td>
-                  <td>
-                    <div className="flex gap-2 items-center">
-                      <span>{landfill.assigned_manager_name}</span>
-                      <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
-                        <MdEdit className="text-[20px]" />
-                      </button>
-                    </div>
-                  </td>
+
+        {showSpinner && (
+          <div className="mx-auto flex justify-center items-center py-5">
+            <ClipLoader
+              color={"#22C55E"}
+              loading={showSpinner}
+              size={50}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        )}
+
+        {!showSpinner && (
+          <div className="overflow-x-auto mb-3">
+            <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Capacity</th>
+                  <th>Operational Time-span</th>
+                  <th>GPS coordinates</th>
+                  <th>Manager</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {availabeLandfills.map((landfill, idx) => (
+                  <tr key={landfill._id}>
+                    <th>{idx + 1}</th>
+                    <td>{landfill.name}</td>
+                    <td>{landfill.capacity}</td>
+                    <td>undefined</td>
+                    <td className="flex flex-col justify-center gap-2">
+                      <span>Latitude: {landfill.latitude}</span>
+                      <span>Longitude: {landfill.longitude}</span>
+                    </td>
+                    <td>
+                      <div className="flex gap-2 items-center">
+                        <span>{landfill.assigned_manager_name}</span>
+                        <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
+                          <MdEdit className="text-[20px]" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="border-2 rounded-lg my-4">
         <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
           Available Secondary Transfer Stations (STS)
         </h2>
-        <div className="overflow-x-auto mb-3">
-          <table className="table table-zebra">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Ward No.</th>
-                <th>Capacity</th>
-                <th>GPS coordinates</th>
-                <th>Manager</th>
-              </tr>
-            </thead>
-            <tbody>
-              {availabeSts.map((sts, idx) => (
-                <tr key={sts._id}>
-                  <th>{idx + 1}</th>
-                  <td>{sts.ward_number}</td>
-                  <td>{sts.capacity + " ton"}</td>
-                  <td className="flex flex-col justify-center gap-2">
-                    <span>Latitude: {sts.latitude}</span>
-                    <span>Longitude: {sts.longitude}</span>
-                  </td>
-                  <td>
-                    <div className="flex gap-2 items-center">
-                      <span>{sts.assigned_manager_name}</span>
-                      <button
-                        onClick={() => handleAssignStsManager(sts._id)}
-                        className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
-                      >
-                        <MdEdit className="text-[20px]" />
-                      </button>
-                    </div>
-                  </td>
+
+        {showSpinner && (
+          <div className="mx-auto flex justify-center items-center py-5">
+            <ClipLoader
+              color={"#22C55E"}
+              loading={showSpinner}
+              size={50}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        )}
+
+        {!showSpinner && (
+          <div className="overflow-x-auto mb-3">
+            <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Ward No.</th>
+                  <th>Capacity</th>
+                  <th>GPS coordinates</th>
+                  <th>Manager</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {availabeSts.map((sts, idx) => (
+                  <tr key={sts._id}>
+                    <th>{idx + 1}</th>
+                    <td>{sts.ward_number}</td>
+                    <td>{sts.capacity + " ton"}</td>
+                    <td className="flex flex-col justify-center gap-2">
+                      <span>Latitude: {sts.latitude}</span>
+                      <span>Longitude: {sts.longitude}</span>
+                    </td>
+                    <td>
+                      <div className="flex gap-2 items-center">
+                        <span>{sts.assigned_managers_name}</span>
+                        <button
+                          onClick={() => handleAssignStsManager(sts._id)}
+                          className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
+                        >
+                          <MdEdit className="text-[20px]" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
