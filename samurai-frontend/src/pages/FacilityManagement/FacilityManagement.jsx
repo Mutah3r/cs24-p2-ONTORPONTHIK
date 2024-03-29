@@ -1,7 +1,36 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import Swal from "sweetalert2";
 
 const FacilityManagement = () => {
+  const [availabeSts, setAvailableSts] = useState([]);
+  const [availabeLandfills, setAvailableLandfills] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:8000/facilities/sts/${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((response) => {
+        setAvailableSts(response.data);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:8000/facilities/land/${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((response) => {
+        setAvailableLandfills(response.data);
+      });
+  }, []);
+
   const handleAddSTS = () => {
     Swal.fire({
       title: "Add New STS (Solid Waste Transfer Station)",
@@ -137,24 +166,26 @@ const FacilityManagement = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>1</th>
-                <td>Rikabibazar Landfill</td>
-                <td>50 Ton</td>
-                <td>24 hours</td>
-                <td className="flex flex-col justify-center gap-2">
-                  <span>Latitude: 23.563037</span>
-                  <span>Longitude: 90.493439</span>
-                </td>
-                <td>
-                  <div className="flex gap-2 items-center">
-                    <span>Unassigned</span>
-                    <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
-                      <MdEdit className="text-[20px]" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              {availabeLandfills.map((landfill, idx) => (
+                <tr key={landfill._id}>
+                  <th>{idx + 1}</th>
+                  <td>{landfill.name}</td>
+                  <td>{landfill.capacity}</td>
+                  <td>undefined</td>
+                  <td className="flex flex-col justify-center gap-2">
+                    <span>Latitude: {landfill.latitude}</span>
+                    <span>Longitude: {landfill.longitude}</span>
+                  </td>
+                  <td>
+                    <div className="flex gap-2 items-center">
+                      <span>{landfill.assigned_manager_name}</span>
+                      <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
+                        <MdEdit className="text-[20px]" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -169,7 +200,6 @@ const FacilityManagement = () => {
             <thead>
               <tr>
                 <th></th>
-                <th>Name</th>
                 <th>Ward No.</th>
                 <th>Capacity</th>
                 <th>GPS coordinates</th>
@@ -177,24 +207,25 @@ const FacilityManagement = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>1</th>
-                <td>Rikabibazar Landfill</td>
-                <td>13</td>
-                <td>50 Ton</td>
-                <td className="flex flex-col justify-center gap-2">
-                  <span>Latitude: 23.563037</span>
-                  <span>Longitude: 90.493439</span>
-                </td>
-                <td>
-                  <div className="flex gap-2 items-center">
-                    <span>Unassigned</span>
-                    <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
-                      <MdEdit className="text-[20px]" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              {availabeSts.map((sts, idx) => (
+                <tr key={sts._id}>
+                  <th>{idx + 1}</th>
+                  <td>{sts.ward_number}</td>
+                  <td>{sts.capacity + " ton"}</td>
+                  <td className="flex flex-col justify-center gap-2">
+                    <span>Latitude: {sts.latitude}</span>
+                    <span>Longitude: {sts.longitude}</span>
+                  </td>
+                  <td>
+                    <div className="flex gap-2 items-center">
+                      <span>{sts.assigned_manager_name}</span>
+                      <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
+                        <MdEdit className="text-[20px]" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
