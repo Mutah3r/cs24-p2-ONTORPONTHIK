@@ -7,6 +7,7 @@ import Profile from "../pages/Profile/Profile";
 import UserManagement from "../pages/UserManagement/UserManagement";
 import FacilityManagement from "../pages/FacilityManagement/FacilityManagement";
 import VehicleManagement from "../pages/VehicleManagement/VehicleManagement";
+import RolesAndPermissions from "../pages/RolesAndPermissions/RolesAndPermissions";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "vehicles",
         element: <VehicleManagement />,
+      },
+      {
+        path: "roles",
+        element: <RolesAndPermissions />,
       },
     ],
   },
