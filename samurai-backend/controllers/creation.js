@@ -33,7 +33,7 @@ exports.getSTSInformation = async (req, res) => {
         const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
             // Find the manager by their MongoDB ID
             let managerName = 'Unassigned'
-            
+
             if (sts.assigned_managers_id !== "-1")
             {
                 const manager = await userModel.findById(sts.assigned_managers_id);
@@ -152,12 +152,15 @@ exports.getLandfillInformation = async (req, res) => {
     }
 };
 
+
+
+
 // POST method for creating a new Landfill (System Admin access)
 exports.createLandfill = async (req, res) => {
     try {
         // Extract token from request headers
         // Extract Landfill information from request body
-        const { name, capacity, latitude, longitude, token } = req.body;
+        const { name, capacity, operational_timespan, latitude, longitude, token } = req.body;
 
         // Check if token exists in the database
         const user = await userModel.findOne({ token });
@@ -175,6 +178,7 @@ exports.createLandfill = async (req, res) => {
         const newLandfill = new Landfill({
             name,
             capacity,
+            operational_timespan,
             latitude,
             longitude,
             assigned_managers_id: "-1"// Initial value for assigned manager ID

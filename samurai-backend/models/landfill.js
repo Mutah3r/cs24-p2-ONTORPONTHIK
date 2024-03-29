@@ -10,6 +10,10 @@ const landfillSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    operational_timespan : {
+        type : String,
+        required : true
+    },
     latitude: {
         type: Number,
         required: true
