@@ -341,6 +341,42 @@ exports.addVehicle = async (req, res) => {
     }
 };
 
+exports.checkUserAssignment = async (req, res) => {
+    const userId = req.params.userId;
+  
+    try {
+      // Find the user by userId
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Check the user's role
+      if (user.role === "STS manager") {
+        // Check if the user is assigned in the STS model
+        const sts = await STS.findOne({ assigned_managers_id: userId });
+        if (sts) {
+          return res.status(200).json({ isAssigned: true, work: "STS manager" });
+        } else {
+          return res.status(200).json({ isAssigned: false });
+        }
+      } else if (user.role === "Landfill manager") {
+        // Check if the user is assigned in the landfill model
+        const landfill = await Landfill.findOne({ assigned_managers_id: userId });
+        if (landfill) {
+          return res.status(200).json({ isAssigned: true, work: "Landfill manager" });
+        } else {
+          return res.status(200).json({ isAssigned: false });
+        }
+      } else {
+        // User has a role other than STS manager or landfill manager
+        return res.status(200).json({ isAssigned: false });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
 
 
 
