@@ -1,15 +1,8 @@
-<<<<<<< HEAD
-const STS = require("../models/sts");
-const userModel = require("../models/user_accounts");
-const jwt = require("jsonwebtoken");
-const Landfill = require("../models/landfill");
-=======
 const STS = require('../models/sts');
 const userModel = require('../models/user_accounts');
 const jwt = require('jsonwebtoken');
 const Landfill = require('../models/landfill')
 const Vehicle = require('../models/vehicle');
->>>>>>> 350be7eb5199516748755f4256ff708e8f80912f
 
 // STS
 
