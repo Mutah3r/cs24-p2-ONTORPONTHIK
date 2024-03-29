@@ -6,6 +6,7 @@ import DashboardHome from "../components/DashboardHome/DashboardHome";
 import Profile from "../pages/Profile/Profile";
 import UserManagement from "../pages/UserManagement/UserManagement";
 import FacilityManagement from "../pages/FacilityManagement/FacilityManagement";
+import VehicleManagement from "../pages/VehicleManagement/VehicleManagement";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "facilities",
         element: <FacilityManagement />,
+      },
+      {
+        path: "vehicles",
+        element: <VehicleManagement />,
       },
     ],
   },

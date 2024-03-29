@@ -6,6 +6,7 @@ import { FaWarehouse } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
+import { FaTruck } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -28,6 +29,11 @@ const Dashboard = () => {
       title: "Facility Management",
       icon: FaWarehouse,
       to: "facilities",
+    },
+    {
+      title: "Vehicles Management",
+      icon: FaTruck,
+      to: "vehicles",
     },
   ];
 
