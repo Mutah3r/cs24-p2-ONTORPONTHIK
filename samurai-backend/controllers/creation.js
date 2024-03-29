@@ -3,7 +3,7 @@ const userModel = require('../models/user_accounts');
 const jwt = require('jsonwebtoken');
 const Landfill = require('../models/landfill')
 const Vehicle = require('../models/vehicle');
-
+const STSEntry = require('../models/sts_entry')
 
 
 
@@ -399,8 +399,11 @@ exports.stsLog = (async (req, res) => {
     const userId = await userModel.findOne({ token });
   
     try {
-     
-      const stsDocument = await STS.findOne({ assigned_managers_id: userId });
+        const vehicle = await Vehicle.findOne({ registration_number });
+        if (!vehicle) {
+          return res.status(404).send({ message: 'Vehicle not found' });
+        }
+      const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
   
       if (!stsDocument) {
         return res.status(404).send({ message: 'STS not found for the given manager' });
