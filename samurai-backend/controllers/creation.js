@@ -77,7 +77,7 @@ exports.createSTS = async (req, res) => {
             capacity,
             latitude,
             longitude,
-            assigned_managers_id: -1 // Initial value for assigned manager ID
+            assigned_managers_id: "-1"// Initial value for assigned manager ID
         });
 
         // Save the new STS instance to the database
@@ -163,7 +163,7 @@ exports.createLandfill = async (req, res) => {
             capacity,
             latitude,
             longitude,
-            assigned_managers_id: -1 // Initial value for assigned manager ID
+            assigned_managers_id: "-1"// Initial value for assigned manager ID
         });
 
         // Save the new Landfill instance to the database

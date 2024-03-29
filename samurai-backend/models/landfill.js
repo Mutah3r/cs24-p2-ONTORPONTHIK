@@ -18,11 +18,10 @@ const landfillSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    assigned_managers_id: [{
-        type: Number,
-        required: true,
-        unique: true
-    }]
+    assigned_managers_id: {
+        type: String,
+        required: true
+    }
 });
 
 const Landfill = mongoose.model('Landfill', landfillSchema);
