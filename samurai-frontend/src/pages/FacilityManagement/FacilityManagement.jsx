@@ -216,6 +216,71 @@ const FacilityManagement = () => {
     });
   };
 
+  const handleAssignLandfillManager = (landfillID) => {
+    Swal.fire({
+      title: "Select Landfill Manager",
+      html: loading
+        ? "Loading..."
+        : renderToString(
+            <select className="swal2-select" id="landfillManagerDropdown">
+              {users.map(
+                (user) =>
+                  user.role === "Landfill manager" && (
+                    <option key={user._id} value={user._id}>
+                      {user.name}
+                    </option>
+                  )
+              )}
+            </select>
+          ),
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const selectedValue = document.getElementById(
+          "landfillManagerDropdown"
+        ).value;
+        return selectedValue;
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowSpinner(true);
+        axios
+          .post("http://localhost:8000/facilities/landManage", {
+            user_id: result.value,
+            token: JSON.parse(localStorage.getItem("user")),
+            landfill_id: landfillID,
+          })
+          .then((res) => {
+            if (
+              res.data?.message === "Manager assigned to Landfill successfully"
+            ) {
+              Swal.fire({
+                title: "Good job!",
+                text: "Landfill manager updated successfully!",
+                icon: "success",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Landfill manager was not updated!",
+              });
+            }
+            setRefetch(!refetch);
+            setShowSpinner(false);
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Landfill manager was not updated!",
+            });
+            setShowSpinner(false);
+          });
+      }
+    });
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Facilities Management</h1>
@@ -270,15 +335,20 @@ const FacilityManagement = () => {
                     <th>{idx + 1}</th>
                     <td>{landfill.name}</td>
                     <td>{landfill.capacity}</td>
-                    <td>undefined</td>
+                    <td>{landfill.operational_timespan}</td>
                     <td className="flex flex-col justify-center gap-2">
                       <span>Latitude: {landfill.latitude}</span>
                       <span>Longitude: {landfill.longitude}</span>
                     </td>
                     <td>
                       <div className="flex gap-2 items-center">
-                        <span>{landfill.assigned_manager_name}</span>
-                        <button className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200">
+                        <span>{landfill.assigned_managers_name}</span>
+                        <button
+                          onClick={() =>
+                            handleAssignLandfillManager(landfill._id)
+                          }
+                          className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
+                        >
                           <MdEdit className="text-[20px]" />
                         </button>
                       </div>
