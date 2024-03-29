@@ -1,11 +1,70 @@
 import { MdEdit } from "react-icons/md";
+import Swal from "sweetalert2";
 
 const FacilityManagement = () => {
+  const handleAddSTS = () => {
+    Swal.fire({
+      title: "Add New STS (Solid Waste Transfer Station)",
+      html: `
+        <input id="wardNumber" class="swal2-input" placeholder="Ward Number">
+        <input id="capacity" class="swal2-input" placeholder="Capacity (in Tonnes)">
+        <input id="latitude" class="swal2-input" placeholder="Latitude">
+        <input id="longitude" class="swal2-input" placeholder="Longitude">
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const wardNumber = document.getElementById("wardNumber").value;
+        const capacity = document.getElementById("capacity").value;
+        const latitude = document.getElementById("latitude").value;
+        const longitude = document.getElementById("longitude").value;
+
+        // Validate ward number, capacity, latitude, and longitude inputs
+        if (
+          !isValidNumber(wardNumber) ||
+          !isValidNumber(capacity) ||
+          !isValidCoordinate(latitude) ||
+          !isValidCoordinate(longitude)
+        ) {
+          Swal.showValidationMessage(
+            "Invalid input. Please enter numeric values."
+          );
+          return false;
+        }
+
+        return {
+          wardNumber: parseFloat(wardNumber),
+          capacity: parseFloat(capacity),
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+        };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log("New STS details:", result.value);
+        // Here you can handle saving the new STS details
+      }
+    });
+  };
+
+  const isValidNumber = (value) => {
+    return !isNaN(parseFloat(value)) && isFinite(value);
+  };
+
+  const isValidCoordinate = (value) => {
+    return isValidNumber(value);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Facilities Management</h1>
       <div className="flex gap-3">
-        <button className="btn btn-wide btn-outline grow">Create STS</button>
+        <button
+          className="btn btn-wide btn-outline grow"
+          onClick={handleAddSTS}
+        >
+          Create STS
+        </button>
         <button className="btn btn-wide btn-outline grow">
           Create Landfill
         </button>
