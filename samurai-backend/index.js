@@ -28,3 +28,4 @@ app.use("/auth", require("./routes/auth"));
 app.use("/users", require("./routes/users"));
 app.use("/profile", require("./routes/profile"));
 app.use("/rbac", require("./routes/rbac"));
+app.use("/facilities", require("./routes/creation"));
