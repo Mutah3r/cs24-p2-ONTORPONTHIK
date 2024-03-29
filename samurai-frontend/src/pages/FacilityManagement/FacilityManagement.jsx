@@ -16,9 +16,11 @@ const FacilityManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
+      setShowSpinner(true);
       try {
         const response = await axios.get("http://localhost:8000/users");
         setUsers(response.data);
+        setShowSpinner(false);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
@@ -95,6 +97,42 @@ const FacilityManagement = () => {
       if (result.isConfirmed) {
         console.log("New STS details:", result.value);
         // Here you can handle saving the new STS details
+        setShowSpinner(true);
+        axios
+          .post("http://localhost:8000/facilities/sts", {
+            ward_number: result.value.wardNumber,
+            capacity: result.value.capacity,
+            latitude: result.value.latitude,
+            longitude: result.value.longitude,
+            token: JSON.parse(localStorage.getItem("user")),
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.message === "STS created successfully") {
+              Swal.fire({
+                title: "Good job!",
+                text: "STS created!",
+                icon: "success",
+              });
+              setRefetch(!refetch);
+              setShowSpinner(false);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+              setShowSpinner(false);
+            }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+            setShowSpinner(false);
+          });
       }
     });
   };
