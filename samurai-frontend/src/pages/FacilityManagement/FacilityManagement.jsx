@@ -95,8 +95,6 @@ const FacilityManagement = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log("New STS details:", result.value);
-        // Here you can handle saving the new STS details
         setShowSpinner(true);
         axios
           .post("http://localhost:8000/facilities/sts", {
@@ -141,6 +139,7 @@ const FacilityManagement = () => {
     Swal.fire({
       title: "Add New Landfill Site",
       html: `
+        <input id="name" class="swal2-input" placeholder="Name">
         <input id="capacity" class="swal2-input" placeholder="Capacity (in Tonnes)">
         <input id="operationalTimespan" class="swal2-input" placeholder="Operational Timespan">
         <input id="latitude" class="swal2-input" placeholder="Latitude">
@@ -149,6 +148,7 @@ const FacilityManagement = () => {
       focusConfirm: false,
       showCancelButton: true,
       preConfirm: () => {
+        const name = document.getElementById("name").value;
         const capacity = document.getElementById("capacity").value;
         const operationalTimespan = document.getElementById(
           "operationalTimespan"
@@ -170,6 +170,7 @@ const FacilityManagement = () => {
         }
 
         return {
+          name: name.trim(),
           capacity: parseFloat(capacity),
           operationalTimespan: operationalTimespan.trim(),
           latitude: parseFloat(latitude),
@@ -180,6 +181,43 @@ const FacilityManagement = () => {
       if (result.isConfirmed) {
         console.log("New Landfill site details:", result.value);
         // Here you can handle saving the new Landfill site details
+        setShowSpinner(true);
+        axios
+          .post("http://localhost:8000/facilities/land", {
+            name: result.value.name,
+            operational_timespan: result.value.operationalTimespan,
+            capacity: result.value.capacity,
+            latitude: result.value.latitude,
+            longitude: result.value.longitude,
+            token: JSON.parse(localStorage.getItem("user")),
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.message === "Landfill created successfully") {
+              Swal.fire({
+                title: "Good job!",
+                text: "Landfill created!",
+                icon: "success",
+              });
+              setRefetch(!refetch);
+              setShowSpinner(false);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+              setShowSpinner(false);
+            }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+            setShowSpinner(false);
+          });
       }
     });
   };
