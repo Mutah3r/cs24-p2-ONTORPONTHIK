@@ -96,6 +96,13 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
 // PUT method for updating a user's details (restricted to own details or System Admin access)
 exports.updateUser = async (req, res) => {
   const userId = req.params.userId;

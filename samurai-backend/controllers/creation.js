@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 const STS = require("../models/sts");
 const userModel = require("../models/user_accounts");
 const jwt = require("jsonwebtoken");
 const Landfill = require("../models/landfill");
+=======
+const STS = require('../models/sts');
+const userModel = require('../models/user_accounts');
+const jwt = require('jsonwebtoken');
+const Landfill = require('../models/landfill')
+const Vehicle = require('../models/vehicle');
+>>>>>>> 350be7eb5199516748755f4256ff708e8f80912f
 
 // STS
 
@@ -182,10 +190,36 @@ exports.assignManagerToSTS = async (req, res) => {
     // Extract user_id, token, and sts_id from request body
     const { user_id, token, sts_id } = req.body;
 
-    // Check if token exists in the database
-    const user = await userModel.findOne({ token });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid token" });
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Check if the provided user_id is an STS manager
+        const assignedManager = await userModel.findById(user_id);
+        if (!assignedManager || assignedManager.role !== 'STS manager') {
+            return res.status(400).json({ message: 'Invalid STS manager ID' });
+        }
+
+        // Assign the manager to the specified STS
+        const sts = await STS.findById(sts_id);
+        if (!sts) {
+            return res.status(404).json({ message: 'STS not found' });
+        }
+
+        sts.assigned_managers_id = user_id;
+        await sts.save();
+
+        res.status(200).json({ message: 'Manager assigned to STS successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 
     // Verify if user is a system manager
@@ -223,10 +257,43 @@ exports.assignManagerToLandfill = async (req, res) => {
     // Extract user_id, token, and landfill_id from request body
     const { user_id, token, landfill_id } = req.body;
 
+<<<<<<< HEAD
     // Check if token exists in the database
     const user = await userModel.findOne({ token });
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
+=======
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Check if the provided user_id is a Landfill manager
+        const assignedManager = await userModel.findById(user_id);
+        if (!assignedManager || assignedManager.role !== 'Landfill manager') {
+            return res.status(400).json({ message: 'Invalid Landfill manager ID' });
+        }
+
+        // Assign the manager to the specified landfill
+        const landfill = await Landfill.findById(landfill_id);
+        if (!landfill) {
+            return res.status(404).json({ message: 'Landfill not found' });
+        }
+
+        landfill.assigned_managers_id = user_id;
+        await landfill.save();
+
+        res.status(200).json({ message: 'Manager assigned to Landfill successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+>>>>>>> 350be7eb5199516748755f4256ff708e8f80912f
     }
 
     // Verify if user is a system manager
@@ -256,4 +323,36 @@ exports.assignManagerToLandfill = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
+};
+
+
+
+
+
+
+
+
+// POST method for adding a new vehicle
+exports.addVehicle = async (req, res) => {
+    try {
+        // Extract vehicle information from request body
+        const { registration_number, type, capacity, fuel_cost_per_km_loaded, fuel_cost_per_km_unloaded } = req.body;
+
+        // Create a new vehicle instance
+        const newVehicle = new Vehicle({
+            registration_number,
+            type,
+            capacity,
+            fuel_cost_per_km_loaded,
+            fuel_cost_per_km_unloaded
+        });
+
+        // Save the new vehicle instance to the database
+        await newVehicle.save();
+
+        res.status(200).json({ message: 'Vehicle added successfully', vehicle: newVehicle });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
