@@ -7,7 +7,6 @@ import { IoMdSettings } from "react-icons/io";
 import Swal from "sweetalert2";
 import ClipLoader from "react-spinners/ClipLoader";
 
-// TODO: make roles list dynamic
 const UserManagement = () => {
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
