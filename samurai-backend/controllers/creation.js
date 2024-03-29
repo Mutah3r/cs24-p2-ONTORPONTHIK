@@ -292,7 +292,21 @@ exports.assignManagerToLandfill = async (req, res) => {
 exports.addVehicle = async (req, res) => {
     try {
         // Extract vehicle information from request body
-        const { registration_number, type, capacity, fuel_cost_per_km_loaded, fuel_cost_per_km_unloaded } = req.body;
+        const { token, registration_number, type, capacity, fuel_cost_per_km_loaded, fuel_cost_per_km_unloaded } = req.body;
+
+
+        const user = await userModel.findOne({ token });
+        
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+
 
         // Create a new vehicle instance
         const newVehicle = new Vehicle({
