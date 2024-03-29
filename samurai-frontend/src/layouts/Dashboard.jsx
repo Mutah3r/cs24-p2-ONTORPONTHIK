@@ -6,8 +6,13 @@ import { FaWarehouse } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const Dashboard = () => {
+  const [user, setUser] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const adminRoutes = [
     {
       title: "Dashboard",
@@ -25,6 +30,24 @@ const Dashboard = () => {
       to: "facilities",
     },
   ];
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:8000/profile?token=${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((res) => {
+        setUser(res.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        // handle error. probably the user is not logged in or the session has been expired
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
     <div>
       <div>
@@ -41,7 +64,11 @@ const Dashboard = () => {
                   >
                     <RxHamburgerMenu />
                   </label>
-                  <h1 className="text-[24px]">Welcome Moylar Ma 👋</h1>
+                  {!isLoading && user && (
+                    <h1 className="text-[24px]">
+                      Welcome {user.name.split(" ")[0]} 👋
+                    </h1>
+                  )}
                 </div>
                 <div className="dropdown dropdown-hover dropdown-left">
                   <div tabIndex={0} className="m-1 cursor-pointer">
