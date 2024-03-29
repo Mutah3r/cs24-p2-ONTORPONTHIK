@@ -43,3 +43,49 @@ exports.getSTSInformation = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
+
+
+
+// POST method for creating a new STS (System Admin access)
+exports.createSTS = async (req, res) => {
+    try {
+        // Extract token from request headers
+        
+        const token = req.params.token;
+
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system admin
+        if (user.role !== 'System Admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Extract STS information from request body
+        const { ward_number, capacity, latitude, longitude } = req.body;
+
+        // Create a new STS instance
+        const newSTS = new STS({
+            ward_number,
+            capacity,
+            latitude,
+            longitude,
+            assigned_managers_id: -1 // Initial value for assigned manager ID
+        });
+
+        // Save the new STS instance to the database
+        await newSTS.save();
+
+        res.status(200).json({ message: 'STS created successfully', sts: newSTS });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
