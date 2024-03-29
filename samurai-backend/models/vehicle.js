@@ -13,8 +13,8 @@ const vehicleSchema = new mongoose.Schema({
         required: true
     },
     capacity: {
-        type: String,
-        enum: ['3 ton', '5 ton', '7 ton'],
+        type: Number,
+        enum: [3,5,7,15],
         required: true
     },
     fuel_cost_per_km_loaded: {
