@@ -26,6 +26,7 @@ const stsSchema = new mongoose.Schema({
     }
 });
 
+
 const STS = mongoose.model('STS', stsSchema);
 
 module.exports = STS;
