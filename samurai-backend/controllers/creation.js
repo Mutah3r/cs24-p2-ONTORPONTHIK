@@ -32,14 +32,14 @@ exports.getSTSInformation = async (req, res) => {
         // Fetch the name of the assigned manager for each STS
         const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
             // Find the manager by their MongoDB ID
-            const manager = await userModel.findById(sts.assigned_manager_id);
+            const manager = await userModel.findById(sts.assigned_managers_id);
             // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
             const managerName = manager ? manager.name : 'Unassigned';
 
             // Return an object containing STS information along with assigned manager name
             return {
                 ...sts.toObject(),
-                assigned_manager_name: managerName
+                assigned_managers_name: managerName
             };
         }));
 
@@ -123,14 +123,14 @@ exports.getLandfillInformation = async (req, res) => {
         // Fetch the name of the assigned manager for each Landfill
         const landfillsWithManager = await Promise.all(landfillInfo.map(async (landfill) => {
             // Find the manager by their MongoDB ID
-            const manager = await userModel.findById(landfill.assigned_manager_id);
+            const manager = await userModel.findById(landfill.assigned_managers_id);
             // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
             const managerName = manager ? manager.name : 'Unassigned';
 
             // Return an object containing Landfill information along with assigned manager name
             return {
                 ...landfill.toObject(),
-                assigned_manager_name: managerName
+                assigned_managers_name: managerName
             };
         }));
 
@@ -296,7 +296,7 @@ exports.addVehicle = async (req, res) => {
 
 
         const user = await userModel.findOne({ token });
-        
+
         if (!user) {
             return res.status(401).json({ message: 'Invalid token' });
         }
