@@ -3,16 +3,37 @@ import axios from "axios";
 import { useState } from "react";
 import { IoLogIn } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-
+import ReCAPTCHA from "react-google-recaptcha";
 import ClipLoader from "react-spinners/ClipLoader";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
+
   const navigate = useNavigate();
+
+  const handleCaptcha = (value) => {
+    if (value) {
+      setIsCaptchaVerified(true);
+    } else {
+      setIsCaptchaVerified(true);
+    }
+  };
 
   const signIn = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+
+    if (!isCaptchaVerified) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Captcha is not verified!",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     const email = event.target.email.value;
     const password = event.target.password.value;
@@ -91,11 +112,22 @@ const Login = () => {
             />
           </label>
         </div>
+        {/* Captcha */}
+        <div>
+          <ReCAPTCHA
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+            onChange={handleCaptcha}
+          />
+        </div>
         {/* Login Button */}
         <div>
           <button
-            disabled={isLoading}
-            className="w-full justify-center mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-green-700 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200"
+            disabled={isLoading || !isCaptchaVerified}
+            className={`${
+              isLoading || !isCaptchaVerified
+                ? "bg-gray-400 cursor-not-allowed hover:bg-gray-400 hover:text-white"
+                : ""
+            } w-full justify-center mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-green-700 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200`}
           >
             {!isLoading && (
               <>
