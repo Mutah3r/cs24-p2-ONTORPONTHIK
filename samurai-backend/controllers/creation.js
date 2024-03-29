@@ -177,3 +177,103 @@ exports.createLandfill = async (req, res) => {
 };
 
 
+
+
+
+
+
+// STS Manager assignement
+
+
+
+
+// POST method for assigning a manager to an STS (System Admin access)
+exports.assignManagerToSTS = async (req, res) => {
+    try {
+        // Extract user_id, token, and sts_id from request body
+        const { user_id, token, sts_id } = req.body;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Check if the provided user_id is an STS manager
+        const assignedManager = await userModel.findById(user_id);
+        if (!assignedManager || assignedManager.role !== 'STS manager') {
+            return res.status(400).json({ message: 'Invalid STS manager ID' });
+        }
+
+        // Assign the manager to the specified STS
+        const sts = await STS.findById(sts_id);
+        if (!sts) {
+            return res.status(404).json({ message: 'STS not found' });
+        }
+
+        sts.assigned_manager_id = user_id;
+        await sts.save();
+
+        res.status(200).json({ message: 'Manager assigned to STS successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+// Landfill manager assignement
+
+
+
+// POST method for assigning a manager to a landfill (System Admin access)
+exports.assignManagerToLandfill = async (req, res) => {
+    try {
+        // Extract user_id, token, and landfill_id from request body
+        const { user_id, token, landfill_id } = req.body;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Check if the provided user_id is a Landfill manager
+        const assignedManager = await userModel.findById(user_id);
+        if (!assignedManager || assignedManager.role !== 'Landfill manager') {
+            return res.status(400).json({ message: 'Invalid Landfill manager ID' });
+        }
+
+        // Assign the manager to the specified landfill
+        const landfill = await Landfill.findById(landfill_id);
+        if (!landfill) {
+            return res.status(404).json({ message: 'Landfill not found' });
+        }
+
+        landfill.assigned_manager_id = user_id;
+        await landfill.save();
+
+        res.status(200).json({ message: 'Manager assigned to Landfill successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
