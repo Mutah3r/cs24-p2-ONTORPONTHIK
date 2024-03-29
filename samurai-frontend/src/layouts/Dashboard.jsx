@@ -29,6 +29,11 @@ const Dashboard = () => {
       to: "users",
     },
     {
+      title: "Roles & Permissions",
+      icon: FaKey,
+      to: "roles",
+    },
+    {
       title: "Facility Management",
       icon: FaWarehouse,
       to: "facilities",
@@ -37,11 +42,6 @@ const Dashboard = () => {
       title: "Vehicles Management",
       icon: FaTruck,
       to: "vehicles",
-    },
-    {
-      title: "Roles & Permissions",
-      icon: FaKey,
-      to: "roles",
     },
   ];
 
