@@ -12,7 +12,6 @@ exports.getSTSInformation = async (req, res) => {
 
         // Check if token exists in the database
         const user = await userModel.findOne({ token });
-        console.log(user.role);
         if (!user) {
             return res.status(401).json({ message: 'Invalid token' });
         }
@@ -22,22 +21,24 @@ exports.getSTSInformation = async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
-        // Retrieve STS information from the database
+        // Retrieve all STS information from the database
         const stsInfo = await STS.find();
 
-        // Fetch the name of assigned managers for each STS
-        const stsWithManagers = await Promise.all(stsInfo.map(async (sts) => {
-            const managerNames = await Promise.all(sts.assigned_managers_id.map(async (managerId) => {
-                const manager = await userModel.findById(managerId);
-                return manager ? manager.name : 'Unassigned';
-            }));
+        // Fetch the name of the assigned manager for each STS
+        const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
+            // Find the manager by their MongoDB ID
+            const manager = await userModel.findById(sts.assigned_manager_id);
+            // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
+            const managerName = manager ? manager.name : 'Unassigned';
+
+            // Return an object containing STS information along with assigned manager name
             return {
                 ...sts.toObject(),
-                assigned_managers_names: managerNames
+                assigned_manager_name: managerName
             };
         }));
 
-        res.status(200).json(stsWithManagers);
+        res.status(200).json(stsWithManager);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -47,13 +48,12 @@ exports.getSTSInformation = async (req, res) => {
 
 
 
-
 // POST method for creating a new STS (System Admin access)
 exports.createSTS = async (req, res) => {
     try {
         // Extract token from request headers
-        
-        const token = req.params.token;
+        // Extract STS information from request body
+        const { ward_number, capacity, latitude, longitude, token } = req.body;
 
 
         // Check if token exists in the database
@@ -64,12 +64,10 @@ exports.createSTS = async (req, res) => {
         }
 
         // Verify if user is a system admin
-        if (user.role !== 'System Admin') {
+        if (user.role !== 'System admin') {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
-        // Extract STS information from request body
-        const { ward_number, capacity, latitude, longitude } = req.body;
 
         // Create a new STS instance
         const newSTS = new STS({

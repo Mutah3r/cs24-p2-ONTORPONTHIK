@@ -20,11 +20,11 @@ const stsSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    assigned_managers_id: [{
-        type: Number,
+    assigned_managers_id: {
+        type: String,
         required: true,
         unique: true
-    }]
+    }
 });
 
 const STS = mongoose.model('STS', stsSchema);
