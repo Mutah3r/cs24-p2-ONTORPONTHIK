@@ -9,5 +9,6 @@ router.post('/land',authController.createLandfill)
 router.post('/stsManage',authController.assignManagerToSTS)
 router.post('/landManage',authController.assignManagerToLandfill)
 router.post('/vehicleCreate' , authController.addVehicle)
+router.get('/assign/:userId',authController.checkUserAssignment)
 
 module.exports = router;
