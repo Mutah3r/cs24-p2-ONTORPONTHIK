@@ -2,6 +2,7 @@ const STS = require('../models/sts');
 const userModel = require('../models/user_accounts');
 const jwt = require('jsonwebtoken');
 const Landfill = require('../models/landfill')
+const Vehicle = require('../models/vehicle');
 
 
 
@@ -274,6 +275,38 @@ exports.assignManagerToLandfill = async (req, res) => {
         await landfill.save();
 
         res.status(200).json({ message: 'Manager assigned to Landfill successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+
+
+
+
+
+// POST method for adding a new vehicle
+exports.addVehicle = async (req, res) => {
+    try {
+        // Extract vehicle information from request body
+        const { registration_number, type, capacity, fuel_cost_per_km_loaded, fuel_cost_per_km_unloaded } = req.body;
+
+        // Create a new vehicle instance
+        const newVehicle = new Vehicle({
+            registration_number,
+            type,
+            capacity,
+            fuel_cost_per_km_loaded,
+            fuel_cost_per_km_unloaded
+        });
+
+        // Save the new vehicle instance to the database
+        await newVehicle.save();
+
+        res.status(200).json({ message: 'Vehicle added successfully', vehicle: newVehicle });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
