@@ -17,5 +17,6 @@ router.get('/lentry/:token', authController.getLandfillEntries)
 router.get('/assign/:userId',authController.checkUserAssignment)
 router.get('/allsts/:token',authController.getAllSTS)
 router.get('/allland/:token',authController.getAllLand)
+router.get('/billslip', authController.getBillingInfo)
 
 module.exports = router;
