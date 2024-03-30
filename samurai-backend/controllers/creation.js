@@ -473,6 +473,12 @@ exports.createLandfillEntry = async (req, res) => {
             return res.status(401).send({ message: 'Invalid token' });
         }
 
+
+        const vehicle = await Vehicle.findOne({ registration_number });
+        if (!vehicle) {
+          return res.status(404).send({ message: 'Vehicle not found' });
+        }
+
         // Check if the user is assigned as a manager to any landfill
         const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
         if (!landfill) {
