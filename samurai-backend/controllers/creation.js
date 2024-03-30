@@ -217,6 +217,12 @@ exports.assignManagerToSTS = async (req, res) => {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
+        const stsDocument = await STS.findOne({ assigned_managers_id: user_id });
+  
+        if (stsDocument) {
+            return res.status(404).send({ message: 'This manager has already been assigned.' });
+        }
+
         // Verify if user is a system manager
         if (user.role !== 'System admin') {
             return res.status(403).json({ message: 'Unauthorized' });
@@ -269,6 +275,11 @@ exports.assignManagerToLandfill = async (req, res) => {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
+        const landfill_cc = await Landfill.findOne({ assigned_managers_id: user_id });
+        if (landfill_cc) {
+            return res.status(404).send({ message: 'Already this user has been assigned' });
+        }
+
         // Verify if user is a system manager
         if (user.role !== 'System admin') {
             return res.status(403).json({ message: 'Unauthorized' });
@@ -280,6 +291,7 @@ exports.assignManagerToLandfill = async (req, res) => {
             return res.status(400).json({ message: 'Invalid Landfill manager ID' });
         }
 
+    
         // Assign the manager to the specified landfill
         const landfill = await Landfill.findById(landfill_id);
         if (!landfill) {
