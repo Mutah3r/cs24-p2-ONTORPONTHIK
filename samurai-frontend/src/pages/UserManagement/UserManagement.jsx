@@ -89,26 +89,41 @@ const UserManagement = () => {
     });
 
     if (role) {
+      // check if he is already assigned to a landfill or sts as a manager or not
+      setIsLoading(true);
       axios
-        .put(`http://localhost:8000/users/${userID}/roles`, {
-          roles: role,
-          token: JSON.parse(localStorage.getItem("user")),
-        })
-        .then((res) => {
-          if (res.data?.message === "User roles updated successfully") {
-            Swal.fire({
-              title: "Success!",
-              text: "Role updated successfully!",
-              icon: "success",
-            });
-            setRefetch(!refetch);
-            setSelectedFilter("All users");
+        .get(`http://localhost:8000/facilities/assign/${userID}`)
+        .then((response) => {
+          if (response.data.isAssigned) {
+            throwErrorPopup("Already assigned as a " + response.data.work);
+            console.log("Already assigned as a " + response.data.work);
+            setIsLoading(false);
+            return;
           } else {
-            throwErrorPopup("Role was not updated!");
+            axios
+              .put(`http://localhost:8000/users/${userID}/roles`, {
+                roles: role,
+                token: JSON.parse(localStorage.getItem("user")),
+              })
+              .then((res) => {
+                setIsLoading(false);
+                if (res.data?.message === "User roles updated successfully") {
+                  Swal.fire({
+                    title: "Success!",
+                    text: "Role updated successfully!",
+                    icon: "success",
+                  });
+                  setRefetch(!refetch);
+                  setSelectedFilter("All users");
+                } else {
+                  throwErrorPopup("Role was not updated!");
+                }
+              })
+              .catch(() => {
+                setIsLoading(false);
+                throwErrorPopup("Role was not updated!");
+              });
           }
-        })
-        .catch(() => {
-          throwErrorPopup("Role was not updated!");
         });
     }
   };
@@ -161,54 +176,67 @@ const UserManagement = () => {
   };
 
   const handleUserDelete = (userId, userEmail) => {
-    setIsLoading(true);
-    axios
-      .get(
-        `http://localhost:8000/profile?token=${JSON.parse(
-          localStorage.getItem("user")
-        )}`
-      )
-      .then((response) => {
-        if (response.data?.email && response.data?.email == userEmail) {
-          throwErrorPopup("Cannot delete your own profile!");
-          setIsLoading(false);
-        } else {
-          axios
-            .delete(`http://localhost:8000/users/${userId}`, {
-              data: { token: JSON.parse(localStorage.getItem("user")) },
-            })
-            .then((res) => {
-              if (res.data?.message === "User deleted successfully") {
-                Swal.fire({
-                  title: "Success!",
-                  text: "User has been deleted!",
-                  icon: "success",
-                });
-                setRefetch(!refetch);
-                setSelectedFilter("All users");
-                setIsLoading(false);
-              } else {
-                throwErrorPopup("Error! Please try again later.");
-                setIsLoading(false);
-              }
-            })
-            .catch((error) => {
-              if (
-                error.response?.data.message ===
-                "Cannot delete a system admin user"
-              ) {
-                throwErrorPopup("Cannot delete a system admin user");
-              } else {
-                throwErrorPopup("Error! Please try again later.");
-              }
+    // Show confirmation popup
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to delete this user.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setIsLoading(true);
+        axios
+          .get(
+            `http://localhost:8000/profile?token=${JSON.parse(
+              localStorage.getItem("user")
+            )}`
+          )
+          .then((response) => {
+            if (response.data?.email && response.data?.email == userEmail) {
+              throwErrorPopup("Cannot delete your own profile!");
               setIsLoading(false);
-            });
-        }
-      })
-      .catch(() => {
-        throwErrorPopup("Error! Please try again later.");
-        setIsLoading(false);
-      });
+            } else {
+              axios
+                .delete(`http://localhost:8000/users/${userId}`, {
+                  data: { token: JSON.parse(localStorage.getItem("user")) },
+                })
+                .then((res) => {
+                  if (res.data?.message === "User deleted successfully") {
+                    Swal.fire({
+                      title: "Success!",
+                      text: "User has been deleted!",
+                      icon: "success",
+                    });
+                    setRefetch(!refetch);
+                    setSelectedFilter("All users");
+                    setIsLoading(false);
+                  } else {
+                    throwErrorPopup("Error! Please try again later.");
+                    setIsLoading(false);
+                  }
+                })
+                .catch((error) => {
+                  if (
+                    error.response?.data.message ===
+                    "Cannot delete a system admin user"
+                  ) {
+                    throwErrorPopup("Cannot delete a system admin user");
+                  } else {
+                    throwErrorPopup("Error! Please try again later.");
+                  }
+                  setIsLoading(false);
+                });
+            }
+          })
+          .catch(() => {
+            throwErrorPopup("Error! Please try again later.");
+            setIsLoading(false);
+          });
+      }
+    });
   };
 
   const throwErrorPopup = (errorMsg) => {

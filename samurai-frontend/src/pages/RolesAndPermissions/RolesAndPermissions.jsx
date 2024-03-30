@@ -29,7 +29,6 @@ const RolesAndPermissions = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log("New Role:", result.value);
         axios
           .post("http://localhost:8000/rbac/roles", {
             name: result.value,
@@ -68,6 +67,8 @@ const RolesAndPermissions = () => {
               });
             }
           });
+      } else {
+        setIsLoading(false);
       }
     });
   };
