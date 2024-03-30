@@ -8,6 +8,7 @@ import UserManagement from "../pages/UserManagement/UserManagement";
 import FacilityManagement from "../pages/FacilityManagement/FacilityManagement";
 import VehicleManagement from "../pages/VehicleManagement/VehicleManagement";
 import RolesAndPermissions from "../pages/RolesAndPermissions/RolesAndPermissions";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -20,7 +21,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "",
