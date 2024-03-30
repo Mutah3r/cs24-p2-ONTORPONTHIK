@@ -507,6 +507,67 @@ exports.getSTSEntriesForManager = async (req, res) => {
 };
 
 
+exports.getAllSTS = async(req,res)=>{
+    try{
+        const token = req.params.token;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+          }
+      
+          // Verify the token
+          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+            if (err) {
+              return res.status(401).json({ message: "Invalid token" });
+            }
+      
+            // Check if the user's role is system admin
+            if (user.role !== "System admin") {
+              return res.status(403).json({ message: "Unauthorized" });
+            }
+      
+           
+          });
+        const stsDocument = await STSEntry.find();
+        res.status(200).send({ message: 'STSEntries retrieved successfully', data: stsDocument });
+    }catch(error){
+        console.error('Error fetching STSEntries:', error);
+        res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
+    }
+};
+
+exports.getAllLand = async(req,res)=>{
+    try{
+        const token = req.params.token;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+          }
+      
+          // Verify the token
+          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+            if (err) {
+              return res.status(401).json({ message: "Invalid token" });
+            }
+      
+            // Check if the user's role is system admin
+            if (user.role !== "System admin") {
+              return res.status(403).json({ message: "Unauthorized" });
+            }
+      
+           
+          });
+        const stsDocument = await LandfillEntry.find();
+        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: stsDocument });
+    }catch(error){
+        console.error('Error fetching LandfillEntries:', error);
+        res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
+    }
+};
 
 
 
