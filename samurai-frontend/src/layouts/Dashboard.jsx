@@ -8,12 +8,15 @@ import { IoLogOut } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { FaTruck } from "react-icons/fa";
 import { FaKey } from "react-icons/fa6";
+import { GrScheduleNew } from "react-icons/gr";
+import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 const Dashboard = () => {
   const [user, setUser] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
 
   const navigate = useNavigate();
 
@@ -46,6 +49,20 @@ const Dashboard = () => {
   ];
 
   useEffect(() => {
+    setIsLoading(true);
+    axios
+      .get("http://localhost:8000/rbac/roles")
+      .then((res) => {
+        console.log(res.data);
+        setRoles(res.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
     axios
       .get(
         `http://localhost:8000/profile?token=${JSON.parse(
@@ -54,6 +71,7 @@ const Dashboard = () => {
       )
       .then((res) => {
         setUser(res.data);
+        console.log(res.data);
         setIsLoading(false);
       })
       .catch(() => {
@@ -95,7 +113,7 @@ const Dashboard = () => {
                   </label>
                   {!isLoading && user && (
                     <h1 className="text-[24px]">
-                      Welcome {user.name.split(" ")[0]} 👋
+                      Welcome {user.name?.split(" ")[0]} 👋
                     </h1>
                   )}
                 </div>
@@ -134,15 +152,63 @@ const Dashboard = () => {
             ></label>
             <ul className="menu p-4 w-80 min-h-full text-white bg-[#016666] text-[16px]">
               {/* Sidebar content here */}
-              {adminRoutes.map((route) => {
-                return (
-                  <li key={route.to}>
-                    <Link className="flex items-center gap-2" to={route.to}>
-                      <route.icon /> <span>{route.title}</span>
-                    </Link>
-                  </li>
-                );
-              })}
+              {user &&
+                user.role === "System admin" &&
+                adminRoutes.map((route) => {
+                  return (
+                    <li key={route.to}>
+                      <Link className="flex items-center gap-2" to={route.to}>
+                        <route.icon /> <span>{route.title}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              {user && user.role !== "System admin" && (
+                <>
+                  <>
+                    {roles &&
+                    roles.find((role) => role.name === user.role)?.permissions
+                      .DashboardStatistics === true ? (
+                      <li>
+                        <Link
+                          className="flex items-center gap-2"
+                          to="/dashboard"
+                        >
+                          <LuLayoutDashboard /> <span>Dashboard</span>
+                        </Link>
+                      </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {roles &&
+                    roles.find((role) => role.name === user.role)?.permissions
+                      .AddVehicleEntry === true ? (
+                      <li>
+                        <Link className="flex items-center gap-2" to="/entry">
+                          <GrScheduleNew /> <span>Vehicle Entry</span>
+                        </Link>
+                      </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {roles &&
+                    roles.find((role) => role.name === user.role)?.permissions
+                      .billing === true ? (
+                      <li>
+                        <Link className="flex items-center gap-2" to="/billing">
+                          <GiMoneyStack /> <span>Billing</span>
+                        </Link>
+                      </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                </>
+              )}
             </ul>
           </div>
         </div>
