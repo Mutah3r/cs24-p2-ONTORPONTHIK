@@ -27,7 +27,7 @@ exports.getSTSInformation = async (req, res) => {
         }
 
         // Retrieve all STS information from the database
-        const stsInfo = await STS.find();
+        const stsInfo = await STS.find({assigned_managers_id:user._id});
 
         // Fetch the name of the assigned manager for each STS
         const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
@@ -123,7 +123,7 @@ exports.getLandfillInformation = async (req, res) => {
         }
 
         // Retrieve all Landfill information from the database
-        const landfillInfo = await Landfill.find();
+        const landfillInfo = await Landfill.find({assigned_managers_id:user._id});
 
         // Fetch the name of the assigned manager for each Landfill
         const landfillsWithManager = await Promise.all(landfillInfo.map(async (landfill) => {
