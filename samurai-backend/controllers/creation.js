@@ -400,66 +400,67 @@ exports.checkUserAssignment = async (req, res) => {
 
 
 
-exports.stsLog = (async (req, res) => {
-    const { 
-        token, 
-        registration_number, 
-        type, 
-        capacity, 
-        time_of_arrival, 
-        time_of_departure ,
-        to
-    } = req.body;
-  
-    
-    const userId = await userModel.findOne({ token });
-  
+  exports.stsLog = async (req, res) => {
     try {
+        const { 
+            token, 
+            registration_number, 
+            type, 
+            capacity, 
+            time_of_arrival, 
+            time_of_departure ,
+            to
+        } = req.body;
+
+        // Find the user by token
+        const userId = await userModel.findOne({ token });
+
         if (!userId) {
             return res.status(401).json({ message: "Invalid token" });
-          }
-      
-          // Verify the token
-          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-              return res.status(401).json({ message: "Invalid token" });
-            }
-      
-            // Check if the user's role is system admin
-            if (userId.role !== "STS manager") {
-              return res.status(403).json({ message: "Unauthorized" });
-            }
-      
-           
-          });
-        const vehicle = await Vehicle.findOne({ registration_number });
-        if (!vehicle) {
-          return res.status(404).send({ message: 'Vehicle not found' });
         }
-      const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
-  
-      if (!stsDocument) {
-        return res.status(404).send({ message: 'STS not found for the given manager' });
-      }
-  
-     
-      const newSTSEntry = new STSEntry({
-        sts_id: stsDocument._id, 
-        vehicle_registration: registration_number,
-        weight_of_waste: capacity,
-        time_of_arrival: new Date(time_of_arrival),
-        time_of_departure: new Date(time_of_departure),
-        to
-      });
-  
-      await newSTSEntry.save();
-  
-      res.status(201).send({ message: 'STSEntry created successfully', data: newSTSEntry });
+
+        // Verify the token
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ message: "Invalid token" });
+            }
+
+            // Check if the user's role is STS manager
+            if (userId.role !== "STS manager") {
+                return res.status(403).json({ message: "Unauthorized" });
+            }
+
+            // Proceed with STS log creation
+            const vehicle = await Vehicle.findOne({ registration_number });
+            if (!vehicle) {
+                return res.status(404).send({ message: 'Vehicle not found' });
+            }
+
+            const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
+
+            if (!stsDocument) {
+                return res.status(404).send({ message: 'STS not found for the given manager' });
+            }
+
+            // Create a new STS entry
+            const newSTSEntry = new STSEntry({
+                sts_id: stsDocument._id, 
+                vehicle_registration: registration_number,
+                weight_of_waste: capacity,
+                time_of_arrival: new Date(time_of_arrival),
+                time_of_departure: new Date(time_of_departure),
+                to
+            });
+
+            await newSTSEntry.save();
+
+            res.status(201).send({ message: 'STSEntry created successfully', data: newSTSEntry });
+        });
     } catch (error) {
-      console.error('Error creating STSEntry:', error);
-      res.status(500).send({ message: 'Error creating STSEntry', error: error.toString() });
+        console.error('Error creating STSEntry:', error);
+        res.status(500).send({ message: 'Error creating STSEntry', error: error.toString() });
     }
-});
+};
 
 
 
@@ -505,67 +506,91 @@ exports.getSTSEntriesForManager = async (req, res) => {
 };
 
 
-exports.getAllSTS = async(req,res)=>{
-    try{
+exports.getAllSTS = async (req, res) => {
+    try {
         const token = req.params.token;
 
         // Find the user by token to get the user ID
         const user = await userModel.findOne({ token });
         if (!user) {
             return res.status(401).json({ message: "Invalid token" });
-          }
-      
-          // Verify the token
-          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+        }
+
+        // Verify the token
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
             if (err) {
-              return res.status(401).json({ message: "Invalid token" });
+                return res.status(401).json({ message: "Invalid token" });
             }
-      
+
             // Check if the user's role is system admin
             if (user.role !== "System admin") {
-              return res.status(403).json({ message: "Unauthorized" });
+                return res.status(403).json({ message: "Unauthorized" });
             }
-      
-           
-          });
-        const stsDocument = await STSEntry.find();
-        res.status(200).send({ message: 'STSEntries retrieved successfully', data: stsDocument });
-    }catch(error){
+
+            // Fetch all STS entries
+            const stsEntries = await STSEntry.find();
+
+            // Map through STS entries and populate sts_id with STS _id
+            const populatedEntries = await Promise.all(stsEntries.map(async (entry) => {
+                const stsDocument = await STS.findById(entry.sts_id);
+                return {
+                    ...entry.toObject(),
+                    sts_name: stsDocument.ward_number
+                };
+            }));
+
+            res.status(200).send({ message: 'STSEntries retrieved successfully', data: populatedEntries });
+        });
+    } catch (error) {
         console.error('Error fetching STSEntries:', error);
         res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
     }
 };
 
-exports.getAllLand = async(req,res)=>{
-    try{
+
+exports.getAllLand = async (req, res) => {
+    try {
         const token = req.params.token;
 
         // Find the user by token to get the user ID
         const user = await userModel.findOne({ token });
         if (!user) {
             return res.status(401).json({ message: "Invalid token" });
-          }
-      
-          // Verify the token
-          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+        }
+
+        // Verify the token
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
             if (err) {
-              return res.status(401).json({ message: "Invalid token" });
+                return res.status(401).json({ message: "Invalid token" });
             }
-      
+
             // Check if the user's role is system admin
             if (user.role !== "System admin") {
-              return res.status(403).json({ message: "Unauthorized" });
+                return res.status(403).json({ message: "Unauthorized" });
             }
-      
-           
-          });
-        const stsDocument = await LandfillEntry.find();
-        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: stsDocument });
-    }catch(error){
+
+            // Fetch all Landfill entries
+            const landfillEntries = await LandfillEntry.find();
+
+            // Map through Landfill entries and populate landfill_id with Landfill _id
+            const populatedEntries = await Promise.all(landfillEntries.map(async (entry) => {
+                const landfillDocument = await Landfill.findById(entry.landfill_id);
+                return {
+                    ...entry.toObject(),
+                    landfill_name: landfillDocument.name
+                    // Add other fields from Landfill document if needed
+                };
+            }));
+
+            res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: populatedEntries });
+        });
+    } catch (error) {
         console.error('Error fetching LandfillEntries:', error);
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
+
+
 
 
 
