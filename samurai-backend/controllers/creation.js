@@ -602,26 +602,23 @@ exports.createLandfillEntry = async (req, res) => {
         const user = await userModel.findOne({ token });
         if (!user) {
             return res.status(401).json({ message: "Invalid token" });
-          }
-      
-          // Verify the token
-          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-              return res.status(401).json({ message: "Invalid token" });
-            }
-      
-            // Check if the user's role is system admin
-            if (user.role !== "Landfill manager") {
-              return res.status(403).json({ message: "Unauthorized" });
-            }
-      
-           
-          });
+        }
 
-        //console.log(vehicle_registration);
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.jwt_secret_key);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Check if the user's role is Landfill manager
+        if (user.role !== "Landfill manager") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
         const vehicle = await Vehicle.findOne({ registration_number:vehicle_registration });
         if (!vehicle) {
-          return res.status(404).send({ message: 'Vehicle not found' });
+            return res.status(404).send({ message: 'Vehicle not found' });
         }
 
         // Check if the user is assigned as a manager to any landfill
@@ -650,10 +647,6 @@ exports.createLandfillEntry = async (req, res) => {
     }
 };
 
-
-
-
-
 exports.getLandfillEntries = async (req, res) => {
     try {
         const token = req.params.token;
@@ -662,21 +655,19 @@ exports.getLandfillEntries = async (req, res) => {
         const user = await userModel.findOne({ token });
         if (!user) {
             return res.status(401).json({ message: "Invalid token" });
-          }
-      
-          // Verify the token
-          jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-              return res.status(401).json({ message: "Invalid token" });
-            }
-      
-            // Check if the user's role is system admin
-            if (user.role !== "Landfill manager") {
-              return res.status(403).json({ message: "Unauthorized" });
-            }
-      
-           
-          });
+        }
+
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.jwt_secret_key);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Check if the user's role is Landfill manager
+        if (user.role !== "Landfill manager") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
 
         // Check if the user is assigned as a manager to any landfill
         const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
@@ -693,6 +684,7 @@ exports.getLandfillEntries = async (req, res) => {
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
+
 
 
 exports.getAllVehicle = async(req,res)=>{
