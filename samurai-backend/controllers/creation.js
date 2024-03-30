@@ -427,3 +427,34 @@ exports.stsLog = (async (req, res) => {
     }
 });
 
+
+
+
+
+exports.getSTSEntriesForManager = async (req, res) => {
+    try {
+
+        const token = req.params.token;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).send({ message: 'Invalid token' });
+        }
+
+        // Find the STS document assigned to the user
+        const stsDocument = await STS.findOne({ assigned_managers_id: user._id });
+        
+        if (!stsDocument) {
+            return res.status(404).send({ message: 'STS not found for the given manager' });
+        }
+
+        // Retrieve all STS entries associated with the STS ID
+        const stsEntries = await STSEntry.find({ sts_id: stsDocument._id });
+
+        res.status(200).send({ message: 'STSEntries retrieved successfully', data: stsEntries });
+    } catch (error) {
+        console.error('Error fetching STSEntries:', error);
+        res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
+    }
+};
