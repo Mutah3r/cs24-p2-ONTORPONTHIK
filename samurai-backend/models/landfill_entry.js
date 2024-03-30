@@ -6,7 +6,7 @@ const landfillEntrySchema = new mongoose.Schema({
         required: true
     },
     vehicle_registration: {
-        type: Number,
+        type: String,
         required: true
     },
     weight_of_waste: {
