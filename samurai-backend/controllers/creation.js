@@ -333,7 +333,10 @@ exports.addVehicle = async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
-
+        const vehicles = await Vehicle.find({registration_number});
+        if(vehicles){
+            return res.status(403).json({ message: 'The number is allready added' });
+        }
         // Create a new vehicle instance
         const newVehicle = new Vehicle({
             registration_number,
