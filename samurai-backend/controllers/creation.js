@@ -697,3 +697,76 @@ exports.getAllVehicle = async(req,res)=>{
         return res.status(500).send({ message: 'Internal Server Error'});
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+exports.getBillingInfo = async (req, res) => {
+    try {
+
+        const { token, vehicle_registration, weight_of_waste, time_of_arrival, time_of_departure } = req.query;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.jwt_secret_key);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Check if the user's role is Landfill manager
+        if (user.role !== "Landfill manager") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        // Check if the user is assigned as a manager to any landfill
+        const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
+        if (!landfill) {
+            return res.status(404).send({ message: 'No Landfill assigned to the manager' });
+        }
+
+
+
+       
+
+        // Query the database to fetch vehicle details
+        const vehicleDetails = await Vehicle.findOne({ registration_number: vehicle_registration });
+        if (!vehicleDetails) {
+            return res.status(404).json({ message: 'Vehicle not found' });
+        }
+
+        const fuel_cost_per_km = vehicleDetails.fuel_cost_per_km_unloaded + (weight_of_waste / vehicleDetails.capacity) * (vehicleDetails.fuel_cost_per_km_loaded - vehicleDetails.fuel_cost_per_km_unloaded);
+
+        // Construct the response object
+        const response = {
+            'Vehicle Number': vehicle_registration,
+            'Truck details': vehicleDetails.type, // Assuming 'type' contains truck details
+            'Time of arrival': time_of_arrival,
+            'Time of departure': time_of_departure,
+            'Weight of waste': weight_of_waste,
+            'Cost per kilometer': fuel_cost_per_km
+        };
+
+        // Send the response
+        res.status(200).json(response);
+
+    } catch (error) {
+        console.error('Error fetching Billing details:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+
+   
+};
