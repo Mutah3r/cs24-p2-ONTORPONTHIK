@@ -33,6 +33,7 @@ const UserManagement = () => {
 
         setUsers(filteredUsers);
         setIsLoading(false);
+        console.log(filteredUsers);
       })
       .catch((error) => {
         throwErrorPopup("An Error Occurred!");
@@ -56,9 +57,10 @@ const UserManagement = () => {
   }, [refetch]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/rbac/roles")
-      .then((res) => setRoles(res.data.roles));
+    axios.get("http://localhost:8000/rbac/roles").then((res) => {
+      const names = res.data.map((item) => item.name);
+      setRoles(names);
+    });
   }, []);
 
   const handleUpdateRole = async (previousRole, userID) => {
