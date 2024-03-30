@@ -548,3 +548,15 @@ exports.getLandfillEntries = async (req, res) => {
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
+
+
+exports.getAllVehicle = async(req,res)=>{
+    try{
+
+        const vehicle = await Vehicle.find();
+        return res.status(200).send({message:'All vehicle',vehicle});
+
+    }catch(error){
+        return res.status(500).send({ message: 'Internal Server Error'});
+    }
+}
