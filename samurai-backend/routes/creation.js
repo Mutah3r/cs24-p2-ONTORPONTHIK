@@ -14,5 +14,6 @@ router.post('/entry', authController.stsLog)
 router.get('/entry/:token', authController.getSTSEntriesForManager)
 router.post('/lentry', authController.createLandfillEntry)
 router.get('/lentry/:token', authController.getLandfillEntries)
+router.get('/assign/:userId',authController.checkUserAssignment)
 
 module.exports = router;
