@@ -5,7 +5,7 @@ const landfillEntrySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    vehicle_id: {
+    vehicle_registration: {
         type: Number,
         required: true
     },

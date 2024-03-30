@@ -11,5 +11,7 @@ router.post('/landManage',authController.assignManagerToLandfill)
 router.post('/vehicleCreate' , authController.addVehicle)
 router.post('/entry', authController.stsLog)
 router.get('/entry/:token', authController.getSTSEntriesForManager)
+router.post('/entry', authController.createLandfillEntry)
+router.get('/entry/:token', authController.getLandfillEntries)
 
 module.exports = router;

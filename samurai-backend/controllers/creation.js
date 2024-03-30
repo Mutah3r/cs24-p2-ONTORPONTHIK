@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const Landfill = require('../models/landfill')
 const Vehicle = require('../models/vehicle');
 const STSEntry = require('../models/sts_entry')
-
+const LandfillEntry = require('../models/landfill_entry')
 
 
 // STS 
@@ -444,7 +444,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
 
         // Find the STS document assigned to the user
         const stsDocument = await STS.findOne({ assigned_managers_id: user._id });
-        
+
         if (!stsDocument) {
             return res.status(404).send({ message: 'STS not found for the given manager' });
         }
@@ -456,5 +456,74 @@ exports.getSTSEntriesForManager = async (req, res) => {
     } catch (error) {
         console.error('Error fetching STSEntries:', error);
         res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
+    }
+};
+
+
+
+
+
+exports.createLandfillEntry = async (req, res) => {
+    try {
+        const { token, registration_number, weight_of_waste, time_of_arrival, time_of_departure } = req.body;
+
+        // Find the user by token to get the user ID and associated landfill
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).send({ message: 'Invalid token' });
+        }
+
+        // Check if the user is assigned as a manager to any landfill
+        const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
+        if (!landfill) {
+            return res.status(404).send({ message: 'No Landfill assigned to the manager' });
+        }
+
+        // Create a new LandfillEntry
+        const newLandfillEntry = new LandfillEntry({
+            landfill_id: landfill._id,
+            registration_number,
+            weight_of_waste,
+            time_of_arrival: new Date(time_of_arrival),
+            time_of_departure: new Date(time_of_departure)
+        });
+
+        // Save the LandfillEntry
+        await newLandfillEntry.save();
+
+        res.status(201).send({ message: 'LandfillEntry created successfully', data: newLandfillEntry });
+    } catch (error) {
+        console.error('Error creating LandfillEntry:', error);
+        res.status(500).send({ message: 'Error creating LandfillEntry', error: error.toString() });
+    }
+};
+
+
+
+
+
+exports.getLandfillEntries = async (req, res) => {
+    try {
+        const token = req.params.token;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).send({ message: 'Invalid token' });
+        }
+
+        // Check if the user is assigned as a manager to any landfill
+        const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
+        if (!landfill) {
+            return res.status(404).send({ message: 'No Landfill assigned to the manager' });
+        }
+
+        // Retrieve all Landfill entries associated with the Landfill ID
+        const landfillEntries = await LandfillEntry.find({ landfill_id: landfill._id });
+
+        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: landfillEntries });
+    } catch (error) {
+        console.error('Error fetching LandfillEntries:', error);
+        res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
