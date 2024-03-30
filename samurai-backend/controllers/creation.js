@@ -508,42 +508,46 @@ exports.getSTSEntriesForManager = async (req, res) => {
 
 exports.getAllSTS = async (req, res) => {
     try {
+        // Extract token from request headers
         const token = req.params.token;
 
-        // Find the user by token to get the user ID
+        // Check if token exists in the database
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(401).json({ message: "Invalid token" });
+            return res.status(401).json({ message: 'Invalid token' });
         }
 
-        // Verify the token
-        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-                return res.status(401).json({ message: "Invalid token" });
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Retrieve all STS information from the database
+        const stsInfo = await STS.find();
+
+        // Fetch the name of the assigned manager for each STS
+        const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
+            // Find the manager by their MongoDB ID
+            let managerName = 'Unassigned'
+
+            if (sts.assigned_managers_id !== "-1")
+            {
+                const manager = await userModel.findById(sts.assigned_managers_id);
+                // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
+                managerName = manager ? manager.name : 'Unassigned';
             }
 
-            // Check if the user's role is system admin
-            if (user.role !== "System admin") {
-                return res.status(403).json({ message: "Unauthorized" });
-            }
+            // Return an object containing STS information along with assigned manager name
+            return {
+                ...sts.toObject(),
+                assigned_managers_name: managerName
+            };
+        }));
 
-            // Fetch all STS entries
-            const stsEntries = await STSEntry.find();
-
-            // Map through STS entries and populate sts_id with STS _id
-            const populatedEntries = await Promise.all(stsEntries.map(async (entry) => {
-                const stsDocument = await STS.findById(entry.sts_id);
-                return {
-                    ...entry.toObject(),
-                    sts_name: stsDocument.ward_number
-                };
-            }));
-
-            res.status(200).send({ message: 'STSEntries retrieved successfully', data: populatedEntries });
-        });
+        res.status(200).json(stsWithManager);
     } catch (error) {
-        console.error('Error fetching STSEntries:', error);
-        res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
