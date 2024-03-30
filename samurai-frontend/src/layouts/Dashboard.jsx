@@ -53,7 +53,6 @@ const Dashboard = () => {
     axios
       .get("http://localhost:8000/rbac/roles")
       .then((res) => {
-        console.log(res.data);
         setRoles(res.data);
         setIsLoading(false);
       })
@@ -71,7 +70,6 @@ const Dashboard = () => {
       )
       .then((res) => {
         setUser(res.data);
-        console.log(res.data);
         setIsLoading(false);
       })
       .catch(() => {

@@ -35,7 +35,7 @@ const FacilityManagement = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:8000/facilities/sts/${JSON.parse(
+        `http://localhost:8000/facilities/allsts/${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
@@ -47,7 +47,7 @@ const FacilityManagement = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:8000/facilities/land/${JSON.parse(
+        `http://localhost:8000/facilities/allland/${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
