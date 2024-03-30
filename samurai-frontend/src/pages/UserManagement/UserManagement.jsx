@@ -43,7 +43,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     axios.get("http://localhost:8000/users/roles").then((response) => {
-      const rolesArray = response.data.map((item) => item.name);
+      const rolesArray = response.data.map((item) => item?.name);
       setRoles(rolesArray);
     });
   }, []);
@@ -334,11 +334,12 @@ const UserManagement = () => {
             onChange={handleUserFiltering}
           >
             <option value="All users">All users</option>
-            {roles.map((role, idx) => (
-              <option key={idx} value={role}>
-                {role}
-              </option>
-            ))}
+            {roles &&
+              roles.map((role, idx) => (
+                <option key={idx} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
         </div>
       </div>
@@ -372,53 +373,54 @@ const UserManagement = () => {
             </thead>
             <tbody>
               {/* rows */}
-              {users.map((user, idx) => (
-                <tr key={user._id}>
-                  <th>{idx + 1}</th>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <span>{user.role}</span>{" "}
-                      <IoMdSettings
-                        onClick={() => handleUpdateRole(user.role, user._id)}
-                        className="text-green-500 text-lg cursor-pointer hover:animate-spin"
-                      />
-                    </div>
-                  </td>
-                  <td className="flex gap-2 items-center">
-                    <button
-                      onClick={() =>
-                        Swal.fire({
-                          title: "Enter User Information",
-                          html:
-                            `<input id="name" class="swal2-input" value="${user.name}" placeholder="Name">` +
-                            `<input id="email" class="swal2-input" value="${user.email}" placeholder="Email">` +
-                            `<div id="passwordDiv" style="text-align:center; margin-top:10px; display:none;">
+              {users &&
+                users.map((user, idx) => (
+                  <tr key={user._id}>
+                    <th>{idx + 1}</th>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <span>{user.role}</span>{" "}
+                        <IoMdSettings
+                          onClick={() => handleUpdateRole(user.role, user._id)}
+                          className="text-green-500 text-lg cursor-pointer hover:animate-spin"
+                        />
+                      </div>
+                    </td>
+                    <td className="flex gap-2 items-center">
+                      <button
+                        onClick={() =>
+                          Swal.fire({
+                            title: "Enter User Information",
+                            html:
+                              `<input id="name" class="swal2-input" value="${user.name}" placeholder="Name">` +
+                              `<input id="email" class="swal2-input" value="${user.email}" placeholder="Email">` +
+                              `<div id="passwordDiv" style="text-align:center; margin-top:10px; display:none;">
                                 <input id="password" type="password" class="swal2-input" placeholder="Password">
                             </div>` +
-                            `<br><input id="passwordCheckbox" style="margin-top:16px" type="checkbox" class="swal2-checkbox" onclick="togglePasswordInput(this)"> Update Password`,
-                          showCancelButton: true,
-                          confirmButtonText: "Update",
-                          cancelButtonText: "Cancel",
-                          preConfirm: () => {
-                            handleUserEdit(user._id, user.role);
-                          },
-                        })
-                      }
-                      className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
-                    >
-                      <MdEdit className="text-[20px]" />
-                    </button>
-                    <button
-                      onClick={() => handleUserDelete(user._id, user.email)}
-                      className="p-1 flex gap-2 items-center bg-red-500 text-white hover:bg-red-200 hover:text-red-500 text-xl rounded-md transition-all duration-200"
-                    >
-                      <MdDeleteForever className="text-[20px]" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                              `<br><input id="passwordCheckbox" style="margin-top:16px" type="checkbox" class="swal2-checkbox" onclick="togglePasswordInput(this)"> Update Password`,
+                            showCancelButton: true,
+                            confirmButtonText: "Update",
+                            cancelButtonText: "Cancel",
+                            preConfirm: () => {
+                              handleUserEdit(user._id, user.role);
+                            },
+                          })
+                        }
+                        className="p-1 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-xl rounded-md transition-all duration-200"
+                      >
+                        <MdEdit className="text-[20px]" />
+                      </button>
+                      <button
+                        onClick={() => handleUserDelete(user._id, user.email)}
+                        className="p-1 flex gap-2 items-center bg-red-500 text-white hover:bg-red-200 hover:text-red-500 text-xl rounded-md transition-all duration-200"
+                      >
+                        <MdDeleteForever className="text-[20px]" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
