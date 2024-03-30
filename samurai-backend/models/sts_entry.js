@@ -20,6 +20,10 @@ const stsEntrySchema = new mongoose.Schema({
     time_of_departure: {
         type: Date,
         required: true
+    },
+    to: {
+        type: String,
+        required: true
     }
 });
 

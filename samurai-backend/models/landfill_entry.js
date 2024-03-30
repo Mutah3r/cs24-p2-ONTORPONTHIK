@@ -20,6 +20,10 @@ const landfillEntrySchema = new mongoose.Schema({
     time_of_departure: {
         type: Date,
         required: true
+    },
+    from: {
+        type: Number,
+        required: true
     }
 });
 
