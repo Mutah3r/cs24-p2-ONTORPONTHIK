@@ -10,12 +10,90 @@ const RolesAndPermissions = () => {
 
   useEffect(() => {
     axios.get("http://localhost:8000/rbac/roles").then((res) => {
-      // const names = res.data.map((item) => item.name);
-      console.log(res.data);
       setRoles(res.data);
       setIsLoading(false);
     });
   }, [refetch]);
+
+  const handleAssignRole = () => {
+    Swal.fire({
+      title: "Select Role and Permissions",
+      html: `
+        <select id="role" class="swal2-select">
+          ${roles.map(
+            (role) => `<option value="${role.name}">${role.name}</option>`
+          )}
+        </select>
+        <div>
+          <br />
+          <input id="dashboard" type="checkbox" checked>
+          <label for="dashboard">Dashboard Statistics</label>
+          <br />
+          <input id="vehicleEntry" type="checkbox" checked>
+          <label for="vehicleEntry">Add Vehicle Entry</label>
+          <br />
+          <input id="billing" type="checkbox" checked>
+          <label for="billing">Billing</label>
+        </div>
+      `,
+      showCancelButton: true,
+      focusConfirm: false,
+      preConfirm: () => {
+        const role = document.getElementById("role").value;
+        const dashboard = document.getElementById("dashboard").checked;
+        const vehicleEntry = document.getElementById("vehicleEntry").checked;
+        const billing = document.getElementById("billing").checked;
+
+        return {
+          role,
+          permissions: {
+            DashboardStatistics: dashboard,
+            AddVehicleEntry: vehicleEntry,
+            billing,
+          },
+        };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //
+        setIsLoading(true);
+        axios
+          .post("http://localhost:8000/rbac/permissions", {
+            name: result.value.role,
+            permissions: result.value.permissions,
+            token: JSON.parse(localStorage.getItem("user")),
+          })
+          .then((res) => {
+            setIsLoading(false);
+            if (res.data?.message === "Permissions updated successfully") {
+              Swal.fire({
+                title: "Good job!",
+                text:
+                  "Permissions assigned to " +
+                  result.value.role +
+                  " successfully!",
+                icon: "success",
+              });
+              setRefetch(!refetch);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            }
+          })
+          .catch(() => {
+            setIsLoading(false);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+          });
+      }
+    });
+  };
 
   const handleAddNewRole = () => {
     setIsLoading(true);
@@ -85,8 +163,11 @@ const RolesAndPermissions = () => {
         >
           Add New Role
         </button>
-        <button className="btn btn-wide btn-outline grow">
-          Add New Permission
+        <button
+          onClick={handleAssignRole}
+          className="btn btn-wide btn-outline grow"
+        >
+          Assign Permission
         </button>
       </div>
 
