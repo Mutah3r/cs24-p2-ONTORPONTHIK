@@ -465,7 +465,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
 
 exports.createLandfillEntry = async (req, res) => {
     try {
-        const { token, registration_number, weight_of_waste, time_of_arrival, time_of_departure } = req.body;
+        const { token, vehicle_registration, weight_of_waste, time_of_arrival, time_of_departure } = req.body;
 
         // Find the user by token to get the user ID and associated landfill
         const user = await userModel.findOne({ token });
@@ -473,8 +473,8 @@ exports.createLandfillEntry = async (req, res) => {
             return res.status(401).send({ message: 'Invalid token' });
         }
 
-
-        const vehicle = await Vehicle.findOne({ registration_number });
+        //console.log(vehicle_registration);
+        const vehicle = await Vehicle.findOne({ registration_number:vehicle_registration });
         if (!vehicle) {
           return res.status(404).send({ message: 'Vehicle not found' });
         }
@@ -488,7 +488,7 @@ exports.createLandfillEntry = async (req, res) => {
         // Create a new LandfillEntry
         const newLandfillEntry = new LandfillEntry({
             landfill_id: landfill._id,
-            registration_number,
+            vehicle_registration,
             weight_of_waste,
             time_of_arrival: new Date(time_of_arrival),
             time_of_departure: new Date(time_of_departure)
