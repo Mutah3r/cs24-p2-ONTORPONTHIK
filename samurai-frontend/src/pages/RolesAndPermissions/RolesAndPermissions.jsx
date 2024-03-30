@@ -1,8 +1,24 @@
 import axios from "axios";
+import { useEffect, useState } from "react";
+import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 
 const RolesAndPermissions = () => {
+  const [refetch, setRefetch] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/rbac/roles").then((res) => {
+      // const names = res.data.map((item) => item.name);
+      console.log(res.data);
+      setRoles(res.data);
+      setIsLoading(false);
+    });
+  }, [refetch]);
+
   const handleAddNewRole = () => {
+    setIsLoading(true);
     Swal.fire({
       title: "Enter New Role",
       html: '<input id="swal-input1" class="swal2-input">',
@@ -20,13 +36,14 @@ const RolesAndPermissions = () => {
             token: JSON.parse(localStorage.getItem("user")),
           })
           .then((res) => {
-            console.log(res.data);
+            setIsLoading(false);
             if (res.data?.message === "Role created successfully") {
               Swal.fire({
                 title: "Good job!",
                 text: "New role created!",
                 icon: "success",
               });
+              setRefetch(!refetch);
             } else {
               Swal.fire({
                 icon: "error",
@@ -36,6 +53,7 @@ const RolesAndPermissions = () => {
             }
           })
           .catch((error) => {
+            setIsLoading(false);
             if (error.response?.data?.message === "Allready added") {
               Swal.fire({
                 icon: "error",
@@ -70,6 +88,52 @@ const RolesAndPermissions = () => {
           Add New Permission
         </button>
       </div>
+
+      <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+        Available Roles
+      </h2>
+
+      {isLoading && (
+        <div className="mx-auto flex justify-center items-center py-5">
+          <ClipLoader
+            color={"#22C55E"}
+            loading={isLoading}
+            size={50}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      )}
+
+      {!isLoading && (
+        <div className="overflow-x-auto">
+          <table className="table table-zebra">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Permissions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roles &&
+                roles.map((role, idx) => (
+                  <tr key={role.name}>
+                    <th>{idx + 1}</th>
+                    <td>{role.name}</td>
+                    <td className="flex flex-col gap-2 justify-center">
+                      {Object.keys(role.permissions).map((key) => (
+                        <span
+                          key={key}
+                        >{`${key}: ${role.permissions[key]}`}</span>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
