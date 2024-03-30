@@ -107,3 +107,45 @@ exports.postRoles = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.updatePermissions = async (req, res) => {
+  const { name, permissions, token } = req.body;
+
+  try {
+    // Check if the token exists in user_account
+    const user = await userModel.findOne({ token });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    // Verify the token
+    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      // Check if the user's role is system admin
+      if (user.role !== "System admin") {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      // Find the role by name
+      const role = await Role.findOne({ name });
+
+      if (!role) {
+        return res.status(404).json({ message: "Role not found" });
+      }
+
+      // Update permissions
+      role.permissions = permissions;
+
+      await role.save();
+
+      res.status(200).json({ message: "Permissions updated successfully" });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -6,5 +6,6 @@ const authController = require("../controllers/rbac");
 
 router.get('/roles',authController.getAllRoles)
 router.post('/roles',authController.postRoles)
+router.post('/permissions',authController.updatePermissions)
 
 module.exports = router;

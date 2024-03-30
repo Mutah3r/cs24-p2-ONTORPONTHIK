@@ -13,11 +13,6 @@ const roleSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
-        AddVehicle: {
-            type: Boolean,
-            default: false
-        },
-
         AddVehicleEntry: {
             type: Boolean,
             default: false
