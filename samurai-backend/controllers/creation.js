@@ -554,43 +554,47 @@ exports.getAllSTS = async (req, res) => {
 
 exports.getAllLand = async (req, res) => {
     try {
+        // Extract token from request headers
         const token = req.params.token;
 
-        // Find the user by token to get the user ID
+        // Check if token exists in the database
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(401).json({ message: "Invalid token" });
+            return res.status(401).json({ message: 'Invalid token' });
         }
 
-        // Verify the token
-        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-                return res.status(401).json({ message: "Invalid token" });
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Retrieve all Landfill information from the database
+        const landfillInfo = await Landfill.find();
+
+        // Fetch the name of the assigned manager for each Landfill
+        const landfillsWithManager = await Promise.all(landfillInfo.map(async (landfill) => {
+            // Find the manager by their MongoDB ID
+
+            let managerName = 'Unassigned'
+            if (landfill.assigned_managers_id !== "-1")
+            {
+                const manager = await userModel.findById(landfill.assigned_managers_id);
+                // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
+                managerName = manager ? manager.name : 'Unassigned';
             }
+            
 
-            // Check if the user's role is system admin
-            if (user.role !== "System admin") {
-                return res.status(403).json({ message: "Unauthorized" });
-            }
+            // Return an object containing Landfill information along with assigned manager name
+            return {
+                ...landfill.toObject(),
+                assigned_managers_name: managerName
+            };
+        }));
 
-            // Fetch all Landfill entries
-            const landfillEntries = await LandfillEntry.find();
-
-            // Map through Landfill entries and populate landfill_id with Landfill _id
-            const populatedEntries = await Promise.all(landfillEntries.map(async (entry) => {
-                const landfillDocument = await Landfill.findById(entry.landfill_id);
-                return {
-                    ...entry.toObject(),
-                    landfill_name: landfillDocument.name
-                    // Add other fields from Landfill document if needed
-                };
-            }));
-
-            res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: populatedEntries });
-        });
+        res.status(200).json(landfillsWithManager);
     } catch (error) {
-        console.error('Error fetching LandfillEntries:', error);
-        res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
