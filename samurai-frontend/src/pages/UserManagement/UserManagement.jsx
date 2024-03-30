@@ -89,26 +89,41 @@ const UserManagement = () => {
     });
 
     if (role) {
+      // check if he is already assigned to a landfill or sts as a manager or not
+      setIsLoading(true);
       axios
-        .put(`http://localhost:8000/users/${userID}/roles`, {
-          roles: role,
-          token: JSON.parse(localStorage.getItem("user")),
-        })
-        .then((res) => {
-          if (res.data?.message === "User roles updated successfully") {
-            Swal.fire({
-              title: "Success!",
-              text: "Role updated successfully!",
-              icon: "success",
-            });
-            setRefetch(!refetch);
-            setSelectedFilter("All users");
+        .get(`http://localhost:8000/facilities/assign/${userID}`)
+        .then((response) => {
+          if (response.data.isAssigned) {
+            throwErrorPopup("Already assigned as a " + response.data.work);
+            console.log("Already assigned as a " + response.data.work);
+            setIsLoading(false);
+            return;
           } else {
-            throwErrorPopup("Role was not updated!");
+            axios
+              .put(`http://localhost:8000/users/${userID}/roles`, {
+                roles: role,
+                token: JSON.parse(localStorage.getItem("user")),
+              })
+              .then((res) => {
+                setIsLoading(false);
+                if (res.data?.message === "User roles updated successfully") {
+                  Swal.fire({
+                    title: "Success!",
+                    text: "Role updated successfully!",
+                    icon: "success",
+                  });
+                  setRefetch(!refetch);
+                  setSelectedFilter("All users");
+                } else {
+                  throwErrorPopup("Role was not updated!");
+                }
+              })
+              .catch(() => {
+                setIsLoading(false);
+                throwErrorPopup("Role was not updated!");
+              });
           }
-        })
-        .catch(() => {
-          throwErrorPopup("Role was not updated!");
         });
     }
   };
