@@ -667,6 +667,10 @@ exports.createLandfillEntry = async (req, res) => {
     }
 };
 
+
+
+
+
 exports.getLandfillEntries = async (req, res) => {
     try {
         const token = req.params.token;
@@ -704,6 +708,70 @@ exports.getLandfillEntries = async (req, res) => {
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
+
+
+
+
+const stsEntries = await STSEntry.find();
+        
+const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
+    const sts_document = await STS.findById(entry.sts_id);
+    return {
+        ...entry.toObject(),
+        sts_name : sts_document.ward_number
+    }
+}));
+
+res.status(200).json({message: "All sts entries", data: populatedEntries});
+
+
+
+
+
+exports.getLandfillEntriesAdmin = async (req, res) => {
+    try {
+        const token = req.params.token;
+
+        // Find the user by token to get the user ID
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.jwt_secret_key);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Check if the user's role is Landfill manager
+        if (user.role !== "System admin") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+
+
+
+        // Check if the user is assigned as a manager to any landfill
+        const landfillentry = await LandfillEntry.find();
+        const populatedEntries = await Promise.adll(landfillentry.map(async (entry) =>{
+            const landfill = await Landfill.findById(entry.landfill_id);
+            return {
+                ...entry.toObject(),
+                name : landfill.name
+            }
+        }))
+
+       
+
+        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: populatedEntries });
+    } catch (error) {
+        console.error('Error fetching LandfillEntries:', error);
+        res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
+    }
+};
+
 
 
 
