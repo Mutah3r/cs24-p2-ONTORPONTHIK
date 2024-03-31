@@ -50,11 +50,34 @@ const Login = () => {
       } else {
         localStorage.setItem("user", JSON.stringify(response.data.token));
         setIsLoading(false);
-        navigate("/dashboard");
+
+        if (response?.data?.isFirstTime === false) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Please change your password after first login",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          navigate("/dashboard/profile");
+        } else {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Welcome Back",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       setIsLoading(false);
-      alert("email or password is incorrect");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Email or password is incorrect!",
+      });
       return;
     }
   };
