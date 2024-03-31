@@ -1,0 +1,23 @@
+# The version of the docker-compose.
+version: "3.8"
+# Telling docker-compose to build the client and server images and run them in containers.
+services:
+  samurai-frontend:
+    # Telling docker-compose to build the client image using the Dockerfile in the client directory.
+    build: ./samurai-frontend
+    # Giving the container a name.
+    container_name: samuraiClient
+    # Mapping the port 3000 on the host machine to the port 3000 on the container.
+    ports:
+      - "5173:5173"
+    
+    # Allows you to run container in detached mode.
+    stdin_open: true
+    tty: true
+  samurai-backend:
+    # Telling docker-compose to build the client image using the Dockerfile in the server directory.
+    build: ./samurai-backend
+    container_name: samuraiServer
+    ports:
+      - "8000:8000"
+    
