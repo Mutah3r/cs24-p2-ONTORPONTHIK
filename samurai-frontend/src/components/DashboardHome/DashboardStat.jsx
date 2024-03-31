@@ -252,7 +252,7 @@ const DashboardStat = ({ user }) => {
                         <td>
                           {formatTimeToHumanReadable(log.time_of_arrival)}
                         </td>
-                        <td>{log.to + " ton"}</td>
+                        <td>{log.to}</td>
                       </tr>
                     ))}
                 </tbody>
