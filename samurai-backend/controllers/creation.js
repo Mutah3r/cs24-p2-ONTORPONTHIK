@@ -712,18 +712,6 @@ exports.getLandfillEntries = async (req, res) => {
 
 
 
-const stsEntries = await STSEntry.find();
-        
-const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
-    const sts_document = await STS.findById(entry.sts_id);
-    return {
-        ...entry.toObject(),
-        sts_name : sts_document.ward_number
-    }
-}));
-
-res.status(200).json({message: "All sts entries", data: populatedEntries});
-
 
 
 
