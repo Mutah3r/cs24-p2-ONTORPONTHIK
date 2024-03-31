@@ -338,7 +338,9 @@ const UserManagement = () => {
                 `<input type="text" id="swal-input-name" placeholder="Name"  class="swal2-input" required>` +
                 `<input type="email" id="swal-input-email" placeholder="Email"  class="swal2-input" required>` +
                 `<input type="password" id="swal-input-password" placeholder="Password"  class="swal2-input" required>` +
-                `<select id="swal-select-role" class="swal2-select" required>${roles
+                `<select id="swal-select-role" class="swal2-select" required>
+                  <option value="Unassigned" selected>Unassigned</option>
+                ${roles
                   .map((role) => `<option value="${role}">${role}</option>`)
                   .join("")}</select>`,
               showCancelButton: true,
