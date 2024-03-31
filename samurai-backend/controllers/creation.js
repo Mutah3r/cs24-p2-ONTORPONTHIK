@@ -743,7 +743,7 @@ exports.getLandfillEntriesAdmin = async (req, res) => {
 
         // Check if the user is assigned as a manager to any landfill
         const landfillentry = await LandfillEntry.find();
-        const populatedEntries = await Promise.adll(landfillentry.map(async (entry) =>{
+        const populatedEntries = await Promise.all(landfillentry.map(async (entry) =>{
             const landfill = await Landfill.findById(entry.landfill_id);
             return {
                 ...entry.toObject(),
