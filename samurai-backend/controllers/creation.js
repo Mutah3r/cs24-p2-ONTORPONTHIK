@@ -22,7 +22,7 @@ exports.getSTSInformation = async (req, res) => {
         }
 
         // Verify if user is a system manager
-        if (user.role !== 'System manager') {
+        if (user.role !== 'System admin') {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
