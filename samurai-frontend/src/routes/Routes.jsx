@@ -9,6 +9,7 @@ import VehicleManagement from "../pages/VehicleManagement/VehicleManagement";
 import RolesAndPermissions from "../pages/RolesAndPermissions/RolesAndPermissions";
 import PrivateRoute from "./PrivateRoute";
 import DashboardHomeWrapper from "../components/DashboardHome/DashboardHomeWrapper";
+import VehicleEntry from "../pages/VehicleEntry/VehicleEntry";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "roles",
         element: <RolesAndPermissions />,
+      },
+      {
+        path: "entry",
+        element: <VehicleEntry />,
       },
     ],
   },

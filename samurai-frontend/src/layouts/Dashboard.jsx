@@ -184,7 +184,10 @@ const Dashboard = () => {
                     roles.find((role) => role.name === user.role)?.permissions
                       .AddVehicleEntry === true ? (
                       <li>
-                        <Link className="flex items-center gap-2" to="/entry">
+                        <Link
+                          className="flex items-center gap-2"
+                          to="/dashboard/entry"
+                        >
                           <GrScheduleNew /> <span>Vehicle Entry</span>
                         </Link>
                       </li>
@@ -197,7 +200,10 @@ const Dashboard = () => {
                     roles.find((role) => role.name === user.role)?.permissions
                       .billing === true ? (
                       <li>
-                        <Link className="flex items-center gap-2" to="/billing">
+                        <Link
+                          className="flex items-center gap-2"
+                          to="/dashboard/billing"
+                        >
                           <GiMoneyStack /> <span>Billing</span>
                         </Link>
                       </li>
