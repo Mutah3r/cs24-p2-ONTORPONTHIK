@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
+import { BiMap } from "react-icons/bi";
 
 const DashboardStat = ({ user }) => {
   const [loading, setLoading] = useState(true);
@@ -11,8 +12,6 @@ const DashboardStat = ({ user }) => {
   const [landfillLogs, setLandfillLogs] = useState(null);
   const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);
   const [error, setError] = useState(false);
-
-  console.log("user role ", user.role);
 
   useEffect(() => {
     setLoading(true);
@@ -24,9 +23,6 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          console.log("sts Logs:");
-          console.log(res.data.data);
-
           setStsLogs(res.data.data);
           setFilteredStsLogs(res.data.data);
           setLoading(false);
@@ -45,9 +41,6 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          console.log("landfill Logs:");
-          console.log(res.data.data);
-
           setLandfillLogs(res.data.data);
           setFilteredLandfillLogs(res.data.data);
           setLoading(false);
@@ -91,12 +84,10 @@ const DashboardStat = ({ user }) => {
 
     const filteredLogs = stsLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredStsLogs(filteredLogs);
-    // console.log(filteredLogs);
   };
 
   const handleTimeSubmitLandfill = (event) => {
@@ -123,9 +114,6 @@ const DashboardStat = ({ user }) => {
         text: "End time must be greater than start time.",
       });
       return;
-    } else {
-      // console.log("Selected Start Time:", selectedStartTime);
-      // console.log("Selected End Time:", selectedEndTime);
     }
 
     const startTimeMili = selectedStartTime.getTime();
@@ -133,12 +121,10 @@ const DashboardStat = ({ user }) => {
 
     const filteredLogs = landfillLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredLandfillLogs(filteredLogs);
-    // console.log(filteredLogs);
   };
 
   const formatTimeToHumanReadable = (timeString) => {
@@ -236,6 +222,7 @@ const DashboardStat = ({ user }) => {
                     <th>Ward No.</th>
                     <th>Vehicle Reg. No.</th>
                     <th>Carried Waste</th>
+                    <th>Optimum Route To Landfill</th>
                     <th>Time of Departure</th>
                     <th>Time of Arrival</th>
                     <th>Destination Landfill</th>
@@ -249,6 +236,16 @@ const DashboardStat = ({ user }) => {
                         <td>{log.sts_name}</td>
                         <td>{log.vehicle_registration}</td>
                         <td>{log.weight_of_waste + " ton"}</td>
+                        <td className="flex items-center justify-center">
+                          <a
+                            href={`https://www.google.com/maps/dir/${log.sts_latitude},${log.sts_longitude}/${log.landfill_latitude},${log.landfill_longitude}`}
+                            target="_blank"
+                          >
+                            <button className="btn btn-neutral flex items-center">
+                              <BiMap className="text-[20px]" />
+                            </button>
+                          </a>
+                        </td>
                         <td>
                           {formatTimeToHumanReadable(log.time_of_departure)}
                         </td>

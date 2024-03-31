@@ -9,12 +9,13 @@ const Login = () => {
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    const response = await axios.post("http://localhost:8000/auth/change_password", {
-      email: email,
-      password: password,
-    });
-
-    console.log(response.data);
+    const response = await axios.post(
+      "http://localhost:8000/auth/change_password",
+      {
+        email: email,
+        password: password,
+      }
+    );
 
     if (response.data.role === "Unassigned") {
       // logout user because unassigned users cannot login
@@ -45,10 +46,10 @@ const Login = () => {
               <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
             </svg>
             <input
-               name="password"
-               type="password"
-               className="grow"
-               placeholder="Old Password"
+              name="password"
+              type="password"
+              className="grow"
+              placeholder="Old Password"
             />
           </label>
         </div>

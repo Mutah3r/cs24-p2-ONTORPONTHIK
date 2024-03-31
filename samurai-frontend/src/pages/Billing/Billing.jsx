@@ -31,9 +31,6 @@ const Billing = () => {
         )}`
       )
       .then((res) => {
-        console.log("landfill Logs:");
-        console.log(res.data.data);
-
         setLandfillLogs(res.data.data);
         setFilteredLandfillLogs(res.data.data);
         setLoading(false);

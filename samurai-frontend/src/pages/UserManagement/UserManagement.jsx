@@ -33,12 +33,10 @@ const UserManagement = () => {
 
         setUsers(filteredUsers);
         setIsLoading(false);
-        console.log(filteredUsers);
       })
       .catch((error) => {
         throwErrorPopup("An Error Occurred!");
         setIsLoading(false);
-        console.log(error);
       });
   };
 
@@ -96,7 +94,6 @@ const UserManagement = () => {
         .then((response) => {
           if (response.data.isAssigned) {
             throwErrorPopup("Already assigned as a " + response.data.work);
-            console.log("Already assigned as a " + response.data.work);
             setIsLoading(false);
             return;
           } else {

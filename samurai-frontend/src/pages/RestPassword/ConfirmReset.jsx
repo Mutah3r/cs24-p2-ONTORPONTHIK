@@ -12,7 +12,6 @@ const ConfirmReset = () => {
   const handleConfirm = (result) => {
     if (result.isConfirmed) {
       const newPassword = result.value;
-      console.log("New Password:", newPassword);
       setLoading(true);
 
       if (newPassword.length < 4) {
@@ -31,7 +30,6 @@ const ConfirmReset = () => {
           newPassword,
         })
         .then((res) => {
-          console.log(res);
           setLoading(false);
           if (res.data?.message === "Password reset successfully") {
             Swal.fire({

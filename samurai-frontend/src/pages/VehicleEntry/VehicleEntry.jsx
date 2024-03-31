@@ -57,7 +57,6 @@ const VehicleEntry = () => {
       }
     }
 
-    console.log(stsFormData);
     setSpinner(true);
     axios
       .post("http://localhost:8000/sts/entry", {
@@ -71,7 +70,6 @@ const VehicleEntry = () => {
       })
       .then((res) => {
         setSpinner(false);
-        console.log(res.data);
         if (res.data.message === "STSEntry created successfully") {
           Swal.fire({
             title: "Good job!",
@@ -125,7 +123,6 @@ const VehicleEntry = () => {
       )
       .then((res) => {
         const namesArray = res.data.map((item) => item.name);
-        console.log(namesArray);
         setLandfills(namesArray);
       });
   }, []);

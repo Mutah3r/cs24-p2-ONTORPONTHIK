@@ -41,7 +41,6 @@ const FacilityManagement = () => {
       )
       .then((response) => {
         setAvailableSts(response.data);
-        console.log(response.data);
       });
   }, [refetch]);
 
@@ -106,7 +105,6 @@ const FacilityManagement = () => {
             token: JSON.parse(localStorage.getItem("user")),
           })
           .then((res) => {
-            console.log(res.data);
             if (res.data.message === "STS created successfully") {
               Swal.fire({
                 title: "Good job!",
@@ -180,8 +178,6 @@ const FacilityManagement = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log("New Landfill site details:", result.value);
-        // Here you can handle saving the new Landfill site details
         setShowSpinner(true);
         axios
           .post("http://localhost:8000/facilities/land", {
@@ -193,7 +189,6 @@ const FacilityManagement = () => {
             token: JSON.parse(localStorage.getItem("user")),
           })
           .then((res) => {
-            console.log(res.data);
             if (res.data.message === "Landfill created successfully") {
               Swal.fire({
                 title: "Good job!",

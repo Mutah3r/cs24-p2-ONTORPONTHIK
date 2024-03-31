@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
-import axiosInstance from "../../utils/axiosInstance";
 
 const DashboardHome = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,8 +34,6 @@ const DashboardHome = () => {
         )}`
       )
       .then((res) => {
-        // console.log("this is sts logs");
-        // console.log(res.data.data);
         setStsLogs(res.data.data);
         setFilteredStsLogs(res.data.data);
         setLogsLoading(false);
@@ -55,14 +52,11 @@ const DashboardHome = () => {
         )}`
       )
       .then((res) => {
-        // console.log('this is faclities logs');
-        // console.log(res.data.data);
         setLandfillLogs(res.data.data);
         setFilteredLandfillLogs(res.data.data);
         setLogsLoading(false);
       })
       .catch(() => {
-        // console.log('faclities logs error');
         setLogsLoading(false);
       });
   }, []);
@@ -113,12 +107,10 @@ const DashboardHome = () => {
 
     const filteredLogs = stsLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredStsLogs(filteredLogs);
-    // console.log(filteredLogs);
   };
 
   const handleTimeSubmitLandfill = (event) => {
@@ -145,9 +137,6 @@ const DashboardHome = () => {
         text: "End time must be greater than start time.",
       });
       return;
-    } else {
-      // console.log("Selected Start Time:", selectedStartTime);
-      // console.log("Selected End Time:", selectedEndTime);
     }
 
     const startTimeMili = selectedStartTime.getTime();
@@ -155,12 +144,10 @@ const DashboardHome = () => {
 
     const filteredLogs = landfillLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredLandfillLogs(filteredLogs);
-    // console.log(filteredLogs);
   };
 
   return (

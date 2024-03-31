@@ -75,14 +75,12 @@ const Profile = () => {
     })
       .then((result) => {
         if (result.isConfirmed) {
-          console.log("New Password:", result.value.newPassword);
           axios
             .post("http://localhost:8000/auth/change-password", {
               token: JSON.parse(localStorage.getItem("user")),
               newPassword: result.value.newPassword,
             })
             .then((res) => {
-              console.log(res.data);
               if (res.data.message === "Password updated successfully") {
                 Swal.fire({
                   position: "top-end",

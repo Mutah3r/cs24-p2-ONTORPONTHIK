@@ -11,7 +11,6 @@ const ResetPassword = () => {
     event.preventDefault();
     setIsLoading(true);
 
-    console.log(event.target.email.value);
     axios
       .post("http://localhost:8000/auth/reset-password/initiate", {
         email: event.target.email.value,
