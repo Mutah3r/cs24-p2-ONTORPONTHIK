@@ -489,7 +489,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
                 return res.status(401).json({ message: "Invalid token" });
             }
 
-            // Check if the user's role is system admin
+            // Check if the user's role is STS manager
             if (user.role !== "STS manager") {
                 return res.status(403).json({ message: "Unauthorized" });
             }
@@ -504,21 +504,21 @@ exports.getSTSEntriesForManager = async (req, res) => {
             // Retrieve all STS entries associated with the STS ID
             const stsEntries = await STSEntry.find({ sts_id: stsDocument._id });
 
+            // Populate entries with STS latitude and longitude
+            const populatedEntries = await Promise.all(stsEntries.map(async (entry) => {
+                // Find the STS document for the entry
+                const sts = await STS.findById(entry.sts_id);
+                // Find the Landfill document for the 'to' field
+                const landfill = await Landfill.findOne({ name: entry.to });
 
-
-            const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
-                const sts_document = await STS.findById(entry.sts_id);
                 return {
                     ...entry.toObject(),
-                    sts_name : sts_document.ward_number
-                }
+                    sts_latitude: sts.latitude,
+                    sts_longitude: sts.longitude,
+                    landfill_latitude: landfill.latitude,
+                    landfill_longitude: landfill.longitude
+                };
             }));
-
-
-
-
-
-
 
             return res.status(200).send({ message: 'STSEntries retrieved successfully', data: populatedEntries });
         });
@@ -527,6 +527,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
         return res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
     }
 };
+
 
 
 
