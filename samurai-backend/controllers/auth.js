@@ -1,7 +1,7 @@
-const userModel = require('../models/user_accounts')
+const userModel = require("../models/user_accounts");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 exports.Login = async (req, res) => {
   try {
@@ -11,7 +11,8 @@ exports.Login = async (req, res) => {
     let isFirstTime = false;
     let userId = "";
 
-    await userModel.findOne({ email: email })
+    await userModel
+      .findOne({ email: email })
       .then((result) => {
         if (result) {
           pass = result.password;
@@ -34,18 +35,23 @@ exports.Login = async (req, res) => {
           res.status(500).json({ message: "Internal Server Error" });
         }
         if (result) {
-          const token = jwt.sign(
-            { email: email },
-            process.env.jwt_secret_key,
-            { expiresIn: "30d" }
-          );
+          const token = jwt.sign({ email: email }, process.env.jwt_secret_key, {
+            expiresIn: "30d",
+          });
 
           // Update token field in the user model
-          userModel.findByIdAndUpdate(userId, { $set: { isLogin: true, token: token } }, { new: true })
-            .then(updatedUser => {
-              res.status(200).json({ token: token, role: role, isFirstTime: isFirstTime });
+          userModel
+            .findByIdAndUpdate(
+              userId,
+              { $set: { isLogin: true, token: token } },
+              { new: true }
+            )
+            .then((updatedUser) => {
+              res
+                .status(200)
+                .json({ token: token, role: role, isFirstTime: isFirstTime });
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
               res.status(500).json({ message: "Internal Server Error" });
             });
@@ -58,15 +64,7 @@ exports.Login = async (req, res) => {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
-
-
-
-
-
-
-
-
+};
 
 exports.Logout = async (req, res) => {
   try {
@@ -74,8 +72,8 @@ exports.Logout = async (req, res) => {
 
     // Find the user by email and update the token
     const user = await userModel.findOneAndUpdate(
-      { token:token },
-      { $set: { token: 'Nothing' } }, // or { $set: { token: '' } } if you prefer an empty string
+      { token: token },
+      { $set: { token: "Nothing" } }, // or { $set: { token: '' } } if you prefer an empty string
       { new: true }
     );
 
@@ -86,16 +84,9 @@ exports.Logout = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-
-
-
-
-
-
 
 exports.changePassword = async (req, res) => {
   const { token, newPassword } = req.body;
@@ -128,86 +119,82 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
 // Function to generate a password reset token
 const generateResetToken = (email) => {
-    return jwt.sign({ email }, process.env.jwt_secret_key, { expiresIn: '5m' });
+  return jwt.sign({ email }, process.env.jwt_secret_key, { expiresIn: "5m" });
 };
 
 // Function to send the password reset email
 const sendResetEmail = async (email, token) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.USER,
-            pass: process.env.PASS,
-        },
-    });
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.USER,
+      pass: process.env.PASS,
+    },
+  });
 
-    const info = await transporter.sendMail({
-        from: '"EcoSync" <EcoSync@gmail.com>', // sender address
-        to: email, // recipient address
-        subject: 'Password Reset for EcoSync', // Subject line
-        html: `<p>Click <a href="http://localhost:5174/forgot-password/${token}">here</a> to reset your password.</p>`,
-    });
+  const info = await transporter.sendMail({
+    from: '"EcoSync" <EcoSync@gmail.com>', // sender address
+    to: email, // recipient address
+    subject: "Password Reset for EcoSync", // Subject line
+    html: `<p>Click <a href="http://localhost:5173/forgot-password/${token}">here</a> to reset your password.</p>`,
+  });
 
-    //console.log('Password reset email sent:', info.response);
+  //console.log('Password reset email sent:', info.response);
 };
 
 exports.initiatePasswordReset = async (req, res) => {
-    try {
-        const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-        // Check if the email exists in the database
-        const user = await userModel.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: 'Email not found' });
-        }
-
-        // Generate and send password reset token
-        const token = generateResetToken(email);
-        await sendResetEmail(email, token);
-
-        res.status(200).json({ message: 'Password reset initiated. Check your email for further instructions.'});
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    // Check if the email exists in the database
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
     }
+
+    // Generate and send password reset token
+    const token = generateResetToken(email);
+    await sendResetEmail(email, token);
+
+    res
+      .status(200)
+      .json({
+        message:
+          "Password reset initiated. Check your email for further instructions.",
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 exports.confirmPasswordReset = async (req, res) => {
-    try {
-        const { token, newPassword } = req.body;
+  try {
+    const { token, newPassword } = req.body;
 
-        // Verify and decode the token
-        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-            if (err) {
-                return res.status(400).json({ message: 'Invalid or expired token' });
-            }
+    // Verify and decode the token
+    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+      if (err) {
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
 
-            // Find user by email
-            const user = await userModel.findOne({ email: decoded.email });
-            if (!user) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+      // Find user by email
+      const user = await userModel.findOne({ email: decoded.email });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-            // Hash the new password
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-            // Update user's password
-            user.password = hashedPassword;
-            await user.save();
+      // Update user's password
+      user.password = hashedPassword;
+      await user.save();
 
-            res.status(200).json({ message: 'Password reset successfully' });
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-    }
+      res.status(200).json({ message: "Password reset successfully" });
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
