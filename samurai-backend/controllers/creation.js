@@ -506,6 +506,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
 };
 
 
+
 exports.getAllSTS = async (req, res) => {
     try {
         // Extract token from request headers
@@ -523,28 +524,18 @@ exports.getAllSTS = async (req, res) => {
         }
 
         // Retrieve all STS information from the database
-        const stsInfo = await STS.find();
 
-        // Fetch the name of the assigned manager for each STS
-        const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
-            // Find the manager by their MongoDB ID
-            let managerName = 'Unassigned'
+        const stsEntries = await STSEntry.find();
 
-            if (sts.assigned_managers_id !== "-1")
-            {
-                const manager = await userModel.findById(sts.assigned_managers_id);
-                // If manager is found, assign their name to managerName, otherwise assign 'Unassigned'
-                managerName = manager ? manager.name : 'Unassigned';
-            }
-
-            // Return an object containing STS information along with assigned manager name
+        const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
+            const sts_document = await STS.findById(entry.sts_id);
             return {
-                ...sts.toObject(),
-                assigned_managers_name: managerName
-            };
+                ...entry.toObject(),
+                sts_name : sts_document.ward_number
+            }
         }));
 
-        res.status(200).json(stsWithManager);
+        res.status(200).json({message: "All sts entries", data: populatedEntries});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

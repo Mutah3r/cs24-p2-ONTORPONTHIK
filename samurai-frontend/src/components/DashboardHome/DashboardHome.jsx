@@ -29,12 +29,13 @@ const DashboardHome = () => {
     setLogsLoading(true);
     axios
       .get(
-        `http://localhost:8000/facilities/allsts/${JSON.parse(
+        `http://localhost:8000/sts/allsts/${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
       .then((res) => {
         setStsLogs(res.data.data);
+        console.log(res.data.data);
         setFilteredStsLogs(res.data.data);
         setLogsLoading(false);
       })
