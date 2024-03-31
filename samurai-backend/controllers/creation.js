@@ -537,7 +537,7 @@ exports.getAllSTS = async (req, res) => {
             }
         
             // Check if the user's role is system admin
-            if (user.role !== "STS manager") {
+            if (user.role !== "System admin") {
                 return res.status(403).json({ message: "Unauthorized" });
             }
         
