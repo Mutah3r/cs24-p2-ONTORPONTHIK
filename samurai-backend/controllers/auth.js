@@ -176,7 +176,7 @@ exports.initiatePasswordReset = async (req, res) => {
         const token = generateResetToken(email);
         await sendResetEmail(email, token);
 
-        res.status(200).json({ message: 'Password reset initiated. Check your email for further instructions.',token:token });
+        res.status(200).json({ message: 'Password reset initiated. Check your email for further instructions.'});
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
