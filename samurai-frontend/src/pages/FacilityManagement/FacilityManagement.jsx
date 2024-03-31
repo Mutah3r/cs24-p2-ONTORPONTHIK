@@ -35,12 +35,13 @@ const FacilityManagement = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:8000/facilities/allsts/${JSON.parse(
+        `http://localhost:8000/facilities/sts/${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
       .then((response) => {
         setAvailableSts(response.data);
+        console.log(response.data);
       });
   }, [refetch]);
 

@@ -34,8 +34,9 @@ const DashboardHome = () => {
         )}`
       )
       .then((res) => {
+        // console.log("this is sts logs");
+        // console.log(res.data.data);
         setStsLogs(res.data.data);
-        console.log(res.data.data);
         setFilteredStsLogs(res.data.data);
         setLogsLoading(false);
       })
@@ -48,16 +49,19 @@ const DashboardHome = () => {
     setLogsLoading(true);
     axios
       .get(
-        `http://localhost:8000/facilities/allland/${JSON.parse(
+        `http://localhost:8000/landfill/alllandentry/${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
       .then((res) => {
+        // console.log('this is faclities logs');
+        // console.log(res.data.data);
         setLandfillLogs(res.data.data);
         setFilteredLandfillLogs(res.data.data);
         setLogsLoading(false);
       })
       .catch(() => {
+        // console.log('faclities logs error');
         setLogsLoading(false);
       });
   }, []);
@@ -108,12 +112,12 @@ const DashboardHome = () => {
 
     const filteredLogs = stsLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      console.log({ startTimeMili, departureTime, endTimeMili });
+      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredStsLogs(filteredLogs);
-    console.log(filteredLogs);
+    // console.log(filteredLogs);
   };
 
   const handleTimeSubmitLandfill = (event) => {
@@ -141,8 +145,8 @@ const DashboardHome = () => {
       });
       return;
     } else {
-      console.log("Selected Start Time:", selectedStartTime);
-      console.log("Selected End Time:", selectedEndTime);
+      // console.log("Selected Start Time:", selectedStartTime);
+      // console.log("Selected End Time:", selectedEndTime);
     }
 
     const startTimeMili = selectedStartTime.getTime();
@@ -150,12 +154,12 @@ const DashboardHome = () => {
 
     const filteredLogs = landfillLogs.filter((log) => {
       const departureTime = new Date(log.time_of_departure).getTime();
-      console.log({ startTimeMili, departureTime, endTimeMili });
+      // console.log({ startTimeMili, departureTime, endTimeMili });
       return departureTime >= startTimeMili && departureTime <= endTimeMili;
     });
 
     setFilteredLandfillLogs(filteredLogs);
-    console.log(filteredLogs);
+    // console.log(filteredLogs);
   };
 
   return (
@@ -246,7 +250,7 @@ const DashboardHome = () => {
                       filteredStsLogs.map((log, idx) => (
                         <tr key={log._id}>
                           <th>{idx + 1}</th>
-                          <td>{"N/A"}</td>
+                          <td>{log.sts_name}</td>
                           <td>{log.vehicle_registration}</td>
                           <td>{log.weight_of_waste + " ton"}</td>
                           <td>
@@ -334,7 +338,7 @@ const DashboardHome = () => {
                       filteredLandfillLogs.map((log, idx) => (
                         <tr key={log._id}>
                           <th>{idx + 1}</th>
-                          <td>N/A</td>
+                          <td>{log.name}</td>
                           <td>{log.vehicle_registration}</td>
                           <td>{log.weight_of_waste + " ton"}</td>
                           <td>
