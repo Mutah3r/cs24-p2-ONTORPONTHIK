@@ -156,7 +156,7 @@ const sendResetEmail = async (email, token) => {
         from: '"EcoSync" <EcoSync@gmail.com>', // sender address
         to: email, // recipient address
         subject: 'Password Reset for EcoSync', // Subject line
-        html: `<p>Click <a href="http://localhost:5173/reset-password?token=${token}">here</a> to reset your password.</p>`,
+        html: `<p>Click <a href="http://localhost:5174/forgot-password/${token}">here</a> to reset your password.</p>`,
     });
 
     //console.log('Password reset email sent:', info.response);

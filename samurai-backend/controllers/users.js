@@ -175,47 +175,62 @@ exports.updateUser = async (req, res) => {
 // DELETE method for deleting a user (System Admin access)
 exports.deleteUser = async (req, res) => {
   const userId = req.params.userId;
-  const { token } = req.body;
+const { token } = req.body;
 
-  try {
-    // Check if the token exists in user_account
-    const user = await userModel.findOne({ token });
+try {
+  // Check if the token exists in user_account
+  const user = await userModel.findOne({ token });
 
-    if (!user) {
+  if (!user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
+  // Verify the token
+  jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+    if (err) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    // Verify the token
-    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+    // Check if the user's role is system admin
+    if (user.role !== "System admin") {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
 
-      // Check if the user's role is system admin
-      if (user.role !== "System admin") {
-        return res.status(403).json({ message: "Unauthorized" });
-      }
+    // Proceed with deleting user
+    const userToDelete = await userModel.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      // Proceed with deleting user
-      const userToDelete = await userModel.findById(userId);
-      if (!userToDelete) {
-        return res.status(404).json({ message: "User not found" });
-      }
+    // Check if the user to delete is a system admin
+    if (userToDelete.role === "System admin") {
+      return res
+        .status(403)
+        .json({ message: "Cannot delete a system admin user" });
+    }
 
-      // Check if the user to delete is a system admin
-      if (userToDelete.role === "System admin") {
-        return res
-          .status(403)
-          .json({ message: "Cannot delete a system admin user" });
-      }
+    // Update assigned managers in STS
+    await STS.updateMany(
+      { assigned_managers_id: userId },
+      { $set: { assigned_managers_id: "-1" } }
+    );
 
-      await userModel.deleteOne({ _id: userId });
-      res.status(200).json({ message: "User deleted successfully" });
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+    // Update assigned managers in Landfill
+    await Landfill.updateMany(
+      { assigned_managers_id: userId },
+      { $set: { assigned_managers_id: "-1" } }
+    );
+
+    // Delete user
+    await userModel.deleteOne({ _id: userId });
+
+    res.status(200).json({ message: "User deleted successfully" });
+  });
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ message: "Internal server error" });
+}
+
 };
 
 // GET method for listing all available roles
