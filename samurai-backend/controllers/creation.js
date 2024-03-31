@@ -7,7 +7,7 @@ const STSEntry = require('../models/sts_entry')
 const LandfillEntry = require('../models/landfill_entry')
 
 
-// STS 
+// STS get or sts manager
 
 // GET method for retrieving STS information
 exports.getSTSInformation = async (req, res) => {
@@ -22,12 +22,12 @@ exports.getSTSInformation = async (req, res) => {
         }
 
         // Verify if user is a system manager
-        if (user.role !== 'STS manager') {
+        if (user.role !== 'System manager') {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
         // Retrieve all STS information from the database
-        const stsInfo = await STS.find({assigned_managers_id:user._id});
+        const stsInfo = await STS.find();
 
         // Fetch the name of the assigned manager for each STS
         const stsWithManager = await Promise.all(stsInfo.map(async (sts) => {
@@ -102,7 +102,7 @@ exports.createSTS = async (req, res) => {
 
 
 
-// Landfill
+// Landfill for managers,
 
 
 // GET method for retrieving Landfill information
@@ -356,6 +356,8 @@ exports.addVehicle = async (req, res) => {
     }
 };
 
+
+
 exports.checkUserAssignment = async (req, res) => {
     const userId = req.params.userId;
   
@@ -507,6 +509,11 @@ exports.getSTSEntriesForManager = async (req, res) => {
 
 
 
+
+
+
+
+
 exports.getAllSTS = async (req, res) => {
     try {
         // Extract token from request headers
@@ -524,23 +531,37 @@ exports.getAllSTS = async (req, res) => {
         }
 
         // Retrieve all STS information from the database
-
-        const stsEntries = await STSEntry.find();
-
-        const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
-            const sts_document = await STS.findById(entry.sts_id);
-            return {
-                ...entry.toObject(),
-                sts_name : sts_document.ward_number
+        jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ message: "Invalid token" });
             }
-        }));
-
-        res.status(200).json({message: "All sts entries", data: populatedEntries});
+        
+            // Check if the user's role is system admin
+            if (user.role !== "STS manager") {
+                return res.status(403).json({ message: "Unauthorized" });
+            }
+        
+            // Find the STS document assigned to the user
+            const stsEntries = await STSEntry.find();
+        
+                const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
+                    const sts_document = await STS.findById(entry.sts_id);
+                    return {
+                        ...entry.toObject(),
+                        sts_name : sts_document.ward_number
+                    }
+                }));
+        
+                res.status(200).json({message: "All sts entries", data: populatedEntries});
+        });
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
 
 
 exports.getAllLand = async (req, res) => {
