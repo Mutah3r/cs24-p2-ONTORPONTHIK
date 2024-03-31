@@ -407,7 +407,6 @@ exports.checkUserAssignment = async (req, res) => {
         const { 
             token, 
             registration_number, 
-            type, 
             capacity, 
             time_of_arrival, 
             time_of_departure ,
