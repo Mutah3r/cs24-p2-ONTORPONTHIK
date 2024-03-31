@@ -513,6 +513,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
 
                 return {
                     ...entry.toObject(),
+                    sts_name: sts.ward_number,
                     sts_latitude: sts.latitude,
                     sts_longitude: sts.longitude,
                     landfill_latitude: landfill.latitude,
