@@ -2,7 +2,7 @@ import Logo from "../../components/Logo/Logo";
 import axios from "axios";
 import { useState } from "react";
 import { IoLogIn } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
@@ -141,6 +141,15 @@ const Login = () => {
             sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
             onChange={handleCaptcha}
           />
+        </div>
+        {/* Forgot Password */}
+        <div className="flex justify-center">
+          <Link
+            to="/forgot-password"
+            className="text-green-500 hover:text-green-700 underline"
+          >
+            Forgot Password
+          </Link>
         </div>
         {/* Login Button */}
         <div>

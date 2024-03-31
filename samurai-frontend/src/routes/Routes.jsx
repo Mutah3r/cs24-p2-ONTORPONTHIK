@@ -11,11 +11,16 @@ import PrivateRoute from "./PrivateRoute";
 import DashboardHomeWrapper from "../components/DashboardHome/DashboardHomeWrapper";
 import VehicleEntry from "../pages/VehicleEntry/VehicleEntry";
 import Billing from "../pages/Billing/Billing";
+import ResetPassword from "../pages/RestPassword/ResetPassword";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ResetPassword />,
   },
   {
     path: "/login",
