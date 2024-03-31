@@ -69,13 +69,13 @@ exports.updateUserDetails = async (req, res) => {
         // Check if the token exists in user_account
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(401).json({ isLogin:false });
+            return res.status(200).json({ isLogin:false });
         }
 
         // Verify the token
         jwt.verify(token, process.env.jwt_secret_key, (err, decoded) => {
             if (err) {
-                return res.status(401).json({ isLogin:false });
+                return res.status(200).json({ isLogin:false });
             }
 
             // Token is valid

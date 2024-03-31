@@ -12,6 +12,7 @@ import { GrScheduleNew } from "react-icons/gr";
 import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Dashboard = () => {
   const [user, setUser] = useState([]);
@@ -47,6 +48,29 @@ const Dashboard = () => {
       to: "vehicles",
     },
   ];
+
+  useEffect(() => {
+    axios
+      .post("http://localhost:8000/profile/isLogin", {
+        token: JSON.parse(localStorage.getItem("user")),
+      })
+      .then((r) => {
+        if (r.data?.isLogin === false) {
+          localStorage.removeItem("user");
+          navigate("/login");
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: "Your session has expired",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .catch(() => {
+        console.log("session check error");
+      });
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
