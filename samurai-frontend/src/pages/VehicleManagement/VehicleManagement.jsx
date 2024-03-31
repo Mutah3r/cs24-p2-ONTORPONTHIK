@@ -184,8 +184,8 @@ const VehicleManagement = () => {
                       <td>{vehicle.registration_number}</td>
                       <td>{vehicle.type}</td>
                       <td>{vehicle.capacity + " ton"}</td>
-                      <td>{vehicle.fuel_cost_per_km_loaded + {" BDT"}}</td>
-                      <td>{vehicle.fuel_cost_per_km_unloaded + {" BDT"}}</td>
+                      <td>{vehicle.fuel_cost_per_km_loaded + " BDT"}</td>
+                      <td>{vehicle.fuel_cost_per_km_unloaded + " BDT"}</td>
                     </tr>
                   ))}
               </tbody>
