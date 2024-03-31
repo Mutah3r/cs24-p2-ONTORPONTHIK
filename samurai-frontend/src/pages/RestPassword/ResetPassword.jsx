@@ -22,6 +22,7 @@ const ResetPassword = () => {
           res.data?.message ===
           "Password reset initiated. Check your email for further instructions."
         ) {
+          event.target.email.value = "";
           Swal.fire({
             title: "Please check your email for further instruction!",
             showClass: {
