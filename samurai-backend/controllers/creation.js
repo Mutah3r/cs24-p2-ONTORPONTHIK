@@ -447,6 +447,7 @@ exports.checkUserAssignment = async (req, res) => {
             // Create a new STS entry
             const newSTSEntry = new STSEntry({
                 sts_id: stsDocument._id, 
+                ward_no: stsDocument.ward_number,
                 vehicle_registration: registration_number,
                 weight_of_waste: capacity,
                 time_of_arrival: new Date(time_of_arrival),
