@@ -447,7 +447,6 @@ exports.checkUserAssignment = async (req, res) => {
             // Create a new STS entry
             const newSTSEntry = new STSEntry({
                 sts_id: stsDocument._id, 
-                ward_no: stsDocument.ward_number,
                 vehicle_registration: registration_number,
                 weight_of_waste: capacity,
                 time_of_arrival: new Date(time_of_arrival),
@@ -500,7 +499,23 @@ exports.getSTSEntriesForManager = async (req, res) => {
             // Retrieve all STS entries associated with the STS ID
             const stsEntries = await STSEntry.find({ sts_id: stsDocument._id });
 
-            return res.status(200).send({ message: 'STSEntries retrieved successfully', data: stsEntries });
+
+
+            const populatedEntries = await Promise.all(stsEntries.map(async (entry)=>{
+                const sts_document = await STS.findById(entry.sts_id);
+                return {
+                    ...entry.toObject(),
+                    sts_name : sts_document.ward_number
+                }
+            }));
+
+
+
+
+
+
+
+            return res.status(200).send({ message: 'STSEntries retrieved successfully', data: populatedEntries });
         });
     } catch (error) {
         console.error('Error fetching STSEntries:', error);
