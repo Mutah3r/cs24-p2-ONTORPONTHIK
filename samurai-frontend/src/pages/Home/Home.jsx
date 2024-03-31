@@ -21,9 +21,20 @@ const Home = () => {
           <h1 className="text-[48px] font-semibold text-white leading-tight">
             Dhaka North City Corporation (DNCC) Waste Management
           </h1>
-          <button className="mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200">
+          <button onClick={()=>document.getElementById('my_modal_5').showModal()} className="mx-auto mt-3 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200">
             Learn More <IoLeafOutline />
           </button>
+          <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">EcoSync</h3>
+            <p className="py-4">EcoSync is a revolutionary waste management project aimed at improving waste collection and transportation processes in Dhaka North City Corporation. It introduces a comprehensive web application that streamlines various aspects of waste management, including user and role management, data entry, billing, route optimization, fleet optimization, and dashboard statistics.</p>
+            <div className="modal-action">
+              <form method="dialog">
+                <button className="btn">Close</button>
+              </form>
+            </div>
+  </div>
+</dialog>
         </div>
       </div>
     </div>
