@@ -843,7 +843,7 @@ exports.getBillingInfo = async (req, res) => {
             const landfill = await Landfill.findById(entry.landfill_id);
            
             const vehicleDetails = await Vehicle.findOne({ registration_number: entry.vehicle_registration });
-            const fuel_cost_per_km = vehicleDetails.fuel_cost_per_km_unloaded + (weight_of_waste / vehicleDetails.capacity) * (vehicleDetails.fuel_cost_per_km_loaded - vehicleDetails.fuel_cost_per_km_unloaded);
+            const fuel_cost_per_km = vehicleDetails.fuel_cost_per_km_unloaded + (entry.weight_of_waste / vehicleDetails.capacity) * (vehicleDetails.fuel_cost_per_km_loaded - vehicleDetails.fuel_cost_per_km_unloaded);
             return {
                 ...entry.toObject(),
                 name : landfill.name,

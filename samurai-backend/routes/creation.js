@@ -18,6 +18,6 @@ router.get('/assign/:userId',authController.checkUserAssignment)
 router.get('/allsts/:token',authController.getAllSTS)
 router.get('/allland/:token',authController.getAllLand)
 router.get('/alllandentry/:token' ,authController.getLandfillEntriesAdmin)
-router.get('/billslip', authController.getBillingInfo)
+router.get('/billslip/:token', authController.getBillingInfo)
 
 module.exports = router;
