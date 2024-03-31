@@ -847,7 +847,8 @@ exports.getBillingInfo = async (req, res) => {
             return {
                 ...entry.toObject(),
                 name : landfill.name,
-                cost_per_km : fuel_cost_per_km
+                cost_per_km : fuel_cost_per_km,
+                track_details : vehicleDetails.type
             }
         }));
 
