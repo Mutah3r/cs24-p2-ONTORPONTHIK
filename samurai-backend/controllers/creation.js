@@ -717,8 +717,16 @@ exports.getLandfillEntries = async (req, res) => {
 
         // Retrieve all Landfill entries associated with the Landfill ID
         const landfillEntries = await LandfillEntry.find({ landfill_id: landfill._id });
+        const populatedEntries = await Promise.all(landfillEntries.map(async (entry) =>{
+            const landfill = await Landfill.findById(entry.landfill_id);
+            return {
+                ...entry.toObject(),
+                name : landfill.name
+            }
+        }));
 
-        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: landfillEntries });
+
+        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: populatedEntries });
     } catch (error) {
         console.error('Error fetching LandfillEntries:', error);
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
@@ -765,7 +773,7 @@ exports.getLandfillEntriesAdmin = async (req, res) => {
                 ...entry.toObject(),
                 name : landfill.name
             }
-        }))
+        }));
 
        
 
