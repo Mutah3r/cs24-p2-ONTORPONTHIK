@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
+import axiosInstance from "../../utils/axiosInstance";
 
 const DashboardHome = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +14,7 @@ const DashboardHome = () => {
   const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);
 
   useEffect(() => {
-    axios
+    axiosInstance
       .get(
         `http://localhost:8000/profile?token=${JSON.parse(
           localStorage.getItem("user")
