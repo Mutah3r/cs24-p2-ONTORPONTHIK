@@ -10,6 +10,7 @@ import RolesAndPermissions from "../pages/RolesAndPermissions/RolesAndPermission
 import PrivateRoute from "./PrivateRoute";
 import DashboardHomeWrapper from "../components/DashboardHome/DashboardHomeWrapper";
 import VehicleEntry from "../pages/VehicleEntry/VehicleEntry";
+import Billing from "../pages/Billing/Billing";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: "entry",
         element: <VehicleEntry />,
+      },
+      {
+        path: "billing",
+        element: <Billing />,
       },
     ],
   },
