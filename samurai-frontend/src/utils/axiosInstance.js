@@ -1,38 +1,43 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(
-  config => {
+  (config) => {
     // Intercept request before it is sent
-    const token = JSON.parse(localStorage.getItem('user'));
-    axios.get(`http://localhost:8000/profile?token=${token}`).then(res => {
-        console.log('from axios interceptor')    
-        console.log(res.data);
-        if(!res.data?.email || !res.data?.role || !res.data?.id){
-            // logout user
-            localStorage.removeItem('user');
-            window.location = '/login';
-            console.log('session expired')
+    const token = JSON.parse(localStorage.getItem("user"));
+    if (!token) {
+      logoutUser();
+      return Promise.reject("User token not found");
+    }
+
+    // if token is found than chk if it exists on the database
+    axios
+      .post(`http://localhost:8000/profile/isLogin`, {
+        token: token,
+      })
+      .then((res) => {
+        if (!res.data?.isLogin) {
+          logoutUser();
+          return Promise.reject({ error: "User not logged in" });
+        } else {
+          return config;
         }
-    })
-    .catch(() => {
-        console.log('from axios interceptor')    
-        // logout user
-        localStorage.removeItem('user');
-        window.location = '/login';
-        console.log('session expired')
-    })
-    return config;
-},
-    error => {
-      console.log('from axios interceptor')    
-    // logout user
-    localStorage.removeItem('user');
-    window.location = '/login';
-    console.log('session expired')
+      })
+      .catch(() => {
+        return Promise.reject({ error: "User not logged in" });
+      });
+  },
+  (error) => {
+    logoutUser();
     return Promise.reject(error);
   }
 );
+
+// Function to logout user
+function logoutUser() {
+  localStorage.removeItem("user");
+  window.location = "/login";
+}
 
 export default axiosInstance;

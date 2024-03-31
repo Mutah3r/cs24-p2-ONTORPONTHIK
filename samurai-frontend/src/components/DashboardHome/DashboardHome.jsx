@@ -14,7 +14,7 @@ const DashboardHome = () => {
   const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);
 
   useEffect(() => {
-    axiosInstance
+    axios
       .get(
         `http://localhost:8000/profile?token=${JSON.parse(
           localStorage.getItem("user")
