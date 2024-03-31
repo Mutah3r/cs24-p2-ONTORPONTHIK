@@ -808,16 +808,9 @@ exports.getAllVehicle = async(req,res)=>{
 
 
 
-
-
-
-
-
-
 exports.getBillingInfo = async (req, res) => {
     try {
-
-        const { token, vehicle_registration, weight_of_waste, time_of_arrival, time_of_departure } = req.query;
+        const token = req.params.token;
 
         // Find the user by token to get the user ID
         const user = await userModel.findOne({ token });
@@ -843,35 +836,26 @@ exports.getBillingInfo = async (req, res) => {
             return res.status(404).send({ message: 'No Landfill assigned to the manager' });
         }
 
+        // Retrieve all Landfill entries associated with the Landfill ID
+        const landfillEntries = await LandfillEntry.find({ landfill_id: landfill._id });
+        const populatedEntries = await Promise.all(landfillEntries.map(async (entry) =>{
+           
+            const landfill = await Landfill.findById(entry.landfill_id);
+           
+            const vehicleDetails = await Vehicle.findOne({ registration_number: entry.vehicle_registration });
+            const fuel_cost_per_km = vehicleDetails.fuel_cost_per_km_unloaded + (weight_of_waste / vehicleDetails.capacity) * (vehicleDetails.fuel_cost_per_km_loaded - vehicleDetails.fuel_cost_per_km_unloaded);
+            return {
+                ...entry.toObject(),
+                name : landfill.name,
+                cost_per_km : fuel_cost_per_km
+            }
+        }));
 
 
-       
-
-        // Query the database to fetch vehicle details
-        const vehicleDetails = await Vehicle.findOne({ registration_number: vehicle_registration });
-        if (!vehicleDetails) {
-            return res.status(404).json({ message: 'Vehicle not found' });
-        }
-
-        const fuel_cost_per_km = vehicleDetails.fuel_cost_per_km_unloaded + (weight_of_waste / vehicleDetails.capacity) * (vehicleDetails.fuel_cost_per_km_loaded - vehicleDetails.fuel_cost_per_km_unloaded);
-
-        // Construct the response object
-        const response = {
-            'Vehicle Number': vehicle_registration,
-            'Truck details': vehicleDetails.type, // Assuming 'type' contains truck details
-            'Time of arrival': time_of_arrival,
-            'Time of departure': time_of_departure,
-            'Weight of waste': weight_of_waste,
-            'Cost per kilometer': fuel_cost_per_km
-        };
-
-        // Send the response
-        res.status(200).json(response);
-
+        res.status(200).send({ message: 'LandfillEntries retrieved successfully', data: populatedEntries });
     } catch (error) {
-        console.error('Error fetching Billing details:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching LandfillEntries:', error);
+        res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
-
-   
 };
+
