@@ -3,10 +3,11 @@ import { MdEdit } from "react-icons/md";
 import { IoKey } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Profile = () => {
+  const [spinner, setSpinner] = useState(false);
   const [userData, setUserData] = useState(null);
   const [refetch, setRefetch] = useState(false);
   const userToken = JSON.parse(localStorage.getItem("user"));
@@ -41,6 +42,81 @@ const Profile = () => {
       });
   };
 
+  const handleChangePassword = () => {
+    setSpinner(true);
+    Swal.fire({
+      title: "Change Password",
+      html: `
+        <input id="new-password" class="swal2-input" type="password" placeholder="New Password">
+        <input id="confirm-password" class="swal2-input" type="password" placeholder="Confirm Password">
+      `,
+      showCancelButton: true,
+      focusConfirm: false,
+      preConfirm: () => {
+        const newPassword =
+          Swal.getPopup().querySelector("#new-password").value;
+        const confirmPassword =
+          Swal.getPopup().querySelector("#confirm-password").value;
+
+        if (!newPassword || !confirmPassword) {
+          Swal.showValidationMessage("Please enter both passwords");
+          setSpinner(false);
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          Swal.showValidationMessage("Passwords do not match");
+          setSpinner(false);
+          return;
+        }
+
+        return { newPassword, confirmPassword };
+      },
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          console.log("New Password:", result.value.newPassword);
+          axios
+            .post("http://localhost:8000/auth/change-password", {
+              token: JSON.parse(localStorage.getItem("user")),
+              newPassword: result.value.newPassword,
+            })
+            .then((res) => {
+              console.log(res.data);
+              if (res.data.message === "Password updated successfully") {
+                Swal.fire({
+                  position: "top-end",
+                  icon: "success",
+                  title: "Password updates successfully",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              } else {
+                Swal.fire({
+                  position: "top-end",
+                  icon: "error",
+                  title: "Password was not updated!",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              }
+              setSpinner(false);
+            });
+        } else {
+          setSpinner(false);
+        }
+      })
+      .catch(() => {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Password was not updated!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setSpinner(false);
+      });
+  };
   const handleChangeName = async () => {
     Swal.fire({
       title: "Enter Name",
@@ -177,12 +253,15 @@ const Profile = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Profile</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-center">Profile</h1>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Current Information</h2>
         {!userData && "Loading..."}
         {userData && (
-          <>
+          <div className="flex flex-col items-center gap-2">
+            <FaUser className="text-[50px] my-2" />
+            <h2 className="text-lg font-semibold mb-2 text-center">
+              Current Information
+            </h2>
             <p className="flex gap-3 items-center">
               <span className="font-semibold">Name:</span> {userData.name}
               <button
@@ -207,14 +286,19 @@ const Profile = () => {
               <span className="font-semibold">Role:</span> {userData.role}
             </p>
             <button
+              disabled={spinner}
+              onClick={handleChangePassword}
               type="submit"
               className="px-4 py-2 flex gap-2 items-center bg-green-500 text-white hover:bg-white hover:text-green-500 text-md mt-4 rounded-md transition-all duration-200"
             >
-              <>
-                Change Password <IoKey />
-              </>
+              {!spinner && (
+                <>
+                  Change Password <IoKey />
+                </>
+              )}
+              {spinner && "Loading.."}
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>
