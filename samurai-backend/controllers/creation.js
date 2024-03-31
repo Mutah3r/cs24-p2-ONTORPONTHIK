@@ -155,6 +155,12 @@ exports.getLandfillInformation = async (req, res) => {
 
 
 
+
+
+
+
+
+
 // POST method for creating a new Landfill (System Admin access)
 exports.createLandfill = async (req, res) => {
     try {
@@ -591,7 +597,7 @@ exports.getAllLand = async (req, res) => {
         }
 
         // Verify if user is a system manager
-        if (user.role !== 'System admin') {
+        if (user.role !== 'System admin' && user.role !== 'STS manager') {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
