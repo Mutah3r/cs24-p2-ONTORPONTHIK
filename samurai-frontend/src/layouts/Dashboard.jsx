@@ -109,11 +109,25 @@ const Dashboard = () => {
       })
       .then(() => {
         localStorage.removeItem("user");
-        navigate("/login");
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Logout Successful!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate("/");
       })
       .catch(() => {
         localStorage.removeItem("user");
-        navigate("/login");
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Logout Successful!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate("/");
       });
   };
 
