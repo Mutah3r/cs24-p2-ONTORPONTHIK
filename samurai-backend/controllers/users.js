@@ -49,18 +49,23 @@ exports.Registration = async (req, res) => {
           },
         });
 
-        await transporter.sendMail({
-          from: '"EcoSync" <EcoSync@gmail.com>', // sender address
-          to: email, // list of receivers
-          subject: "Login Credential for EcoSync", // Subject line
-          text: "Login Credential for EcoSync",
-          html: `<div>
-                                <p>Your Password is: ${password}</p>
-                                <p>Please change your password after login.</p>
-                            </div>`,
-        });
+        try{
+          await transporter.sendMail({
+            from: '"EcoSync" <EcoSync@gmail.com>', // sender address
+            to: email, // list of receivers
+            subject: "Login Credential for EcoSync", // Subject line
+            text: "Login Credential for EcoSync",
+            html: `<div>
+                                  <p>Your Password is: ${password}</p>
+                                  <p>Please change your password after login.</p>
+                              </div>`,
+          });
+          return res.status(200).json({ message: "Registration successful" });
+        }catch(err){
+          return res.status(200).json({ message: "Registration successful" });
+        }
 
-        return res.status(200).json({ message: "Registration successful" });
+        
       }
     });
   } catch (error) {
