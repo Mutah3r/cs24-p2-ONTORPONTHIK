@@ -167,9 +167,12 @@ const VehicleManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex gap-3 justify-between items-center">
+      <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
         <h1 className="text-2xl font-semibold mb-4">Vehicles Management</h1>
-        <button className="btn btn-wide btn-outline" onClick={handleAddVehicle}>
+        <button
+          className="btn md:btn-wide btn-outline"
+          onClick={handleAddVehicle}
+        >
           Add Vehicle
         </button>
       </div>
