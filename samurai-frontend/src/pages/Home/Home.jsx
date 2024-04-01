@@ -56,7 +56,9 @@ const Home = () => {
               </p>
               <div className="modal-action">
                 <form method="dialog">
-                  <button className="btn">Close</button>
+                  <button className="bg-green-500 text-white hover:bg-neutral-100 hover:text-green-500 px-6 py-3 text-xl rounded-md transition-all duration-200">
+                    Close
+                  </button>
                 </form>
               </div>
             </div>
