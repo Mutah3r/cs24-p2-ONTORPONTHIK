@@ -382,15 +382,15 @@ const FacilityManagement = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Facilities Management</h1>
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <button
-          className="btn btn-wide btn-outline grow"
+          className="btn md:btn-wide btn-outline grow"
           onClick={handleAddSTS}
         >
           Create STS
         </button>
         <button
-          className="btn btn-wide btn-outline grow"
+          className="btn md:btn-wide btn-outline grow"
           onClick={handleAddLandfill}
         >
           Create Landfill

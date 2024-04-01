@@ -351,7 +351,7 @@ const UserManagement = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">User Management</h1>
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between items-center">
         <button
           disabled={isLoading}
           onClick={() =>
@@ -379,7 +379,10 @@ const UserManagement = () => {
           <FaPlus /> Add New User
         </button>
         <div className="flex gap-3 items-center">
-          <label htmlFor="filter" className="block text-sm font-semibold">
+          <label
+            htmlFor="filter"
+            className="hidden sm:block text-sm font-semibold"
+          >
             Filter
           </label>
           <select
