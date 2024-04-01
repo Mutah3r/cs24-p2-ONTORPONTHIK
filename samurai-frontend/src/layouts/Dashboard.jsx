@@ -11,6 +11,7 @@ import { FaKey } from "react-icons/fa6";
 import { GrScheduleNew } from "react-icons/gr";
 import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
+import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -148,7 +149,7 @@ const Dashboard = () => {
                     <RxHamburgerMenu />
                   </label>
                   {!isLoading && user && (
-                    <h1 className="text-[24px]">
+                    <h1 className="text-[24px] hidden sm:block">
                       Welcome {user.name?.split(" ")[0]} 👋
                     </h1>
                   )}
@@ -187,6 +188,15 @@ const Dashboard = () => {
               className="drawer-overlay"
             ></label>
             <ul className="menu p-4 w-80 min-h-full text-white bg-[#016666] text-[16px]">
+              <div className="flex justify-start sm:justify-end mb-1">
+                <label
+                  htmlFor="my-drawer"
+                  aria-label="close sidebar"
+                  className="text-3xl cursor-pointer hover:text-green-500 transition-all duration-300"
+                >
+                  <MdCancel />
+                </label>
+              </div>
               {/* Sidebar content here */}
               {user &&
                 user.role === "System admin" &&
