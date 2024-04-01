@@ -182,16 +182,16 @@ const RolesAndPermissions = () => {
       <h1 className="text-2xl font-semibold mb-4">
         Roles & Permissions Management
       </h1>
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <button
           onClick={handleAddNewRole}
-          className="btn btn-wide btn-outline grow"
+          className="btn md:btn-wide btn-outline grow"
         >
           Add New Role
         </button>
         <button
           onClick={handleAssignRole}
-          className="btn btn-wide btn-outline grow"
+          className="btn md:btn-wide btn-outline grow"
         >
           Assign Permission
         </button>
