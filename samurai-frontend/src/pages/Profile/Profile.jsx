@@ -297,7 +297,7 @@ const Profile = () => {
             <h2 className="text-lg font-semibold mb-2 text-center">
               Current Information
             </h2>
-            <p className="flex gap-3 items-center">
+            <p className="flex flex-col sm:flex-row gap-3 items-center">
               <span className="font-semibold">Name:</span> {userData.name}
               <button
                 onClick={handleChangeName}
@@ -307,7 +307,7 @@ const Profile = () => {
                 <MdEdit className="text-[15px]" />
               </button>
             </p>
-            <p className="flex gap-3 items-center">
+            <p className="flex flex-col sm:flex-row gap-3 items-center">
               <span className="font-semibold">Email:</span> {userData.email}
               <button
                 onClick={handleChangeEmail}
