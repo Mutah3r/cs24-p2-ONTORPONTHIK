@@ -70,18 +70,15 @@ exports.Logout = async (req, res) => {
   try {
     const { token } = req.body;
 
-    // Find the user by email and update the token
+    // Find the user and update the token
     const user = await userModel.findOneAndUpdate(
       { token: token },
       { $set: { token: "Nothing" } }, // or { $set: { token: '' } } if you prefer an empty string
       { new: true }
     );
-
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-    } else {
-      res.status(200).json({ message: "Logout successful" });
-    }
+    await user.save();
+    return res.status(200).json({ message: "Logout successful" });
+    
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -94,25 +91,11 @@ exports.changePassword = async (req, res) => {
   try {
     // Check if the token exists in user_account
     const user = await userModel.findOne({ token });
-
-    if (!user) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-
-    // Verify the token
-    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
-
-      // Proceed with changing password
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedNewPassword;
-
-      await user.save();
-
-      res.status(200).json({ message: "Password updated successfully" });
-    });
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+    return res.status(200).json({ message: "Password updated successfully" });
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -173,27 +156,17 @@ exports.confirmPasswordReset = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    // Verify and decode the token
-    jwt.verify(token, process.env.jwt_secret_key, async (err, decoded) => {
-      if (err) {
-        return res.status(400).json({ message: "Invalid or expired token" });
-      }
+    // Find user by token
+    const user = await userModel.findOne({ token });
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      // Find user by email
-      const user = await userModel.findOne({ email: decoded.email });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
 
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-      // Update user's password
-      user.password = hashedPassword;
-      await user.save();
-
-      res.status(200).json({ message: "Password reset successfully" });
-    });
+    return res.status(200).json({ message: "Password reset successfully" });
+    
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
