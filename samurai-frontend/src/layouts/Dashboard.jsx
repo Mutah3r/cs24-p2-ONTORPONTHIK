@@ -17,12 +17,13 @@ import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
 
 const Dashboard = () => {
-  const [user, setUser] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [roles, setRoles] = useState([]);
+  const [user, setUser] = useState([]); // State for storing user data
+  const [isLoading, setIsLoading] = useState(true); // State for loading indicator
+  const [roles, setRoles] = useState([]); // State for storing roles data
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
 
+  // Define routes for admin dashboard
   const adminRoutes = [
     {
       title: "Dashboard",
@@ -51,8 +52,10 @@ const Dashboard = () => {
     },
   ];
 
+  // Check session on component mount
   useSessionCheck();
 
+  // Fetch roles data from the server
   useEffect(() => {
     setIsLoading(true);
     axios
@@ -66,6 +69,7 @@ const Dashboard = () => {
       });
   }, []);
 
+  // Fetch user data from the server
   useEffect(() => {
     axios
       .get(
@@ -78,11 +82,11 @@ const Dashboard = () => {
         setIsLoading(false);
       })
       .catch(() => {
-        // handle error. probably the user is not logged in or the session has been expired
         setIsLoading(false);
       });
   }, []);
 
+  // Logout functionality
   const handleLogout = () => {
     axios
       .post("http://localhost:8000/auth/logout", {
@@ -100,6 +104,7 @@ const Dashboard = () => {
       });
   };
 
+  // JSX code for rendering the dashboard
   return (
     <div>
       <div>
@@ -116,12 +121,16 @@ const Dashboard = () => {
                   >
                     <RxHamburgerMenu />
                   </label>
+
+                  {/* Display welcome message if user data is loaded */}
                   {!isLoading && user && (
                     <h1 className="text-[24px] hidden sm:block">
                       Welcome {user.name?.split(" ")[0]} 👋
                     </h1>
                   )}
                 </div>
+
+                {/* Dropdown for user profile and logout */}
                 <div className="dropdown dropdown-hover dropdown-left">
                   <div tabIndex={0} className="m-1 cursor-pointer">
                     <FaUserCircle className="text-[48px]" />
@@ -146,9 +155,13 @@ const Dashboard = () => {
                   </ul>
                 </div>
               </div>
-              <Outlet />
+
+              {/* Render nested routes */}
+              <Outlet /> 
             </div>
           </div>
+
+          {/* Sidebar for navigation */}
           <div className="drawer-side">
             <label
               htmlFor="my-drawer"
@@ -165,6 +178,7 @@ const Dashboard = () => {
                   <MdCancel />
                 </label>
               </div>
+
               {/* Sidebar content here */}
               {user &&
                 user.role === "System admin" &&
@@ -179,6 +193,7 @@ const Dashboard = () => {
                 })}
               {user && user.role !== "System admin" && (
                 <>
+                  {/* Render Dashboard route based on user permissions */}
                   <>
                     {roles &&
                     roles.find((role) => role.name === user.role)?.permissions
