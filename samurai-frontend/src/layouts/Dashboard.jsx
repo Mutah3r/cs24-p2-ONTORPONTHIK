@@ -13,8 +13,8 @@ import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
-import Swal from "sweetalert2";
 import useSessionCheck from "../hooks/useSessionCheck";
+import { showAlert } from "../utils/alerts";
 
 const Dashboard = () => {
   const [user, setUser] = useState([]);
@@ -90,24 +90,12 @@ const Dashboard = () => {
       })
       .then(() => {
         localStorage.removeItem("user");
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Logout Successful!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        showAlert("Logout Successful!", "success");
         navigate("/");
       })
       .catch(() => {
         localStorage.removeItem("user");
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Logout Successful!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        showAlert("Logout Successful!", "success");
         navigate("/");
       });
   };
