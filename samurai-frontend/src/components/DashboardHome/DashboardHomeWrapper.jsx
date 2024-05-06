@@ -2,58 +2,47 @@ import { useEffect, useState } from "react";
 import DashboardHome from "./DashboardHome";
 import DashboardStat from "./DashboardStat";
 import axios from "axios";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import ClipLoader from "react-spinners/ClipLoader";
 
+// DashboardHomeWrapper serves as a conditional wrapper component that decides which dashboard view to display based on the user's role.
 const DashboardHomeWrapper = () => {
-  const [user, setUser] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [user, setUser] = useState([]); // State to store user data
+  const [loading, setLoading] = useState(true); // State to manage the loading status of the user data
 
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // fetch user data
   useEffect(() => {
     axios
       .get(
+        // URL constructed with the user's token retrieved from localStorage
         `http://localhost:8000/profile?token=${JSON.parse(
           localStorage.getItem("user")
         )}`
       )
       .then((res) => {
-        setUser(res.data);
-        setLoading(false);
+        setUser(res.data); // Set user data in state
+        setLoading(false); // Update loading state to false after data is fetched
       });
   }, []);
 
+  // Conditional rendering based on the loading state and user role
   if (!loading && user) {
     if (user.role === "System admin") {
-      return <DashboardHome />;
+      return <DashboardHome />; // Render DashboardHome if the user is a system admin
     } else {
-      return <DashboardStat user={user} />;
+      return <DashboardStat user={user} />; // Render DashboardStat for other roles, passing user data as a prop
     }
   } else {
-    return <>Loading...</>;
+    return (
+      <div className="flex items-center w-full justify-center py-3">
+        <ClipLoader
+          color={"#22C55E"}
+          loading={true}
+          size={50}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
   }
 };
 
