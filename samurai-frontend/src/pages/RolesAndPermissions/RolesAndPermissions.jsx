@@ -5,35 +5,14 @@ import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 
 const RolesAndPermissions = () => {
+  // State variables to manage the roles list, loading state, and trigger refetching
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [roles, setRoles] = useState([]);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // fetch roles from the server on initial load and on refetch change
   useEffect(() => {
     axios.get("http://localhost:8000/rbac/roles").then((res) => {
       setRoles(res.data);
@@ -41,6 +20,7 @@ const RolesAndPermissions = () => {
     });
   }, [refetch]);
 
+  // Function to open a dialog for assigning permissions to a role
   const handleAssignRole = () => {
     Swal.fire({
       title: "Select Role and Permissions",
@@ -121,8 +101,11 @@ const RolesAndPermissions = () => {
     });
   };
 
+// Function to handle adding new roles
   const handleAddNewRole = () => {
     setIsLoading(true);
+
+    // Dialog for entering new role name
     Swal.fire({
       title: "Enter New Role",
       html: '<input id="swal-input1" class="swal2-input">',
@@ -146,7 +129,7 @@ const RolesAndPermissions = () => {
                 text: "New role created!",
                 icon: "success",
               });
-              setRefetch(!refetch);
+              setRefetch(!refetch); // Toggle refetch to update roles list
             } else {
               Swal.fire({
                 icon: "error",
