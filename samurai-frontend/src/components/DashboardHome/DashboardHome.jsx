@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 import { formatTimeToHumanReadable } from '../../utils/timeUtils';
+import STSLogsChart from "./STSLogsChart";
+import LandfillLogsChart from "./LandfillLogsChart";
 
 const DashboardHome = () => {
   // State declarations
@@ -166,6 +168,23 @@ const DashboardHome = () => {
       {!isLoading && (
         <div className="container mx-auto p-6">
           <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
+
+          {/* Week Summary */}
+          <div className="border-2 rounded-lg my-4 pb-5">
+            <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+                Week Summary
+            </h2>
+            <div className="grid gird-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-center">STS Logs Chart</h4>
+                <STSLogsChart logsData={stsLogs} />
+              </div>
+              <div>
+                <h4 className="text-center">Landfill Logs Chart</h4>
+                <LandfillLogsChart logsData={landfillLogs} />
+              </div>
+            </div>
+          </div>
 
           {/* STS Logs Section */}
           <div className="border-2 rounded-lg my-4 pb-5">
