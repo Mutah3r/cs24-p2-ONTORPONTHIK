@@ -3,41 +3,21 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
+import { formatTimeToHumanReadable } from '../../utils/timeUtils';
 
 const DashboardHome = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [logsLoading, setLogsLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [stsLogs, setStsLogs] = useState([]);
-  const [filteredStsLogs, setFilteredStsLogs] = useState([]);
-  const [landfillLogs, setLandfillLogs] = useState([]);
-  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);
+  // State declarations
+  const [isLoading, setIsLoading] = useState(true); // State to track overall loading status
+  const [logsLoading, setLogsLoading] = useState(true); // State to track logs loading status
+  const [user, setUser] = useState(null); // State to store user data
+  const [stsLogs, setStsLogs] = useState([]); // State for storing STS logs
+  const [filteredStsLogs, setFilteredStsLogs] = useState([]); // State for storing filtered STS logs
+  const [landfillLogs, setLandfillLogs] = useState([]); // State for storing landfill logs
+  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]); // State for storing filtered landfill logs
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to navigate between routes
 
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // fetch user data
   useEffect(() => {
     axios
       .get(
@@ -51,6 +31,7 @@ const DashboardHome = () => {
       });
   }, []);
 
+  // fetch STS logs
   useEffect(() => {
     setLogsLoading(true);
     axios
@@ -69,6 +50,7 @@ const DashboardHome = () => {
       });
   }, []);
 
+  // fetch landfill logs
   useEffect(() => {
     setLogsLoading(true);
     axios
@@ -87,21 +69,8 @@ const DashboardHome = () => {
       });
   }, []);
 
-  const formatTimeToHumanReadable = (timeString) => {
-    const date = new Date(timeString);
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    };
 
-    return date.toLocaleDateString(undefined, options);
-  };
-
+  // Handler for STS log time range submission
   const handleTimeSubmitSTS = (event) => {
     event.preventDefault();
     const startTime = document.getElementById("startTimeSTS");
@@ -139,6 +108,7 @@ const DashboardHome = () => {
     setFilteredStsLogs(filteredLogs);
   };
 
+  // Handler for landfill log time range submission
   const handleTimeSubmitLandfill = (event) => {
     event.preventDefault();
     const startTime = document.getElementById("startTimeLandfill");
@@ -176,8 +146,10 @@ const DashboardHome = () => {
     setFilteredLandfillLogs(filteredLogs);
   };
 
+  // Main component
   return (
     <div>
+      {/* Display loading spinner if isLoading is true */}
       {isLoading && (
         <div className="flex items-center w-full justify-center py-3">
           <ClipLoader
@@ -189,15 +161,19 @@ const DashboardHome = () => {
           />
         </div>
       )}
+
+      {/* Display dashboard when not loading */}
       {!isLoading && (
         <div className="container mx-auto p-6">
           <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
 
+          {/* STS Logs Section */}
           <div className="border-2 rounded-lg my-4 pb-5">
             <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
               STS Logs
             </h2>
 
+            {/* Form for selecting time range for STS logs */}
             <div className="mt-5">
               <form
                 onSubmit={handleTimeSubmitSTS}
@@ -237,6 +213,7 @@ const DashboardHome = () => {
               </form>
             </div>
 
+            {/* Display STS logs */}
             {!logsLoading && (
               <div className="overflow-x-auto">
                 <h1 className="text-center text-green-500 font-semibold">
@@ -281,11 +258,13 @@ const DashboardHome = () => {
             )}
           </div>
 
+          {/* Landfill Logs Section */}
           <div className="border-2 rounded-lg my-4 pb-5">
             <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
               Landfill Logs
             </h2>
 
+            {/* Form for selecting time range for Landfill logs */}
             <div className="mt-5">
               <form
                 onSubmit={handleTimeSubmitLandfill}
@@ -325,6 +304,7 @@ const DashboardHome = () => {
               </form>
             </div>
 
+            {/* Display Landfill logs */}
             {!logsLoading && (
               <div className="overflow-x-auto">
                 <h1 className="text-center text-green-500 font-semibold">
