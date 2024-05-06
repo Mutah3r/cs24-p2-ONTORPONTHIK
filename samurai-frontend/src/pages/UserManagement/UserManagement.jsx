@@ -6,40 +6,16 @@ import { FaPlus } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import Swal from "sweetalert2";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useNavigate } from "react-router-dom";
 
 const UserManagement = () => {
+  // states
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("All users");
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // Handler for filtering users based on their role
   const handleUserFiltering = (event) => {
     setSelectedFilter(event.target.value);
     setIsLoading(true);
@@ -66,6 +42,7 @@ const UserManagement = () => {
       });
   };
 
+  // fetch roles
   useEffect(() => {
     axios.get("http://localhost:8000/users/roles").then((response) => {
       const rolesArray = response.data.map((item) => item?.name);
@@ -73,6 +50,7 @@ const UserManagement = () => {
     });
   }, []);
 
+  // refetch users
   useEffect(() => {
     axios.get("http://localhost:8000/users").then((res) => {
       setUsers(res.data);
@@ -87,13 +65,16 @@ const UserManagement = () => {
     });
   }, []);
 
+  // Function to handle updating a user's role
   const handleUpdateRole = async (previousRole, userID) => {
+    // Forming input options for the role selection
     const inputOptions = {};
 
     roles.forEach((name) => {
       inputOptions[name] = name;
     });
 
+    // Display a popup for role selection
     const { value: role } = await Swal.fire({
       title: "Set Role",
       input: "select",
@@ -112,6 +93,7 @@ const UserManagement = () => {
       },
     });
 
+    // On role selection, attempt to update the user's role
     if (role) {
       // check if he is already assigned to a landfill or sts as a manager or not
       setIsLoading(true);
