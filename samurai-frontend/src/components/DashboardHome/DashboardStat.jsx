@@ -3,41 +3,20 @@ import { useEffect, useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 import { BiMap } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { formatTimeToHumanReadable } from "../../utils/timeUtils";
 
+// Component to display different types of log data based on user role
 const DashboardStat = ({ user }) => {
-  const [loading, setLoading] = useState(true);
-  const [logsLoading, setLogsLoading] = useState(true);
-  const [stsLogs, setStsLogs] = useState(null);
-  const [filteredStsLogs, setFilteredStsLogs] = useState([]);
-  const [landfillLogs, setLandfillLogs] = useState(null);
-  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);
-  const [error, setError] = useState(false);
-  const navigate = useNavigate();
+  // State variables for managing data and UI states
+  const [loading, setLoading] = useState(true);  // Overall loading state for the component
+  const [logsLoading, setLogsLoading] = useState(true);  // Specific loading state for log data
+  const [stsLogs, setStsLogs] = useState(null);  // Store STS logs
+  const [filteredStsLogs, setFilteredStsLogs] = useState([]);  // Store filtered STS logs
+  const [landfillLogs, setLandfillLogs] = useState(null);  // Store landfill logs
+  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);  // Store filtered landfill logs
+  const [error, setError] = useState(false);  // Error state
 
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // fetch data based on user role
   useEffect(() => {
     setLoading(true);
     if (user.role === "STS manager") {
@@ -48,8 +27,9 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          setStsLogs(res.data.data);
-          setFilteredStsLogs(res.data.data);
+          console.log(res);
+          setStsLogs(res.data.data); // Set the fetched STS logs
+          setFilteredStsLogs(res.data.data); // Initialize the filtered logs
           setLoading(false);
           setLogsLoading(false);
         })
@@ -66,8 +46,9 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          setLandfillLogs(res.data.data);
-          setFilteredLandfillLogs(res.data.data);
+          console.log(res.data.data);
+          setLandfillLogs(res.data.data); // Set the fetched landfill logs
+          setFilteredLandfillLogs(res.data.data); // Initialize the filtered logs
           setLoading(false);
           setLogsLoading(false);
         })
@@ -78,8 +59,10 @@ const DashboardStat = ({ user }) => {
     }
   }, []);
 
+  // Handlers for form submissions to filter logs based on the selected time range
   const handleTimeSubmitSTS = (event) => {
     event.preventDefault();
+    // Form handling and filtering logic for STS logs
     const startTime = document.getElementById("startTimeSTS");
     const endTime = document.getElementById("endTimeSTS");
     const selectedStartTime = new Date(startTime.value);
@@ -117,6 +100,7 @@ const DashboardStat = ({ user }) => {
 
   const handleTimeSubmitLandfill = (event) => {
     event.preventDefault();
+    // Similar form handling and filtering logic for landfill logs
     const startTime = document.getElementById("startTimeLandfill");
     const endTime = document.getElementById("endTimeLandfill");
     const selectedStartTime = new Date(startTime.value);
@@ -152,25 +136,11 @@ const DashboardStat = ({ user }) => {
     setFilteredLandfillLogs(filteredLogs);
   };
 
-  const formatTimeToHumanReadable = (timeString) => {
-    const date = new Date(timeString);
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    };
-
-    return date.toLocaleDateString(undefined, options);
-  };
-
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
 
+      {/* Show loader while fetching data */}
       {loading && (
         <div className="flex items-center w-full justify-center py-3">
           <ClipLoader
@@ -183,12 +153,14 @@ const DashboardStat = ({ user }) => {
         </div>
       )}
 
+      {/* Conditionally render the STS manager dashboard if the user has the STS manager role and data is available */}
       {!loading && user.role === "STS manager" && stsLogs && (
         <div className="border-2 rounded-lg my-4 pb-5">
           <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
             STS Logs
           </h2>
 
+          {/* Form for selecting time range for STS logs */}
           <div className="mt-5">
             <form className="px-8 pt-6 pb-8 mb-4">
               <div className="mb-4">
@@ -229,6 +201,7 @@ const DashboardStat = ({ user }) => {
             </form>
           </div>
 
+          {/* Display of STS logs */}
           {!logsLoading && (
             <div className="overflow-x-auto">
               <h1 className="text-center text-green-500 font-semibold">
@@ -287,14 +260,14 @@ const DashboardStat = ({ user }) => {
         </div>
       )}
 
-      {/* landfill manager dashboard  */}
-
+      {/* Conditional rendering for the Landfill manager dashboard */}
       {!loading && user.role === "Landfill manager" && landfillLogs && (
         <div className="border-2 rounded-lg my-4 pb-5">
           <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
             Landfill Logs
           </h2>
 
+          {/* Form for selecting time range for landfill logs */}
           <div className="mt-5">
             <form className="px-8 pt-6 pb-8 mb-4">
               <div className="mb-4">
@@ -335,6 +308,7 @@ const DashboardStat = ({ user }) => {
             </form>
           </div>
 
+          {/* Display of landfill logs */}
           {!logsLoading && (
             <div className="overflow-x-auto">
               <h1 className="text-center text-green-500 font-semibold">
@@ -381,6 +355,8 @@ const DashboardStat = ({ user }) => {
           )}
         </div>
       )}
+
+      {/* Error handling: Displays message if there is an error in fetching logs */}
       {error && (
         <h1 className="text-center text-red-500 font-semibold">
           No Logs Available
