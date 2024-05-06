@@ -4,6 +4,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 import { BiMap } from "react-icons/bi";
 import { formatTimeToHumanReadable } from "../../utils/timeUtils";
+import STSLogsChart from "./STSLogsChart";
+import LandfillLogsChart from "./LandfillLogsChart";
 
 // Component to display different types of log data based on user role
 const DashboardStat = ({ user }) => {
@@ -156,6 +158,16 @@ const DashboardStat = ({ user }) => {
       {/* Conditionally render the STS manager dashboard if the user has the STS manager role and data is available */}
       {!loading && user.role === "STS manager" && stsLogs && (
         <div className="border-2 rounded-lg my-4 pb-5">
+          {/* Week Summary */}
+          <div className="border-2 rounded-lg my-4 pb-5">
+            <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+                Week Summary
+            </h2>
+            <div>
+              <STSLogsChart logsData={stsLogs} />
+            </div>
+          </div>
+
           <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
             STS Logs
           </h2>
@@ -263,6 +275,16 @@ const DashboardStat = ({ user }) => {
       {/* Conditional rendering for the Landfill manager dashboard */}
       {!loading && user.role === "Landfill manager" && landfillLogs && (
         <div className="border-2 rounded-lg my-4 pb-5">
+          {/* Week Summary */}
+          <div className="border-2 rounded-lg my-4 pb-5">
+            <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+                Week Summary
+            </h2>
+            <div>
+              <LandfillLogsChart logsData={landfillLogs} />
+            </div>
+          </div>
+
           <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
             Landfill Logs
           </h2>
