@@ -4,41 +4,17 @@ import { MdEdit } from "react-icons/md";
 import Swal from "sweetalert2";
 import { renderToString } from "react-dom/server";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useNavigate } from "react-router-dom";
 
 const FacilityManagement = () => {
+  // State hooks
   const [showSpinner, setShowSpinner] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
   const [users, setUsers] = useState([]);
   const [refetch, setRefetch] = useState(false);
   const [availabeSts, setAvailableSts] = useState([]);
   const [availabeLandfills, setAvailableLandfills] = useState([]);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
-  }, []);
-
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -58,6 +34,7 @@ const FacilityManagement = () => {
     fetchUsers();
   }, []);
 
+  // Fetch STS facilities data when refetch is toggled
   useEffect(() => {
     axios
       .get(
@@ -70,6 +47,7 @@ const FacilityManagement = () => {
       });
   }, [refetch]);
 
+  // Fetch landfill facilities data when refetch is toggled
   useEffect(() => {
     axios
       .get(
@@ -82,6 +60,7 @@ const FacilityManagement = () => {
       });
   }, [refetch]);
 
+  // Handler for adding a new STS
   const handleAddSTS = () => {
     Swal.fire({
       title: "Add New STS (Solid Waste Transfer Station)",
@@ -137,7 +116,7 @@ const FacilityManagement = () => {
                 text: "STS created!",
                 icon: "success",
               });
-              setRefetch(!refetch);
+              setRefetch(!refetch); // Toggle to refetch facility data
               setShowSpinner(false);
             } else {
               Swal.fire({
@@ -160,7 +139,9 @@ const FacilityManagement = () => {
     });
   };
 
+  // Similar to handleAddSTS, this function handles adding a new landfill site
   const handleAddLandfill = () => {
+    // Similar structure to handleAddSTS for adding landfill, including user input and validation
     Swal.fire({
       title: "Add New Landfill Site",
       html: `
@@ -244,6 +225,7 @@ const FacilityManagement = () => {
     });
   };
 
+  // Validation functions for numeric input and geographic coordinates
   const isValidNumber = (value) => {
     return !isNaN(parseFloat(value)) && isFinite(value);
   };
@@ -252,7 +234,9 @@ const FacilityManagement = () => {
     return isValidNumber(value);
   };
 
+  // Function to assign an STS manager, similar structure to adding facilities but for user assignments
   const handleAssignStsManager = (stsID) => {
+    // Uses renderToString to render React components for selection in SweetAlert
     Swal.fire({
       title: "Select STS Manager",
       html: loading
@@ -299,7 +283,7 @@ const FacilityManagement = () => {
                 text: "STS manager was not updated!",
               });
             }
-            setRefetch(!refetch);
+            setRefetch(!refetch); // Trigger refetch
             setShowSpinner(false);
           })
           .catch(() => {
@@ -314,6 +298,7 @@ const FacilityManagement = () => {
     });
   };
 
+  // Similar to handleAssignStsManager, but for assigning landfill managers
   const handleAssignLandfillManager = (landfillID) => {
     Swal.fire({
       title: "Select Landfill Manager",
@@ -364,7 +349,7 @@ const FacilityManagement = () => {
                 text: "Landfill manager was not updated!",
               });
             }
-            setRefetch(!refetch);
+            setRefetch(!refetch); // Trigger data refetch
             setShowSpinner(false);
           })
           .catch(() => {
