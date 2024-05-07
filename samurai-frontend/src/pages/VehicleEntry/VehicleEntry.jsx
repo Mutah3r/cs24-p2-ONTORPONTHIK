@@ -7,30 +7,18 @@ const VehicleEntry = () => {
   const [user, setUser] = useState(null);
   const [spinner, setSpinner] = useState(false);
   const [landfills, setLandfills] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [input, setInput] = useState('');
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .post("http://localhost:8000/profile/isLogin", {
-        token: JSON.parse(localStorage.getItem("user")),
-      })
-      .then((r) => {
-        if (r.data?.isLogin === false) {
-          localStorage.removeItem("user");
-          navigate("/login");
-          Swal.fire({
-            position: "top-end",
-            icon: "error",
-            title: "Your session has expired",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      })
-      .catch(() => {
-        console.log("session check error");
-      });
+  useEffect(()=>{
+    axios.get('http://localhost:8000/vehicle/allvehicle')
+    .then(res => {
+      const registrationNumbers = res.data?.vehicle?.map(vehicle => vehicle.registration_number);
+      setVehicles(registrationNumbers); 
+    })
   }, []);
 
   const [formData, setFormData] = useState({
@@ -54,6 +42,19 @@ const VehicleEntry = () => {
   const handleSTSChange = (e) => {
     const { name, value } = e.target;
 
+    setInput(value);
+
+    // Give vehicle suggestions to the user
+    if (value.length > 0) {
+      const filteredSuggestions = vehicles.filter(number =>
+        number.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+
+
     // Validation for Weight Carrying field
     if (name === "weightCarrying" && !/^\d+([,.]\d+)?$/.test(value)) {
       return; // Do not update state if input does not match the regex
@@ -63,6 +64,31 @@ const VehicleEntry = () => {
       ...stsFormData,
       [name]: value,
     });
+  };
+
+  const onSuggestionClick = (value) => {
+    console.log(value);
+    setStsFormData({
+      ...stsFormData,
+      vehicleRegNo: value,
+    });
+    setInput(value);
+    setSuggestions([]);
+  };
+
+  const SuggestionList = () => {
+    if (suggestions.length === 0 || input === '') {
+      return null;
+    }
+    return (
+      <ul className="suggestions border-2 rounded-lg p-3 shadow-md">
+        {suggestions.map((suggestion, index) => (
+          <li className="cursor-pointer hover:bg-gray-200 py-2 px-4 rounded-lg" key={index} onClick={() => onSuggestionClick(suggestion)}>
+            {suggestion}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   // Function to handle form submission
@@ -310,12 +336,14 @@ const VehicleEntry = () => {
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Vehicle Reg. No.:</label>
           <input
+            id="sts_vehicle_reg_no"
             type="text"
             name="vehicleRegNo"
             value={stsFormData.vehicleRegNo}
             onChange={handleSTSChange}
             className="input input-bordered w-full"
           />
+          <SuggestionList />
         </div>
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Vehicle Type:</label>
