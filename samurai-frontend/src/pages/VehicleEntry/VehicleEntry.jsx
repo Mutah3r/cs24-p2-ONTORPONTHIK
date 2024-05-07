@@ -49,7 +49,9 @@ const VehicleEntry = () => {
       const filteredSuggestions = vehicles.filter(number =>
         number.toLowerCase().includes(value.toLowerCase())
       );
-      setSuggestions(filteredSuggestions);
+      if(name === 'vehicleRegNo'){
+        setSuggestions(filteredSuggestions);
+      }
     } else {
       setSuggestions([]);
     }
