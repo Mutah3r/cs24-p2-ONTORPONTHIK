@@ -1,4 +1,6 @@
 const userModel = require("../models/user_accounts");
+const STS = require("../models/sts");
+const Landfill = require("../models/landfill");
 const Role = require("../models/role");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");

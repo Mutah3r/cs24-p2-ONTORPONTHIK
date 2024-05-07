@@ -1,23 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/creation");
+const middleware = require("../middlewars/authentcation")
 
-router.get('/sts/:token',authController.getSTSInformation)
-router.post('/sts',authController.createSTS)
-router.get('/land/:token',authController.getLandfillInformation)
-router.post('/land',authController.createLandfill)
+//all sts information
+router.get('/sts/:token',middleware.isSystemAdmin,authController.getSTSInformation)
+//sts create
+router.post('/sts',middleware.isSystemAdminBody,authController.createSTS)
+//all landfill information
+router.get('/land/:token',middleware.isLandfillManager,authController.getLandfillInformation)
+//landfill create
+router.post('/land',middleware.isSystemAdminBody,authController.createLandfill)
+//assign to sts manager
 router.post('/stsManage',authController.assignManagerToSTS)
+//assign to landfill manager
 router.post('/landManage',authController.assignManagerToLandfill)
-router.post('/vehicleCreate' , authController.addVehicle)
+//add vehicle
+router.post('/vehicleCreate' ,middleware.isSystemAdminBody, authController.addVehicle)
+//get all vehicle
 router.get('/allvehicle',authController.getAllVehicle)
+//create sts log
 router.post('/entry', authController.stsLog)
+//sts entries for all manager
 router.get('/entry/:token', authController.getSTSEntriesForManager)
+//create landfill entry
 router.post('/lentry', authController.createLandfillEntry)
+//landfill entries for all manager
 router.get('/lentry/:token', authController.getLandfillEntries)
+//check is user already assigned or not
 router.get('/assign/:userId',authController.checkUserAssignment)
+//get all sts logs
 router.get('/allsts/:token',authController.getAllSTS)
+//get all landfill logs
 router.get('/allland/:token',authController.getAllLand)
+//get all landfill logs for admin
 router.get('/alllandentry/:token' ,authController.getLandfillEntriesAdmin)
+//create billslip
 router.get('/billslip/:token', authController.getBillingInfo)
 
 module.exports = router;

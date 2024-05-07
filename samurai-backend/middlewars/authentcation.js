@@ -20,6 +20,7 @@ exports.islogin = async function(req, res, next) {
         });
     } catch (error) {
         console.log("Some error occured");
+        return res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -33,3 +34,89 @@ exports.limiter = rateLimiter({
         message:"Please try again after 1 minute"
     },
 });
+
+exports.isSystemAdmin = async function(req,res,next){
+    try{
+        const token = req.params.token;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+        next();
+    }catch(error){
+        console.log("Some error occured");
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+exports.isSystemAdminBody = async function(req,res,next){
+    try{
+        const token = req.body.token;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'System admin') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+        next();
+    }catch(error){
+        console.log("Some error occured");
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+exports.isLandfillManager = async function(req,res,next){
+    try{
+        // Extract token from request body
+        const token = req.params.token;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'Landfill manager') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+        next();
+    }catch(error){
+        console.log("Some error occured");
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+exports.isSTSManagerBody = async function(req,res,next){
+    try{
+        // Extract token from request body
+        const token = req.body.token;
+
+        // Check if token exists in the database
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        // Verify if user is a system manager
+        if (user.role !== 'STS manager') {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+        next();
+    }catch(error){
+        console.log("Some error occured");
+        return res.status(500).json({ message: "Server error" });
+    }
+};

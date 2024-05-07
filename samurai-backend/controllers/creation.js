@@ -12,20 +12,7 @@ const LandfillEntry = require('../models/landfill_entry')
 // GET method for retrieving STS information
 exports.getSTSInformation = async (req, res) => {
     try {
-        // Extract token from request headers
-        const token = req.params.token;
-
-        // Check if token exists in the database
-        const user = await userModel.findOne({ token });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-
-        // Verify if user is a system manager
-        if (user.role !== 'System admin') {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
-
+        
         // Retrieve all STS information from the database
         const stsInfo = await STS.find();
 
@@ -56,29 +43,12 @@ exports.getSTSInformation = async (req, res) => {
 };
 
 
-
-
 // POST method for creating a new STS (System Admin access)
 exports.createSTS = async (req, res) => {
     try {
-        // Extract token from request headers
         // Extract STS information from request body
         const { ward_number, capacity, latitude, longitude, token } = req.body;
-
-
-        // Check if token exists in the database
-        const user = await userModel.findOne({ token });
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-
-        // Verify if user is a system admin
-        if (user.role !== 'System admin') {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
-
-
+        
         // Create a new STS instance
         const newSTS = new STS({
             ward_number,
@@ -100,8 +70,6 @@ exports.createSTS = async (req, res) => {
 
 
 
-
-
 // Landfill for managers,
 
 
@@ -113,15 +81,6 @@ exports.getLandfillInformation = async (req, res) => {
 
         // Check if token exists in the database
         const user = await userModel.findOne({ token });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-
-        // Verify if user is a system manager
-        if (user.role !== 'Landfill manager') {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
-
         // Retrieve all Landfill information from the database
         const landfillInfo = await Landfill.find({assigned_managers_id:user._id});
 
@@ -155,31 +114,12 @@ exports.getLandfillInformation = async (req, res) => {
 
 
 
-
-
-
-
-
-
 // POST method for creating a new Landfill (System Admin access)
 exports.createLandfill = async (req, res) => {
     try {
         // Extract token from request headers
         // Extract Landfill information from request body
         const { name, capacity, operational_timespan, latitude, longitude, token } = req.body;
-
-        // Check if token exists in the database
-        const user = await userModel.findOne({ token });
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-
-        // Verify if user is a system admin
-        if (user.role !== 'System admin') {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
-
         // Create a new Landfill instance
         const newLandfill = new Landfill({
             name,
@@ -200,16 +140,7 @@ exports.createLandfill = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
 // STS Manager assignement
-
-
-
 
 // POST method for assigning a manager to an STS (System Admin access)
 exports.assignManagerToSTS = async (req, res) => {
@@ -255,14 +186,6 @@ exports.assignManagerToSTS = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
-
-
-
-
-
-
 
 
 // Landfill manager assignement
@@ -315,29 +238,11 @@ exports.assignManagerToLandfill = async (req, res) => {
 };
 
 
-
-
-
-
-
-
 // POST method for adding a new vehicle
 exports.addVehicle = async (req, res) => {
     try {
         // Extract vehicle information from request body
         const { token, registration_number, type, capacity, fuel_cost_per_km_loaded, fuel_cost_per_km_unloaded } = req.body;
-
-
-        const user = await userModel.findOne({ token });
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
-
-        // Verify if user is a system manager
-        if (user.role !== 'System admin') {
-            return res.status(403).json({ message: 'Unauthorized' });
-        }
 
         const vehicles = await Vehicle.findOne({registration_number});
         if(vehicles){
@@ -400,13 +305,6 @@ exports.checkUserAssignment = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
-
-
-
-
-
-
-
 
   exports.stsLog = async (req, res) => {
     try {
@@ -529,14 +427,6 @@ exports.getSTSEntriesForManager = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
 exports.getAllSTS = async (req, res) => {
     try {
         // Extract token from request headers
@@ -585,8 +475,6 @@ exports.getAllSTS = async (req, res) => {
 };
 
 
-
-
 exports.getAllLand = async (req, res) => {
     try {
         // Extract token from request headers
@@ -632,10 +520,6 @@ exports.getAllLand = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-
-
-
 
 exports.createLandfillEntry = async (req, res) => {
     try {
@@ -690,10 +574,6 @@ exports.createLandfillEntry = async (req, res) => {
     }
 };
 
-
-
-
-
 exports.getLandfillEntries = async (req, res) => {
     try {
         const token = req.params.token;
@@ -740,13 +620,6 @@ exports.getLandfillEntries = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
 exports.getLandfillEntriesAdmin = async (req, res) => {
     try {
         const token = req.params.token;
@@ -791,9 +664,6 @@ exports.getLandfillEntriesAdmin = async (req, res) => {
     }
 };
 
-
-
-
 exports.getAllVehicle = async(req,res)=>{
     try{
 
@@ -804,11 +674,6 @@ exports.getAllVehicle = async(req,res)=>{
         return res.status(500).send({ message: 'Internal Server Error'});
     }
 }
-
-
-
-
-
 
 exports.getBillingInfo = async (req, res) => {
     try {
@@ -861,4 +726,3 @@ exports.getBillingInfo = async (req, res) => {
         res.status(500).send({ message: 'Error fetching LandfillEntries', error: error.toString() });
     }
 };
-
