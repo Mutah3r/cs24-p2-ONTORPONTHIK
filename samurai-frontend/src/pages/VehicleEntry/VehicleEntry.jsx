@@ -67,7 +67,6 @@ const VehicleEntry = () => {
   };
 
   const onSuggestionClick = (value) => {
-    console.log(value);
     setStsFormData({
       ...stsFormData,
       vehicleRegNo: value,

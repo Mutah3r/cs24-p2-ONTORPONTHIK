@@ -37,7 +37,6 @@ const STSLogsChart = ({logsData}) => {
   };
 
   const last7DaysData = processLast7DaysData(logsData);
-  console.log(last7DaysData);
 
   const shortDayNames = {
     "Monday": "Mon",

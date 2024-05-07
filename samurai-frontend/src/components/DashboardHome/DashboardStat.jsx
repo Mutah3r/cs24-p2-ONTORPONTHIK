@@ -29,7 +29,6 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          console.log(res);
           setStsLogs(res.data.data); // Set the fetched STS logs
           setFilteredStsLogs(res.data.data); // Initialize the filtered logs
           setLoading(false);
@@ -48,7 +47,6 @@ const DashboardStat = ({ user }) => {
           )}`
         )
         .then((res) => {
-          console.log(res.data.data);
           setLandfillLogs(res.data.data); // Set the fetched landfill logs
           setFilteredLandfillLogs(res.data.data); // Initialize the filtered logs
           setLoading(false);
