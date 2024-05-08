@@ -155,17 +155,25 @@ exports.initiatePasswordReset = async (req, res) => {
 exports.confirmPasswordReset = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
+    jwt.verify(token, process.env.jwt_secret_key, async(err, decoded) => {
+      if (err) {
+          console.error('Error verifying JWT token:', err);
+          // Handle error
+      } else {
+          // Extract email from the decoded payload
+          const email = decoded.email; // Assuming email is stored in the payload
+          // Find user by token
+          const user = await userModel.findOne({ email });
+          // Hash the new password
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Find user by token
-    const user = await userModel.findOne({ token });
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+          // Update user's password
+          user.password = hashedPassword;
+          await user.save();
 
-    // Update user's password
-    user.password = hashedPassword;
-    await user.save();
-
-    return res.status(200).json({ message: "Password reset successfully" });
+          return res.status(200).json({ message: "Password reset successfully" });
+      }
+    });
     
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

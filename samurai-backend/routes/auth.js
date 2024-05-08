@@ -7,6 +7,6 @@ router.post('/login',middleware.limiter,authController.Login)
 router.post('/logout',authController.Logout)
 router.post('/change-password',middleware.islogin, authController.changePassword)
 router.post('/reset-password/initiate',authController.initiatePasswordReset)
-router.post('/reset-password/confirm',middleware.islogin, authController.confirmPasswordReset)
+router.post('/reset-password/confirm', authController.confirmPasswordReset)
 
 module.exports = router;
