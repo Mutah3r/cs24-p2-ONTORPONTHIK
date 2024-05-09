@@ -306,6 +306,9 @@ exports.checkUserAssignment = async (req, res) => {
     }
   };
 
+
+
+  // [ASIF]
   exports.stsLog = async (req, res) => {
     try {
         const { 
@@ -337,9 +340,29 @@ exports.checkUserAssignment = async (req, res) => {
 
             // Proceed with STS log creation
             const vehicle = await Vehicle.findOne({ registration_number });
+
+            
             if (!vehicle) {
                 return res.status(404).send({ message: 'Vehicle not found' });
             }
+
+
+
+            // Updated the vehicle [ASIF]
+            Vehicle.findOneAndUpdate(
+                { registration_number },
+                {
+                    $set: {
+                        type,
+                        capacity,
+                        fuel_cost_per_km_loaded,
+                        fuel_cost_per_km_unloaded,
+                        left_from_sts: true,
+                        left_from_landfill: false,
+                        destination_landfill: to
+                    }
+                }
+            );
 
             const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
 
