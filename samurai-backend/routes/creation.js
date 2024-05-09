@@ -19,6 +19,8 @@ router.post('/landManage',authController.assignManagerToLandfill)
 router.post('/vehicleCreate' ,middleware.isSystemAdminBody, authController.addVehicle)
 //get all vehicle
 router.get('/allvehicle',authController.getAllVehicle)
+//get all available vehicle for sts entry
+router.get('/allstsvehicle',authController.getAvailableVehicleForSTS)
 //create sts log
 router.post('/entry', authController.stsLog)
 //sts entries for all manager

@@ -698,6 +698,29 @@ exports.getAllVehicle = async(req,res)=>{
     }
 }
 
+
+
+
+
+
+
+
+
+
+// [ASIF]
+
+exports.getAvailableVehicleForSTS = async(req, res) => {
+    try {
+        const vehicles = await Vehicle.find({ left_from_landfill: true });
+
+        return res.status(200).send({ message: 'Available vehicles', vehicles });
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
 exports.getBillingInfo = async (req, res) => {
     try {
         const token = req.params.token;
