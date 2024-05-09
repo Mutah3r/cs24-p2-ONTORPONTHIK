@@ -356,12 +356,12 @@ exports.checkUserAssignment = async (req, res) => {
                         left_from_sts: true,
                         left_from_landfill: false,
                         destination_landfill: to,
-                        carring_weight: capacity
+                        carrying_weight: capacity
                     }
                 }
             );
 
-            console.log(type)
+            // console.log(type)
 
             const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
 

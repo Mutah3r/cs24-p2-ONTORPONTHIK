@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const VehicleEntry = () => {
@@ -8,16 +7,26 @@ const VehicleEntry = () => {
   const [spinner, setSpinner] = useState(false);
   const [landfills, setLandfills] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [vehiclesType, setVehiclesType] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [input, setInput] = useState('');
 
-  const navigate = useNavigate();
 
   useEffect(()=>{
-    axios.get('http://localhost:8000/vehicle/allvehicle')
+    axios.get('http://localhost:8000/vehicle/allstsvehicle')
     .then(res => {
-      const registrationNumbers = res.data?.vehicle?.map(vehicle => vehicle.registration_number);
+      const registrationNumbers = res.data?.vehicles?.map(vehicle => vehicle.registration_number);
       setVehicles(registrationNumbers); 
+
+      const vehiclesRegistrationNumbersAndTypes = res.data?.vehicles?.map(vehicle => {
+        return {
+          reg_no: vehicle.registration_number,
+          type: vehicle.type,
+          capacity: vehicle.capacity
+        }
+      });
+
+      setVehiclesType(vehiclesRegistrationNumbersAndTypes);
     })
   }, []);
 
@@ -46,11 +55,26 @@ const VehicleEntry = () => {
 
     // Give vehicle suggestions to the user
     if (value.length > 0) {
-      const filteredSuggestions = vehicles.filter(number =>
+      const filteredSuggestions = vehicles? vehicles.filter(number =>
         number.toLowerCase().includes(value.toLowerCase())
-      );
+      ) : [];
       if(name === 'vehicleRegNo'){
+        // give available vehicles suggestions
         setSuggestions(filteredSuggestions);
+        // update the vehicle type field if the entered vehicle matches any available vehicle
+        const matchedVehicle = vehiclesType.find(vehicle => vehicle.reg_no === value);
+        
+        if(matchedVehicle){
+          const txtBx = document.getElementById('stsVehicleType');
+          txtBx.value = matchedVehicle.type;
+          document.getElementById('vehicle-max-capacity').innerHTML = `Maximum Capacity: ${matchedVehicle.capacity} Ton`;
+        }
+        else{
+          const txtBx = document.getElementById('stsVehicleType');
+          txtBx.value = "";
+          document.getElementById('vehicle-max-capacity').innerHTML = ``;
+        }
+
       }
     } else {
       setSuggestions([]);
@@ -69,6 +93,19 @@ const VehicleEntry = () => {
   };
 
   const onSuggestionClick = (value) => {
+    const matchedVehicle = vehiclesType.find(vehicle => vehicle.reg_no === value);
+
+    if(matchedVehicle){
+      const txtBx = document.getElementById('stsVehicleType');
+      txtBx.value = matchedVehicle.type;
+      document.getElementById('vehicle-max-capacity').innerHTML = `Maximum Capacity: ${matchedVehicle.capacity} Ton`;
+    }
+    else{
+      const txtBx = document.getElementById('stsVehicleType');
+      txtBx.value = "";
+      document.getElementById('vehicle-max-capacity').innerHTML = ``;
+    }
+
     setStsFormData({
       ...stsFormData,
       vehicleRegNo: value,
@@ -96,9 +133,21 @@ const VehicleEntry = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // carrying weight cannot be greater than maximum weight
+    const selectedVehicle = vehiclesType.find(vehicle => vehicle.reg_no === stsFormData.vehicleRegNo);
+    if(selectedVehicle && parseFloat(stsFormData.weightCarrying) > parseFloat(selectedVehicle.capacity)){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `Maximum allowed weight is ${selectedVehicle.capacity} Ton`,
+      });
+
+      return;
+    }
+
     // Check for empty fields
     for (const key in stsFormData) {
-      if (stsFormData[key] === "") {
+      if (key !== "vehicleType" && stsFormData[key] === "") {
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -111,16 +160,23 @@ const VehicleEntry = () => {
     }
 
     setSpinner(true);
+    
+    const postDataInfo = {
+      token: JSON.parse(localStorage.getItem("user")),
+      registration_number: stsFormData.vehicleRegNo,
+      type: document.getElementById('stsVehicleType').value,
+      capacity: parseInt(stsFormData.weightCarrying),
+      time_of_arrival: stsFormData.arrivalTime,
+      time_of_departure: stsFormData.departureTime,
+      to: stsFormData.destination,
+    }
+
+    console.log(postDataInfo);
+    // setSpinner(false);
+    // return;
+
     axios
-      .post("http://localhost:8000/sts/entry", {
-        token: JSON.parse(localStorage.getItem("user")),
-        registration_number: stsFormData.vehicleRegNo,
-        type: stsFormData.vehicleType,
-        capacity: parseInt(stsFormData.weightCarrying),
-        time_of_arrival: stsFormData.arrivalTime,
-        time_of_departure: stsFormData.departureTime,
-        to: stsFormData.destination,
-      })
+      .post("http://localhost:8000/sts/entry", postDataInfo)
       .then((res) => {
         setSpinner(false);
         if (res.data.message === "STSEntry created successfully") {
@@ -348,20 +404,16 @@ const VehicleEntry = () => {
         </div>
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Vehicle Type:</label>
-          <select
+          <input
+            type="text"
             name="vehicleType"
-            value={stsFormData.vehicleType}
+            id="stsVehicleType"
+            disabled={true}
             onChange={handleSTSChange}
-            className="select select-bordered w-full"
-          >
-            <option value="">Select vehicle type</option>
-            <option value="Open Truck">Open Truck</option>
-            <option value="Dump Truck">Dump Truck</option>
-            <option value="Compactor">Compactor</option>
-            <option value="Container Carrier">Container Carrier</option>
-          </select>
+            className="input input-bordered w-full"
+          />
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <label className="block mb-1 text-gray-700">Weight Carrying:</label>
           <input
             type="text"
@@ -370,6 +422,9 @@ const VehicleEntry = () => {
             onChange={handleSTSChange}
             className="input input-bordered w-full"
           />
+        </div>
+        <div className="mb-2">
+          <label id="vehicle-max-capacity" className="block mb-1 text-green-500 text-right">Maximum Capacity: 10 Ton</label>
         </div>
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Time of Arrival:</label>
