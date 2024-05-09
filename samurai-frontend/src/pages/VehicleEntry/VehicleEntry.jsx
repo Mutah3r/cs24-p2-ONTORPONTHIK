@@ -10,6 +10,7 @@ const VehicleEntry = () => {
   const [vehiclesType, setVehiclesType] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [input, setInput] = useState('');
+  const [refetch, setRefetch] = useState(false);
 
 
   useEffect(()=>{
@@ -28,7 +29,7 @@ const VehicleEntry = () => {
 
       setVehiclesType(vehiclesRegistrationNumbersAndTypes);
     })
-  }, []);
+  }, [refetch]);
 
   const [formData, setFormData] = useState({
     vehicleRegNo: "",
@@ -171,10 +172,6 @@ const VehicleEntry = () => {
       to: stsFormData.destination,
     }
 
-    console.log(postDataInfo);
-    // setSpinner(false);
-    // return;
-
     axios
       .post("http://localhost:8000/sts/entry", postDataInfo)
       .then((res) => {
@@ -185,6 +182,20 @@ const VehicleEntry = () => {
             text: "Entry Added!!",
             icon: "success",
           });
+          
+          setStsFormData({
+            vehicleRegNo: "",
+            vehicleType: "",
+            weightCarrying: "",
+            arrivalTime: "",
+            departureTime: "",
+            destination: "",
+          });
+          setVehicles([]);
+          setVehiclesType([]);
+          setSuggestions([]);
+
+          setRefetch(refetch);
         } else {
           Swal.fire({
             icon: "error",
