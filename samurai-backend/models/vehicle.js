@@ -41,6 +41,11 @@ const vehicleSchema = new mongoose.Schema({
     destination_landfill: {
         type: String,
         required: false
+    },
+    carring_weight: {
+        type: Number,
+        default: 0,
+        required: false
     }
 
 });

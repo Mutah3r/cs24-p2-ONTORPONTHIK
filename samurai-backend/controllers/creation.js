@@ -359,10 +359,13 @@ exports.checkUserAssignment = async (req, res) => {
                         fuel_cost_per_km_unloaded,
                         left_from_sts: true,
                         left_from_landfill: false,
-                        destination_landfill: to
+                        destination_landfill: to,
+                        carring_weight: capacity
                     }
                 }
             );
+
+            console.log(type)
 
             const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
 
@@ -687,6 +690,8 @@ exports.getLandfillEntriesAdmin = async (req, res) => {
     }
 };
 
+
+
 exports.getAllVehicle = async(req,res)=>{
     try{
 
@@ -708,7 +713,6 @@ exports.getAllVehicle = async(req,res)=>{
 
 
 // [ASIF]
-
 exports.getAvailableVehicleForSTS = async(req, res) => {
     try {
         const vehicles = await Vehicle.find({ left_from_landfill: true });
@@ -719,6 +723,51 @@ exports.getAvailableVehicleForSTS = async(req, res) => {
         return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
     }
 };
+
+
+
+// [ASIF]
+exports.getAvailableVehicleForLandfill = async(req, res) => {
+    try {
+        const token = req.params.token;
+
+        
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        
+        try {
+            jwt.verify(token, process.env.JWT_SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        if (user.role !== "Landfill manager") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        
+        const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
+
+        if (!landfill) {
+            return res.status(404).send({ message: 'No Landfill assigned to the manager' });
+        }
+        const vehicles = await Vehicle.find({
+            left_from_sts: true,
+            destination_landfill: landfill.name
+        });
+
+        return res.status(200).send({ message: 'Available vehicles for landfill', vehicles });
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
 
 
 exports.getBillingInfo = async (req, res) => {
