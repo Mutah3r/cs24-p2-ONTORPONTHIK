@@ -349,17 +349,29 @@ exports.checkUserAssignment = async (req, res) => {
 
 
             // Updated the vehicle [ASIF]
-            Vehicle.findOneAndUpdate(
-                { registration_number },
-                {
-                    $set: {
-                        left_from_sts: true,
-                        left_from_landfill: false,
-                        destination_landfill: to,
-                        carrying_weight: capacity
-                    }
+            
+            try {
+                const updatedVehicle = await Vehicle.findOneAndUpdate(
+                    { registration_number },
+                    {
+                        $set: {
+                            left_from_sts: true,
+                            left_from_landfill: false,
+                            destination_landfill: to,
+                            carrying_weight: capacity
+                        }
+                    },
+                    { new: true }  // Returns the updated document
+                );
+            
+                if (!updatedVehicle) {
+                    console.log('No document found with that registration number.');
+                } else {
+                    console.log('Update successful:', updatedVehicle);
                 }
-            );
+            } catch (error) {
+                console.error('Error updating the vehicle:', error);
+            }
 
             // console.log(type)
 
