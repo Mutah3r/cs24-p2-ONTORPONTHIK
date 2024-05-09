@@ -107,6 +107,16 @@ const generateResetToken = (email) => {
   return jwt.sign({ email }, process.env.jwt_secret_key, { expiresIn: "5m" });
 };
 
+// Generate a random string function
+function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
 // Function to send the password reset email
 const sendResetEmail = async (email, token) => {
   const transporter = nodemailer.createTransport({
@@ -125,6 +135,56 @@ const sendResetEmail = async (email, token) => {
   });
 
   //console.log('Password reset email sent:', info.response);
+};
+
+// Function to send the password reset email for mobile app
+const sendResetEmailforApp = async (email, token) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.USER,
+      pass: process.env.PASS,
+    },
+  });
+
+  const info = await transporter.sendMail({
+    from: '"EcoSync" <EcoSync@gmail.com>', // sender address
+    to: email, // recipient address
+    subject: "Password Reset for EcoSync", // Subject line
+    html: `<p>Your new password is ${token}</p>`,
+  });
+
+};
+
+//reset password for mobile app
+exports.ResetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email exists in the database
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    // Generate and send password reset token
+    const token = generateRandomString(6);
+    await sendResetEmailforApp(email, token);
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(token, 10);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
+    res
+      .status(200)
+      .json({
+        message:
+          "Password reset initiated. Check your email for further instructions.",
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 exports.initiatePasswordReset = async (req, res) => {
