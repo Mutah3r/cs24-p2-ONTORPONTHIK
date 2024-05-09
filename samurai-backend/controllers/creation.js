@@ -353,10 +353,6 @@ exports.checkUserAssignment = async (req, res) => {
                 { registration_number },
                 {
                     $set: {
-                        type,
-                        capacity,
-                        fuel_cost_per_km_loaded,
-                        fuel_cost_per_km_unloaded,
                         left_from_sts: true,
                         left_from_landfill: false,
                         destination_landfill: to,
