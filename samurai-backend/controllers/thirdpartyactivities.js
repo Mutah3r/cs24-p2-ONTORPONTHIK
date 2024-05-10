@@ -143,6 +143,20 @@ exports.Registration = async (req, res) => {
           username
         });
 
+        const updatedContractor = await ThirdPartyCnt.findByIdAndUpdate(
+            assigned_contractor_company,
+            { $set: { assigned_manager_id: newUser._id } },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedContractor) {
+            return res.status(404).send({
+                message: "Contractor not found."
+            });
+        }
+
+        
+
         const transporter = nodemailer.createTransport({
           service: "gmail",
           auth: {
