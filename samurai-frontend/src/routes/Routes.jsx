@@ -14,6 +14,7 @@ import Billing from "../pages/Billing/Billing";
 import ResetPassword from "../pages/RestPassword/ResetPassword";
 import ConfirmReset from "../pages/RestPassword/ConfirmReset";
 import OptimalFleet from "../pages/OptimalFleet/OptimalFleet";
+import ManageThirdParty from "../pages/ManageThirdParty/ManageThirdParty";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
         path: "optimal-fleet",
         element: <OptimalFleet />,
       },
+      {
+        path: "third-party-management",
+        element: <ManageThirdParty />
+      }
     ],
   },
 ]);
