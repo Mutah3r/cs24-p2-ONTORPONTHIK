@@ -339,7 +339,7 @@ exports.checkUserAssignment = async (req, res) => {
             }
 
 
-            const sts = await STS.findOne({ assigned_managers_id: user._id });
+            const sts = await STS.findOne({ assigned_managers_id: userId._id });
 
             if (!sts) {
                 return res.status(404).json({ message: "No STS assigned to this manager" });
