@@ -10,7 +10,6 @@ const Employee = require('../models/employee');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
 const EmployeeLog = require('../models/employee_log');
-const moment = require('moment');
 
 // /thirdparties/allthirdparties [get all thirdparty contact]
 exports.getAllThirdPartyContractors = async (req, res) => { // contactor companies
@@ -359,7 +358,6 @@ exports.createEmployeeLog = async (req, res) => {
 
 
 // Get Employes entries
-
 exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
     const { token } = req.params;
     const { is_today } = req.query; // Expect 'is_today' to be a query parameter
@@ -440,6 +438,7 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
         });
     }
 };
+
 
 
 //Get employess information for last 7 days
