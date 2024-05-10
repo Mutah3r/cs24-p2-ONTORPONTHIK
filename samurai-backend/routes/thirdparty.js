@@ -12,7 +12,10 @@ router.post('/thirdparty', Controller.addThirdPartyContractor);
 router.post('/addnewmanager', Controller.Registration);
 //get all third party company name and id
 router.get('/allcompany', Controller.getAllThirdPartyCompanyNames);
-
+// add new employee
+router.post('/addnewemployee', Controller.createEmployee);
+// get employes for specific managers
+router.get('/getemployees/:token', Controller.getEmployeesByManager);
 
 
 

@@ -191,7 +191,7 @@ exports.createEmployee = async (req, res) => {
         // Fetch the user details using the ID from the decoded token
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Invalid token" });
         }
 
         // Check if the user role is 'Contract Manager'
@@ -244,16 +244,16 @@ exports.createEmployee = async (req, res) => {
 // get all employess of the current managers
 exports.getEmployeesByManager = async (req, res) => {
     try {
+
         // Extract token from the query params
         const { token } = req.params;
         if (!token) {
             return res.status(401).json({ message: "No token provided" });
         }
 
-        
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Invalid token" });
         }
 
         // Check if the user role is 'Contract Manager'

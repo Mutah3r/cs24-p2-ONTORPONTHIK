@@ -32,6 +32,7 @@ const employeeLogSchema = new mongoose.Schema({
     }
 });
 
+
 const EmployeeLog = mongoose.model('EmployeeLog', employeeLogSchema);
 
 module.exports = EmployeeLog;
