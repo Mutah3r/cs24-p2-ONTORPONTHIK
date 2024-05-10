@@ -58,8 +58,8 @@ exports.addNormalUser = async (req, res) => {
   
   exports.addFeedback = async (req, res) => {
     try {
-      const { user_email, role, location, type, description, photos } = req.body;
-      const feedback = new Feedback({ user_email, role, location, type, description, photos });
+      const { user_email, role, location, type, description } = req.body;
+      const feedback = new Feedback({ user_email, role, location, type, description});
       await feedback.save();
       res.status(201).send(feedback);
     } catch (error) {
