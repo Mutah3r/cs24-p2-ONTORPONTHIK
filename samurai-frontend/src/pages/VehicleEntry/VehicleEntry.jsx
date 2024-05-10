@@ -36,7 +36,6 @@ const VehicleEntry = () => {
     axios.get(`http://localhost:8000/vehicle/alllandfillvehicle/${JSON.parse(localStorage.getItem("user"))}`)
     .then(res => {
       setAvailableLandfillVehicles(res.data?.vehicles);
-      console.log(res.data?.vehicles);
     })
   },[]);
 
@@ -131,27 +130,30 @@ const VehicleEntry = () => {
 
 
   const onSuggestionClickLandfill = (value) => {
-    console.log(value);
     const matchedVehicle = availableLandfillVehicles.find(vehicle => vehicle.registration_number === value);
 
-    console.log(matchedVehicle);
     if(matchedVehicle){
-      // const txtBx = document.getElementById('stsVehicleType');
-      // txtBx.value = matchedVehicle.type;
-      // document.getElementById('vehicle-max-capacity').innerHTML = `Maximum Capacity: ${matchedVehicle.capacity} Ton`;
+      setFormData({
+        ...formData,
+        vehicleRegNo: value,
+        capacity: matchedVehicle.capacity,
+        weightCarrying: matchedVehicle.carring_weight,
+      });
       document.getElementById('landfillLoadCarrying').value = matchedVehicle.carring_weight;
-
+      document.getElementById('fromStsWardNumber').value = matchedVehicle.from_sts;
     }
     else{
-      // const txtBx = document.getElementById('stsVehicleType');
-      // txtBx.value = "";
-      // document.getElementById('vehicle-max-capacity').innerHTML = ``;
+      document.getElementById('landfillLoadCarrying').value = "";
+      document.getElementById('fromStsWardNumber').value = "";
     }
 
-    // setStsFormData({
-    //   ...stsFormData,
-    //   vehicleRegNo: value,
-    // });
+    setFormData({
+      ...formData,
+      vehicleRegNo: value,
+      capacity: matchedVehicle.capacity,
+      weightCarrying: matchedVehicle.carring_weight,
+    });
+
     setInput(value);
     setSuggestions([]);
   };
@@ -233,7 +235,6 @@ const VehicleEntry = () => {
       to: stsFormData.destination,
     }
 
-    console.log(postDataInfo);
     // return;
 
     axios
@@ -324,17 +325,25 @@ const VehicleEntry = () => {
 
       const filteredSuggestionNames = filteredSuggestions.map(item => item.registration_number);
 
-      console.log(filteredSuggestionNames);
+
 
       if(name === 'vehicleRegNo'){
         setSuggestions(filteredSuggestionNames);
         const matchedVehicle = availableLandfillVehicles.find(vehicle => vehicle.registration_number === value);
 
         if(matchedVehicle){
-          // set the all other fileds
+          setFormData({
+            ...formData,
+            vehicleRegNo: value,
+            capacity: matchedVehicle.capacity,
+            weightCarrying: matchedVehicle.carring_weight,
+          });
+        document.getElementById('landfillLoadCarrying').value = matchedVehicle.carring_weight;
+        document.getElementById('fromStsWardNumber').value = matchedVehicle.from_sts;
         }
         else{
-          // clear all other fields
+          document.getElementById('landfillLoadCarrying').value = "";
+          document.getElementById('fromStsWardNumber').value = "";
         }
       }
       else {
@@ -381,7 +390,8 @@ const VehicleEntry = () => {
       .post("http://localhost:8000/landfill/lentry", {
         token: JSON.parse(localStorage.getItem("user")),
         vehicle_registration: formData.vehicleRegNo,
-        weight_of_waste: parseFloat(formData.capacity),
+        // weight_of_waste: parseFloat(formData.capacity),
+        weight_of_waste: parseFloat(formData.weightCarrying),
         time_of_arrival: formData.arrivalTime,
         time_of_departure: formData.departureTime,
         from: parseInt(formData.from),
@@ -445,6 +455,7 @@ const VehicleEntry = () => {
             name="capacity"
             pattern="[0-9]+([,.][0-9]+)?"
             // value={formData.capacity}
+            disabled={true}
             onChange={handleChange}
             className="input input-bordered w-full"
           />
@@ -471,12 +482,13 @@ const VehicleEntry = () => {
         </div>
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">
-            From (Ward Number):
+            From (STS Ward Number):
           </label>
           <input
+            disabled={true}
             type="text"
             name="from"
-            value={formData.from}
+            id="fromStsWardNumber"
             onChange={handleChange}
             className="input input-bordered w-full"
           />
