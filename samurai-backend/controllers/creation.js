@@ -591,10 +591,37 @@ exports.createLandfillEntry = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        const vehicle = await Vehicle.findOne({ registration_number:vehicle_registration });
+        const vehicle = await Vehicle.findOne({ registration_number: vehicle_registration });
         if (!vehicle) {
             return res.status(404).send({ message: 'Vehicle not found' });
         }
+
+
+
+        // Updated the vehicle [ASIF]
+        try {
+            const updatedVehicle = await Vehicle.findOneAndUpdate(
+                { vehicle_registration },
+                {
+                    $set: {
+                        left_from_sts: false,
+                        left_from_landfill: true,
+                        destination_landfill: "None",
+                        carrying_weight: 0,
+                        from_sts: "None"
+                    }
+                },
+            );
+        
+            if (!updatedVehicle) {
+                console.log('No document found with that registration number.');
+            } else {
+                console.log('Update successful:', updatedVehicle);
+            }
+        } catch (error) {
+            console.error('Error updating the vehicle:', error);
+        }
+
 
         // Check if the user is assigned as a manager to any landfill
         const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
