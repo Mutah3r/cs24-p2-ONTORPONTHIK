@@ -851,11 +851,16 @@ exports.getAvailableVehicleForSTSFleetOptimized = async(req, res) => {
         });
 
         let modified_total_waste = waste;
+        let mn = dp[modified_total_waste];
+        let ans_wer = modified_total_waste;
         for(; modified_total_waste <= totalCapacity; modified_total_waste++) {
-            if (dp[modified_total_waste] !== Infinity) {
-                break;
+            if (mn > dp[modified_total_waste]) {
+                ans_wer = modified_total_waste;
+                mn = dp[modified_total_waste];
             }
         }
+
+        modified_total_waste = ans_wer;
 
         // Extract the fleet composition
         let fleetComposition = {
