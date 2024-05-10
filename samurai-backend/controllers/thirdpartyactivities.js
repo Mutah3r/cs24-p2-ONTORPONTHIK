@@ -96,7 +96,6 @@ exports.Registration = async (req, res) => {
       name,
       email,
       password,
-      role,
       token,
       contact_number,
       assigned_contractor_company,
@@ -134,7 +133,7 @@ exports.Registration = async (req, res) => {
           name,
           email,
           password: hashedPassword,
-          role,
+          role: 'Contractor Manager',
           isLogin: false,
           token: '',  // Assuming token is cleared or handled differently post-registration
           date_of_account_creation: new Date(),  // Set the creation date to current date
@@ -143,6 +142,20 @@ exports.Registration = async (req, res) => {
           access_level,
           username
         });
+
+        const updatedContractor = await ThirdPartyCnt.findByIdAndUpdate(
+            assigned_contractor_company,
+            { $set: { assigned_manager_id: newUser._id } },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedContractor) {
+            return res.status(404).send({
+                message: "Contractor not found."
+            });
+        }
+
+        
 
         const transporter = nodemailer.createTransport({
           service: "gmail",

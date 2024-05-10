@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const employeeLogSchema = new mongoose.Schema({
-    employee_id: { // select it from this particular managers contacted employes.... using managers id.
+    employee_id: {   
         type: String,
         required: true
     },
@@ -26,7 +26,7 @@ const employeeLogSchema = new mongoose.Schema({
         type: Number,
         required: True
     },
-    total_payment: { // for contact managers , they can create a pay slip for each employee . Get employe hourly payment and mutiply it with total hour worked and then generate a pay slip from frontend with time detals and payment
+    total_payment: { // calculate current days payment by 
         type: Number,
         required: true
     }

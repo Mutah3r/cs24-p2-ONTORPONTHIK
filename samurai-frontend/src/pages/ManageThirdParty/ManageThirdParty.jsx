@@ -29,6 +29,15 @@ const ManageThirdParty = () => {
     });
   }, [refetch]);
 
+  function getObjectIdByCompanyName(companyName) {
+    for (const company of thirdPartyCompanies) {
+      if (company.name_of_the_company === companyName) {
+        return company.objectId;
+      }
+    }
+    return null; // Return null if company name is not found
+  }
+
   const handleAddContractor = () => {
     Swal.fire({
       title: "Add New Third-Party Contractor",
@@ -155,7 +164,6 @@ const ManageThirdParty = () => {
               <input id="contract-username" class="swal2-input" placeholder="Username">
               <input id="contractor-email" type="email" class="swal2-input" placeholder="Contractor Email" type="text">
               <input id="password" type="password" class="swal2-input" placeholder="Password" type="text">
-              <input id="role" class="swal2-input" placeholder="Role" type="text">
               <input id="date-of-account-creation" class="swal2-input" placeholder="Account Creation Date">
               <input id="contact-number" class="swal2-input" placeholder="Contact Number">
               <select id="assigned-contractor-company" class="swal2-select" placeholder="Type">
@@ -182,14 +190,13 @@ const ManageThirdParty = () => {
         const contractor_email =
           document.getElementById("contractor-email").value;
         const password = document.getElementById("password").value;
-        const role = document.getElementById("role").value;
         const date_of_account_creation = document.getElementById(
           "date-of-account-creation"
         ).value;
         const contact_number = document.getElementById("contact-number").value;
-        const assigned_contractor_company = document.getElementById(
+        const assigned_contractor_company = getObjectIdByCompanyName(document.getElementById(
           "assigned-contractor-company"
-        ).value;
+        ).value);
         const access_level = document.getElementById("access-level").value;
 
         if (
@@ -197,7 +204,6 @@ const ManageThirdParty = () => {
           !contract_username ||
           !contractor_email ||
           !password ||
-          !role ||
           !date_of_account_creation ||
           !contact_number ||
           !assigned_contractor_company ||
@@ -212,7 +218,6 @@ const ManageThirdParty = () => {
           contract_username,
           contractor_email,
           password,
-          role,
           date_of_account_creation,
           contact_number,
           assigned_contractor_company,
@@ -231,7 +236,7 @@ const ManageThirdParty = () => {
             email: result.value.contractor_email,
             password: result.value.password,
             role: result.value.role,
-            token: JSON.parse(localStorage.getItem('user')),
+            token: JSON.parse(localStorage.getItem("user")),
             contact_number: result.value.contact_number,
             assigned_contractor_company:
               result.value.assigned_contractor_company,
@@ -256,41 +261,6 @@ const ManageThirdParty = () => {
             });
             setIsLoading(false);
           });
-
-        // make a network call in post method to update the information in the database
-        //   axios.post('http://localhost:8000/thirdparties/thirdparty',{
-        //       name_of_the_company: result.value.companyName,
-        //       registration_id: result.value.reg_id,
-        //       registration_date: result.value.reg_date,
-        //       tin_of_the_company: result.value.tin,
-        //       contact_number: result.value.contract_no,
-        //       workforce_size: parseInt(result.value.workforce_size),
-        //       payment_per_tonnage_of_waste: parseFloat(result.value.payment_per_tonnage),
-        //       required_amount_of_waste_per_day: parseFloat(result.value.required_amount_per_day),
-        //       contract_duration: result.value.contract_duration,
-        //       area_of_collection: result.value.area_of_collection,
-        //       designated_sts: parseInt(result.value.designated_sts)
-        //   })
-        //   .then(res => {
-        //       if(res.data?.message==='New third-party contractor added successfully'){
-        //           Swal.fire({
-        //               title: "Good job!",
-        //               text: "New third-party contractor added successfully!",
-        //               icon: "success"
-        //             });
-        //       }
-        //       setIsLoading(false);
-        //       setRefetch(!refetch);
-        //   })
-        //   .catch(() => {
-        //       Swal.fire({
-        //           icon: "error",
-        //           title: "Oops...",
-        //           text: "Something went wrong!",
-        //           footer: '<a href="#">Why do I have this issue?</a>'
-        //         });
-        //       setIsLoading(false);
-        //   })
       }
     });
   };
