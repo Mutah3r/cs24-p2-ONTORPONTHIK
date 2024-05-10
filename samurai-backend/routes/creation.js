@@ -41,5 +41,9 @@ router.get('/allland/:token',authController.getAllLand)
 router.get('/alllandentry/:token' ,authController.getLandfillEntriesAdmin)
 //create billslip
 router.get('/billslip/:token', authController.getBillingInfo)
+//Fleet View
+router.get('/fleetview', authController.getAvailableVehicleForSTSFleetView);
+//Optimized fleet
+router.get('/fleetoptimized', authController.getAvailableVehicleForSTSFleetOptimized)
 
 module.exports = router;

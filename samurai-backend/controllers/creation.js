@@ -349,7 +349,7 @@ exports.checkUserAssignment = async (req, res) => {
 
 
             // Updated the vehicle [ASIF]
-            
+
             try {
                 const updatedVehicle = await Vehicle.findOneAndUpdate(
                     { registration_number },
@@ -460,6 +460,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
         return res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
     }
 };
+
 
 exports.getAllSTS = async (req, res) => {
     try {
@@ -731,6 +732,163 @@ exports.getAvailableVehicleForSTS = async(req, res) => {
         return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
     }
 };
+
+
+
+// [ASIF] [ASIF]
+exports.getAvailableVehicleForSTSFleetView = async(req, res) => {
+    try {
+        const vehicles = await Vehicle.find({ left_from_landfill: true });
+
+        // Initialize counts for each type of vehicle
+        let fleetComposition = {
+            open_truck: 0,
+            dump_truck: 0,
+            compactor: 0,
+            container_carrier: 0
+        };
+
+        // Tally up each vehicle type
+        vehicles.forEach(vehicle => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase(); // Normalize the type to match your fleetComposition keys
+            if (fleetComposition.hasOwnProperty(typeKey)) {
+                fleetComposition[typeKey]++;
+            }
+        });
+
+        // Send the response with vehicle counts
+        return res.status(200).send(fleetComposition);
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
+// [ASIF] [ASIF] [ASIF]
+exports.getAvailableVehicleForSTSFleetOptimized = async(req, res) => {
+    try {
+        // Extract parameters from the query string
+        const { token, Open_Truck = "None", Dump_Truck = "None", Compactor = "None", Container_Carrier = "None", total_waste } = req.query;
+
+        // Convert total_waste from string to number and validate
+        const waste = parseInt(total_waste, 10);
+        if (isNaN(waste)) {
+            return res.status(400).json({ message: "Invalid 'total_waste' parameter, must be a number." });
+        }
+
+        // Validate and authenticate the user
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.JWT_SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ message: "Token verification failed" });
+        }
+
+        // Authorization check
+        if (user.role !== "STS manager") {
+            return res.status(403).json({ message: "Unauthorized access, user must be an STS manager" });
+        }
+
+        // Prepare dynamic query for vehicle types based on provided parameters
+        let typeConditions = [];
+        if (Open_Truck !== "None") typeConditions.push({ type: Open_Truck });
+        if (Dump_Truck !== "None") typeConditions.push({ type: Dump_Truck });
+        if (Compactor !== "None") typeConditions.push({ type: Compactor });
+        if (Container_Carrier !== "None") typeConditions.push({ type: Container_Carrier });
+
+        const vehicles = await Vehicle.find({
+            left_from_landfill: true,
+            ...(typeConditions.length > 0 && {$or: typeConditions})
+        });
+
+        if (!vehicles.length) {
+            return res.status(404).json({ message: 'No available vehicles match the selected types' });
+        }
+
+        // Check if total capacity meets required waste clearance
+        const totalCapacity = vehicles.reduce((sum, vehicle) => sum + vehicle.capacity, 0);
+        if (totalCapacity < waste) {
+            return res.status(400).json({ message: 'Available fleet cannot clear out all the waste' });
+        }
+
+        // Compute average costs per vehicle type
+        let typeCosts = {};
+        vehicles.forEach(vehicle => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase();
+            typeCosts[typeKey] = typeCosts[typeKey] || { sum: 0, count: 0 };
+            const cost = (vehicle.fuel_cost_per_km_loaded + vehicle.fuel_cost_per_km_unloaded) / 2;
+            typeCosts[typeKey].sum += cost;
+            typeCosts[typeKey].count++;
+        });
+
+        Object.keys(typeCosts).forEach(type => {
+            typeCosts[type] = typeCosts[type].sum / typeCosts[type].count;
+        });
+
+        // Initialize DP arrays
+        let dp = Array(200).fill(Infinity); // Adjust size according to your needs
+        let id = Array.from({ length: 200 }, () => []);
+        dp[0] = 0;
+
+        vehicles.forEach((vehicle, index) => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase();
+            const cost = typeCosts[typeKey];
+            for (let j = 199; j >= vehicle.capacity; j--) {
+                if (dp[j] > dp[j - vehicle.capacity] + cost) {
+                    dp[j] = dp[j - vehicle.capacity] + cost;
+                    id[j] = [...id[j - vehicle.capacity]];
+                    id[j].push(index);
+                }
+            }
+        });
+
+        let modified_total_waste = waste;
+        for(; modified_total_waste <= totalCapacity; modified_total_waste++) {
+            if (dp[modified_total_waste] !== Infinity) {
+                break;
+            }
+        }
+
+        // Extract the fleet composition
+        let fleetComposition = {
+            open_truck: 0,
+            dump_truck: 0,
+            compactor: 0,
+            container_carrier: 0
+        };
+        id[modified_total_waste].forEach(idx => {
+            const type = vehicles[idx].type.replace(/\s+/g, '_').toLowerCase();  // Convert 'Open Truck' to 'open_truck'
+            fleetComposition[type]++;
+        });
+
+        // Final response with specific format
+        return res.status(200).send({
+            message: 'Optimal total cost per kilometer: ' + dp[modified_total_waste],
+            total_cost_per_km: dp[modified_total_waste],
+            open_truck: fleetComposition.open_truck,
+            dump_truck: fleetComposition.dump_truck,
+            compactor: fleetComposition.compactor,
+            container_carrier: fleetComposition.container_carrier
+        });
+
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
+
 
 
 
