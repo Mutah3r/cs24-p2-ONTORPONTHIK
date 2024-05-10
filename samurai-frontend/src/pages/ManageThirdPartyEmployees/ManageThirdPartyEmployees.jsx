@@ -6,9 +6,26 @@ import Swal from "sweetalert2";
 
 const ManageThirdPartyEmployees = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
-    setIsLoading(false);
+    setIsLoading(true);
+
+    axios
+      .get(
+        `http://localhost:8000/thirdparties/getemployees/${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((res) => {
+        console.log(res.data?.employees);
+        setEmployees(res.data?.employees);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+      });
   }, []);
 
   const handleAddNewEmployee = () => {
@@ -98,38 +115,6 @@ const ManageThirdPartyEmployees = () => {
               text: error.response?.data?.message,
             });
           });
-
-        // axios
-        //   .post("http://localhost:8000/thirdparties/addnewmanager", {
-        //     name: result.value.contractor_name,
-        //     email: result.value.contractor_email,
-        //     password: result.value.password,
-        //     role: result.value.role,
-        //     token: JSON.parse(localStorage.getItem("user")),
-        //     contact_number: result.value.contact_number,
-        //     assigned_contractor_company:
-        //       result.value.assigned_contractor_company,
-        //     access_level: result.value.access_level,
-        //     username: result.value.contract_username,
-        //   })
-        //   .then((res) => {
-        //     Swal.fire({
-        //       title: "Good job!",
-        //       text: res.data?.message,
-        //       icon: "success",
-        //     });
-
-        //     setIsLoading(false);
-        //     setRefetch(!refetch);
-        //   })
-        //   .catch((error) => {
-        //     Swal.fire({
-        //       icon: "error",
-        //       title: "Oops...",
-        //       text: error.response?.data?.message,
-        //     });
-        //     setIsLoading(false);
-        //   });
       }
     });
   };
@@ -158,6 +143,40 @@ const ManageThirdPartyEmployees = () => {
             aria-label="Loading Spinner"
             data-testid="loader"
           />
+        </div>
+      )}
+
+      {!isLoading && (
+        <div className="overflow-x-auto pb-4 my-6">
+          <table className="table table-zebra">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Job Title</th>
+                <th>Date of Birth</th>
+                <th>Payment Rate Per Hour</th>
+                <th>Contact Info</th>
+                <th>Assigned STS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees &&
+                employees.map((e, idx) => {
+                  return (
+                    <tr key={idx}>
+                      <th>{idx + 1}</th>
+                      <td>{e.full_name}</td>
+                      <td>{e.job_title}</td>
+                      <td>{e.date_of_birth}</td>
+                      <td>{e.payment_rate_per_hour} BDT</td>
+                      <td>{e.contact_information}</td>
+                      <td>{e.assigned_sts}</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

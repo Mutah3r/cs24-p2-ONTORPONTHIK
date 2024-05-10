@@ -24,7 +24,7 @@ const employeeLogSchema = new mongoose.Schema({
     },
     waste_carried : { // get it in kg , then convert it to TON by dividing 1000
         type: Number,
-        required: True
+        required: true
     },
     total_payment: { // calculate current days payment by 
         type: Number,
