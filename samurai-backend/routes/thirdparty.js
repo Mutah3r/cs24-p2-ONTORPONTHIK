@@ -8,4 +8,13 @@ router.get('/allthirdparties', Controller.getAllThirdPartyContractors);
 //post [create new third party] 
 router.post('/thirdparty', Controller.addThirdPartyContractor);
 
+//post [create new manager user]
+router.post('/addnewmanager', Controller.Registration);
+
+
+
+
+
+
+
 module.exports = router;
