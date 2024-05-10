@@ -359,6 +359,7 @@ exports.createEmployeeLog = async (req, res) => {
 
 
 // Get Employes entries
+
 exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
     const { token } = req.params;
     const { is_today } = req.query; // Expect 'is_today' to be a query parameter
@@ -385,8 +386,9 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
             return res.status(404).json({ message: "No employees found under this manager." });
         }
 
-        // Extract employee IDs
+        // Extract employee IDs and fetch employee details
         const employeeIds = employees.map(emp => emp._id);
+        const employeeDetails = await Employee.find({ _id: { $in: employeeIds } });
 
         // Construct the query for logs
         const query = { employee_id: { $in: employeeIds } };
@@ -412,10 +414,19 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
         // Convert kg to tons for the sum of waste carried
         const totalWasteCarriedTons = totalWasteCarried / 1000;
 
+        // Add full name to each log
+        const logsWithFullName = logs.map(log => {
+            const employee = employeeDetails.find(emp => emp._id.toString() === log.employee_id.toString());
+            return {
+                ...log.toObject(),
+                full_name: employee ? employee.full_name : "Unknown"
+            };
+        });
+
         // Respond with the logs and summary data
         res.status(200).json({
             message: "Logs retrieved successfully",
-            logs: logs,
+            logs: logsWithFullName,
             summary: {
                 totalWasteCarriedTons,
                 totalPayment
@@ -429,7 +440,6 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
         });
     }
 };
-
 
 
 //Get employess information for last 7 days
