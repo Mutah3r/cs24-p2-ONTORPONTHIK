@@ -70,8 +70,8 @@ exports.addNormalUser = async (req, res) => {
   
   exports.addPostSocial = async (req, res) => {
     try {
-      const { user_email, title, description } = req.body;
-      const postSocial = new PostSocial({ user_email, title, description });
+      const { user_email, title, description,time } = req.body;
+      const postSocial = new PostSocial({ user_email, title, description,time });
       await postSocial.save();
       res.status(201).send(postSocial);
     } catch (error) {
@@ -109,13 +109,14 @@ exports.addNormalUser = async (req, res) => {
     }
   };
 
-  exports.post = async(req,res)=>{
+  exports.post = async (req, res) => {
     try {
-      const posts = await Post.find();
-      res.status(200).json(posts);
+        const posts = await Post.find().sort({ time: -1 }); // Sort by time in descending order
+        res.status(200).json(posts);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server Error' });
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
     }
-  }
+}
+
   
