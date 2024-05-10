@@ -90,9 +90,42 @@ const ManageThirdParty = () => {
         }).then((result) => {
           if (result.isConfirmed) {
             setIsLoading(true);
+            console.log(result);
 
             // make a network call in post method to update the information in the database
             console.log(result);
+            axios.post('http://localhost:8000/thirdparties/thirdparty',{
+                name_of_the_company: result.value.companyName,
+                registration_id: result.value.reg_id,
+                registration_date: result.value.reg_date,
+                tin_of_the_company: result.value.tin,
+                contact_number: result.value.contract_no,
+                workforce_size: parseInt(result.value.workforce_size),
+                payment_per_tonnage_of_waste: parseFloat(result.value.payment_per_tonnage),
+                required_amount_of_waste_per_day: parseFloat(result.value.required_amount_per_day),
+                contract_duration: result.value.contract_duration,
+                area_of_collection: result.value.area_of_collection,
+                designated_sts: parseInt(result.value.designated_sts)
+            })
+            .then(res => {
+                if(res.data?.message==='New third-party contractor added successfully'){
+                    Swal.fire({
+                        title: "Good job!",
+                        text: "New third-party contractor added successfully!",
+                        icon: "success"
+                      });
+                }
+                setIsLoading(false);
+            })
+            .catch(() => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                  });
+                setIsLoading(false);
+            })
           }
         });
     };
@@ -146,6 +179,25 @@ const ManageThirdParty = () => {
                     </tr>
                 </thead>
                 <tbody>
+                    {
+                        thirdParties && thirdParties.map((party, idx) => {
+                            return (
+                                <tr key={idx}>
+                                    <th>{idx + 1}</th>
+                                    <td>Reg-No:19</td>
+                                    <td>5/10/2024</td>
+                                    <td>5214789652</td>
+                                    <td>0176666666</td>
+                                    <td>250</td>
+                                    <td>150 Tk</td>
+                                    <td>2 Ton</td>
+                                    <td>5 years</td>
+                                    <td>Dhaka Uttara</td>
+                                    <td>10</td>
+                                </tr>
+                            )
+                        })
+                    }
                     <tr>
                         <th>1</th>
                         <td>Reg-No:19</td>
