@@ -5,6 +5,11 @@ const PostSocial = require('../models/post');
 const Volunteering = require('../models/volunteering');
 const bcrypt = require("bcryptjs")
 const nodemailer = require("nodemailer");
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.openai_key,
+});
 
 exports.addNormalUser = async (req, res) => {
     try {
@@ -81,6 +86,25 @@ exports.addNormalUser = async (req, res) => {
       res.status(201).send(volunteering);
     } catch (error) {
       res.status(400).send(error);
+    }
+  };
+
+  //educational resource
+  exports.Resource = async (req, res) => {
+    try {
+      
+        let instructionsAndResources = `Please provide some educational resources on waste management practices,recycling 
+        guidelines,composting techniques, and environmental conservation based on the need of Bangladesh, add some resource link.`;
+  
+        const response = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: instructionsAndResources }],
+        });
+  
+        res.status(200).json(response.choices[0]);
+      
+    } catch (error) {
+      res.status(404).send(error);
     }
   };
   
