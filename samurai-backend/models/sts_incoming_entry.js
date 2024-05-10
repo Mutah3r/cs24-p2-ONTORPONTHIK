@@ -20,11 +20,6 @@ const stsIncomingEntryLogSchema = new mongoose.Schema({
         required: true,
         enum: ['Domestic', 'Plastic', 'Construction Waste'], //just from drop down box
     },
-    designated_sts: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'STS', // Assuming 'STS' is the model for Station Transfer Stations
-        required: true
-    },
     vehicle_used_for_transportation: { // this is from doorstep to sts, so enter by name, like rikshaw, or thela gari
         type: String,
         required: true
