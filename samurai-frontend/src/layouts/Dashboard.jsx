@@ -13,6 +13,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { MdCancel } from "react-icons/md";
 import { ImTruck } from "react-icons/im";
+import { FaPeopleGroup } from "react-icons/fa6";
 import axios from "axios";
 import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
@@ -51,6 +52,11 @@ const Dashboard = () => {
       icon: FaTruck,
       to: "vehicles",
     },
+    {
+      title: "Third-Party Management",
+      icon: FaPeopleGroup,
+      to: "third-party-management",
+    }
   ];
 
   // Check session on component mount
