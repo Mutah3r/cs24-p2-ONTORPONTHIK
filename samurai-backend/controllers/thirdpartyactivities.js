@@ -410,7 +410,7 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
         const totalPayment = logs.reduce((sum, log) => sum + log.total_payment, 0);
 
         // Convert kg to tons for the sum of waste carried
-        const totalWasteCarriedTons = totalWasteCarried / 1000;
+        const totalWasteCarriedTons = totalWasteCarried;
 
         // Add full name to each log
         const logsWithFullName = logs.map(log => {
