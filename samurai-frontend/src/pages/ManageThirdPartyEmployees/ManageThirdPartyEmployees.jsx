@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const ManageThirdPartyEmployees = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
+  const [refetch, setRefetch] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -26,7 +27,7 @@ const ManageThirdPartyEmployees = () => {
         console.log(error);
         setIsLoading(false);
       });
-  }, []);
+  }, [refetch]);
 
   const handleAddNewEmployee = () => {
     // endpoint: /thirdparties/addnewemployee
@@ -101,6 +102,7 @@ const ManageThirdPartyEmployees = () => {
           })
           .then((res) => {
             setIsLoading(false);
+            setRefetch(!refetch);
             Swal.fire({
               title: "Good job!",
               text: res.data?.message,
@@ -109,6 +111,7 @@ const ManageThirdPartyEmployees = () => {
           })
           .catch((error) => {
             setIsLoading(false);
+            setRefetch(!refetch);
             Swal.fire({
               icon: "error",
               title: "Oops...",

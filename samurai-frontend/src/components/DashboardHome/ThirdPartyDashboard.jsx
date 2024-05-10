@@ -2,11 +2,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 import { formatTimeToHumanReadable } from "../../utils/timeUtils";
+import ThirdPartyChart from "./ThirdPartyChart";
 
 const ThirdPartyDashboard = () => {
   const [logs, setLogs] = useState([]);
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastWeekData, setLastWeekData] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -18,15 +20,25 @@ const ThirdPartyDashboard = () => {
         )}?is_today=false`
       )
       .then((res) => {
-        console.log(res.data);
         setLogs(res.data);
         setIsLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsLoading(false);
       });
   }, [refetch]);
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://localhost:8000/thirdparties/getemployeelogsforlast/${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((res) => {
+        setLastWeekData(res?.data?.totalsSeparatedByDay);
+      });
+  }, []);
 
   const handleTodaysLogs = () => {
     setIsLoading(true);
@@ -38,15 +50,13 @@ const ThirdPartyDashboard = () => {
         )}?is_today=true`
       )
       .then((res) => {
-        console.log(res.data);
         setLogs(res.data);
         setIsLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsLoading(false);
       });
-  }
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -67,16 +77,31 @@ const ThirdPartyDashboard = () => {
       )}
 
       {!isLoading && (
+        <>
+          <div className="overflow-x-auto mb-6">
+            <h1 className="text-center font-semibold my-6">Last Week Summary</h1>
+            <ThirdPartyChart latestData={lastWeekData} />
+          </div>
+        </>
+      )}
+
+      {!isLoading && (
         <div className="overflow-x-auto">
-          <h1 className="text-center font-semibold my-6">
-            Employee Logs
-          </h1>
+          <h1 className="text-center font-semibold my-6">Employee Logs</h1>
           <div className="flex justify-between items-center my-3">
             <div className="flex flex-col gap-1 text-green-500 font-semibold">
               <span>Total Payment: {logs?.summary?.totalPayment} BDT</span>
-              <span>Total Waste: {parseFloat(logs?.summary?.totalWasteCarriedTons) * 1000} kg</span>
+              <span>
+                Total Waste:{" "}
+                {parseFloat(logs?.summary?.totalWasteCarriedTons) * 1000} kg
+              </span>
             </div>
-            <button onClick={handleTodaysLogs} className="btn btn-active btn-neutral">Show Todays Logs</button>
+            <button
+              onClick={handleTodaysLogs}
+              className="btn btn-active btn-neutral"
+            >
+              Show Todays Logs
+            </button>
           </div>
           <table className="table table-zebra my-4">
             <thead>
