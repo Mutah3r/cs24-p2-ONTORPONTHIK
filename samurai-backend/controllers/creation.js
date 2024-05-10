@@ -874,7 +874,7 @@ exports.getAvailableVehicleForSTSFleetOptimized = async(req, res) => {
         });
 
         // Initialize DP arrays
-        let dp = Array(200).fill(Infinity); // Adjust size according to your needs
+        let dp = Array(200).fill(Infinity); // Size according to the maximum capacity of a landfill
         let id = Array.from({ length: 200 }, () => []);
         dp[0] = 0;
 

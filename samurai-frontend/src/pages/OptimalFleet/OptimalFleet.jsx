@@ -59,7 +59,7 @@ const OptimalFleet = () => {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-semibold mb-4 text-center">Optimal Fleet Viwe</h1>
+            <h1 className="text-2xl font-semibold mb-4 text-center">Optimal Fleet View</h1>
             <h2 className="text-center text-[20px]  mb-6">Available Vehicles</h2>
 
             <div className="grid gird-cols-2 md:grid-cols-4 gap-6 text-center">

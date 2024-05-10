@@ -4,13 +4,24 @@ import ClipLoader from "react-spinners/ClipLoader";
 import Swal from "sweetalert2";
 
 const ManageThirdParty = () => {
+    const [thirdParties, setThirdParties] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [refetch, setRefetch] = useState(false);
 
     useEffect(() => {
-        // load the third parties
-        setIsLoading(false);
+        setIsLoading(true);
+        axios.get('http://localhost:8000/thirdparties/allthirdparties')
+        .then(res => {
+            console.log(res.data);
+            setThirdParties(res.data);
+            setIsLoading(false);
+        })
+        .catch(error => {
+            console.log(error);
+            setIsLoading(false);
+        })
     },[]);
+
 
     const handleAddContractor = () => {
         Swal.fire({
@@ -78,7 +89,9 @@ const ManageThirdParty = () => {
           },
         }).then((result) => {
           if (result.isConfirmed) {
-            // setIsLoading(true);
+            setIsLoading(true);
+
+            // make a network call in post method to update the information in the database
             console.log(result);
           }
         });
