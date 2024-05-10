@@ -36,7 +36,7 @@ const UserManagement = () => {
         setUsers(filteredUsers);
         setIsLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         throwErrorPopup("An Error Occurred!");
         setIsLoading(false);
       });

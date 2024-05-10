@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { MdCancel } from "react-icons/md";
 import { ImTruck } from "react-icons/im";
 import { FaPeopleGroup } from "react-icons/fa6";
+import { MdManageAccounts } from "react-icons/md";
+import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import axios from "axios";
 import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
@@ -259,6 +261,54 @@ const Dashboard = () => {
                           <ImTruck /> <span>Optimal Fleet</span>
                         </Link>
                       </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {user.role === "Contractor Manager" ? (
+                      <>
+                        <li>
+                          <Link
+                            className="flex items-center gap-2"
+                            to="/dashboard"
+                          >
+                            <LuLayoutDashboard /> <span>Dashboard</span>
+                          </Link>
+                        </li>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {user.role === "Contractor Manager" ? (
+                      <>
+                        <li>
+                          <Link
+                            className="flex items-center gap-2"
+                            to="/dashboard/manage-thirdparty-employee"
+                          >
+                            <MdManageAccounts /> <span>Manage Employees</span>
+                          </Link>
+                        </li>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {user.role === "Contractor Manager" ? (
+                      <>
+                        <li>
+                          <Link
+                            className="flex items-center gap-2"
+                            to="/dashboard/employee-log"
+                          >
+                            <TbDeviceDesktopAnalytics /> <span>Enter Employee Log</span>
+                          </Link>
+                        </li>
+                      </>
                     ) : (
                       ""
                     )}
