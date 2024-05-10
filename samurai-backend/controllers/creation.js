@@ -315,10 +315,14 @@ exports.checkUserAssignment = async (req, res) => {
             token, 
             registration_number, 
             capacity, 
+            carring_weight,
             time_of_arrival, 
             time_of_departure ,
             to
         } = req.body;
+
+        console.log(req.body);
+        // return;
 
         // Find the user by token
         const userId = await userModel.findOne({ token });
@@ -357,6 +361,7 @@ exports.checkUserAssignment = async (req, res) => {
 
             // Updated the vehicle [ASIF]
 
+            console.log(carring_weight);
             try {
                 const updatedVehicle = await Vehicle.findOneAndUpdate(
                     { registration_number },
@@ -365,7 +370,8 @@ exports.checkUserAssignment = async (req, res) => {
                             left_from_sts: true,
                             left_from_landfill: false,
                             destination_landfill: to,
-                            carrying_weight: capacity,
+                            // carrying_weight: capacity,
+                            carring_weight: carring_weight,
                             from_sts: sts.ward_number
                         }
                     },
@@ -392,7 +398,7 @@ exports.checkUserAssignment = async (req, res) => {
             const newSTSEntry = new STSEntry({
                 sts_id: stsDocument._id, 
                 vehicle_registration: registration_number,
-                weight_of_waste: capacity,
+                weight_of_waste: carring_weight,
                 time_of_arrival: new Date(time_of_arrival),
                 time_of_departure: new Date(time_of_departure),
                 to

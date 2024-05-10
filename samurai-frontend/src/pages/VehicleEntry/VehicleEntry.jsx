@@ -7,6 +7,7 @@ const VehicleEntry = () => {
   const [spinner, setSpinner] = useState(false);
   const [landfills, setLandfills] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [availableLandfillVehicles, setAvailableLandfillVehicles] = useState([]);
   const [vehiclesType, setVehiclesType] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [input, setInput] = useState('');
@@ -30,6 +31,14 @@ const VehicleEntry = () => {
       setVehiclesType(vehiclesRegistrationNumbersAndTypes);
     })
   }, [refetch]);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/vehicle/alllandfillvehicle/${JSON.parse(localStorage.getItem("user"))}`)
+    .then(res => {
+      setAvailableLandfillVehicles(res.data?.vehicles);
+      console.log(res.data?.vehicles);
+    })
+  },[]);
 
   const [formData, setFormData] = useState({
     vehicleRegNo: "",
@@ -115,6 +124,40 @@ const VehicleEntry = () => {
     setSuggestions([]);
   };
 
+
+
+
+
+
+
+  const onSuggestionClickLandfill = (value) => {
+    console.log(value);
+    const matchedVehicle = availableLandfillVehicles.find(vehicle => vehicle.registration_number === value);
+
+    console.log(matchedVehicle);
+    if(matchedVehicle){
+      // const txtBx = document.getElementById('stsVehicleType');
+      // txtBx.value = matchedVehicle.type;
+      // document.getElementById('vehicle-max-capacity').innerHTML = `Maximum Capacity: ${matchedVehicle.capacity} Ton`;
+      document.getElementById('landfillLoadCarrying').value = matchedVehicle.carring_weight;
+
+    }
+    else{
+      // const txtBx = document.getElementById('stsVehicleType');
+      // txtBx.value = "";
+      // document.getElementById('vehicle-max-capacity').innerHTML = ``;
+    }
+
+    // setStsFormData({
+    //   ...stsFormData,
+    //   vehicleRegNo: value,
+    // });
+    setInput(value);
+    setSuggestions([]);
+  };
+
+
+
   const SuggestionList = () => {
     if (suggestions.length === 0 || input === '') {
       return null;
@@ -129,6 +172,22 @@ const VehicleEntry = () => {
       </ul>
     );
   };
+
+  const SuggestionListLandfill = () => {
+    if (suggestions.length === 0 || input === '') {
+      return null;
+    }
+    return (
+      <ul className="suggestions border-2 rounded-lg p-3 shadow-md">
+        {suggestions.map((suggestion, index) => (
+          <li className="cursor-pointer hover:bg-gray-200 py-2 px-4 rounded-lg" key={index} onClick={() => onSuggestionClickLandfill(suggestion)}>
+            {suggestion}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
 
   // Function to handle form submission
   const handleSubmit = (e) => {
@@ -162,15 +221,20 @@ const VehicleEntry = () => {
 
     setSpinner(true);
     
+    const vehiType = document.getElementById('stsVehicleType').value;
     const postDataInfo = {
       token: JSON.parse(localStorage.getItem("user")),
       registration_number: stsFormData.vehicleRegNo,
       type: document.getElementById('stsVehicleType').value,
-      capacity: parseInt(stsFormData.weightCarrying),
+      capacity: parseFloat(vehiType == "Open Truck"? 3 : vehiType == "Dump Truck"? 5 : vehiType == "Compactor"? 7 : vehiType == "Container Carrier"? 15 : 0),
+      carring_weight: parseFloat(stsFormData.weightCarrying),
       time_of_arrival: stsFormData.arrivalTime,
       time_of_departure: stsFormData.departureTime,
       to: stsFormData.destination,
     }
+
+    console.log(postDataInfo);
+    // return;
 
     axios
       .post("http://localhost:8000/sts/entry", postDataInfo)
@@ -249,6 +313,35 @@ const VehicleEntry = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    setInput(value);
+
+    // Give vehicle suggestions to the user
+    if(value.length > 0){
+      const filteredSuggestions = availableLandfillVehicles? availableLandfillVehicles.filter(vehicle =>
+        vehicle.registration_number.toLowerCase().includes(value.toLowerCase())
+      ) : [];
+
+      const filteredSuggestionNames = filteredSuggestions.map(item => item.registration_number);
+
+      console.log(filteredSuggestionNames);
+
+      if(name === 'vehicleRegNo'){
+        setSuggestions(filteredSuggestionNames);
+        const matchedVehicle = availableLandfillVehicles.find(vehicle => vehicle.registration_number === value);
+
+        if(matchedVehicle){
+          // set the all other fileds
+        }
+        else{
+          // clear all other fields
+        }
+      }
+      else {
+        setSuggestions([]);
+      }
+
+    }
 
     // Regular expression to allow only integer numbers
     const integerRegex = /^\d*$/;
@@ -342,14 +435,16 @@ const VehicleEntry = () => {
             onChange={handleChange}
             className="input input-bordered w-full"
           />
+          <SuggestionListLandfill />
         </div>
         <div className="mb-4">
           <label className="block mb-1 text-gray-700">Weight Carrying:</label>
           <input
+            id="landfillLoadCarrying"
             type="text"
             name="capacity"
             pattern="[0-9]+([,.][0-9]+)?"
-            value={formData.capacity}
+            // value={formData.capacity}
             onChange={handleChange}
             className="input input-bordered w-full"
           />

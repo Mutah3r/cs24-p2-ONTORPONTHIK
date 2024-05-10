@@ -26,12 +26,6 @@ const VehicleManagement = () => {
           <option value="Compactor">Compactor</option>
           <option value="Container Carrier">Container Carrier</option>
         </select>
-        <select id="capacity" class="swal2-select" placeholder="Capacity">
-          <option value="3">3 ton</option>
-          <option value="5">5 ton</option>
-          <option value="7">7 ton</option>
-          <option value="15">15 ton</option>
-        </select>
         <input id="fuelCostLoaded" class="swal2-input" placeholder="Fuel Cost per Kilo(Loaded)" type="text">
         <input id="fuelCostUnloaded" class="swal2-input" placeholder="Fuel Cost per Kilo(Unloaded)" type="text">
       `,
@@ -41,7 +35,8 @@ const VehicleManagement = () => {
         const registrationNumber =
           document.getElementById("registrationNumber").value;
         const type = document.getElementById("type").value;
-        const capacity = document.getElementById("capacity").value;
+        // const capacity = document.getElementById("capacity").value;
+        const capacity = type == "Open Truck"? "3" : type == "Dump Truck"? "5" : type == "Compactor"? "7" : type == "Container Carrier"? "15" : "";
         const fuelCostLoaded = document.getElementById("fuelCostLoaded").value;
         const fuelCostUnloaded =
           document.getElementById("fuelCostUnloaded").value;
