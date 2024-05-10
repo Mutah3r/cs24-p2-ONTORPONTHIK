@@ -253,7 +253,7 @@ exports.getEmployeesByManager = async (req, res) => {
 
         const user = await userModel.findOne({ token });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Invalid token" });
         }
 
         // Check if the user role is 'Contract Manager'
