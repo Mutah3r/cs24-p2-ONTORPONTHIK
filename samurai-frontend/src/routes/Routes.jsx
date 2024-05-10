@@ -15,6 +15,8 @@ import ResetPassword from "../pages/RestPassword/ResetPassword";
 import ConfirmReset from "../pages/RestPassword/ConfirmReset";
 import OptimalFleet from "../pages/OptimalFleet/OptimalFleet";
 import ManageThirdParty from "../pages/ManageThirdParty/ManageThirdParty";
+import ManageThirdPartyEmployees from "../pages/ManageThirdPartyEmployees/ManageThirdPartyEmployees";
+import ThirdPartyEmployeeLogs from "../pages/ThirdPartyEmployeeLogs/ThirdPartyEmployeeLogs";
 
 const router = createBrowserRouter([
   {
@@ -80,7 +82,15 @@ const router = createBrowserRouter([
       {
         path: "third-party-management",
         element: <ManageThirdParty />
-      }
+      },
+      {
+        path: "manage-thirdparty-employee",
+        element: <ManageThirdPartyEmployees />
+      },
+      {
+        path: "employee-log",
+        element: <ThirdPartyEmployeeLogs />
+      },
     ],
   },
 ]);

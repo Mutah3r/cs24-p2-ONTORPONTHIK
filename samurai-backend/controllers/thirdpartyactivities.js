@@ -6,6 +6,7 @@ const Vehicle = require('../models/vehicle');
 const STSEntry = require('../models/sts_entry')
 const LandfillEntry = require('../models/landfill_entry')
 const ThirdPartyCnt = require('../models/third_party_contractor');
+const Employee = require('../models/employee');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
 
@@ -172,4 +173,111 @@ exports.Registration = async (req, res) => {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
+};
+
+
+
+
+
+// Create new employee [Contractor manager]
+exports.createEmployee = async (req, res) => {
+    try {
+        // Decode the token to find the user
+        const { token } = req.body;
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Fetch the user details using the ID from the decoded token
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if the user role is 'Contract Manager'
+        if (user.role !== 'Contractor Manager') {
+            return res.status(403).json({ message: "User is not a contract manager" });
+        }
+
+        // Fetch the third-party contractor details to get the assigned sts
+        const contractor = await ThirdPartyCnt.findOne({ assigned_manager_id: user._id });
+        if (!contractor) {
+            return res.status(404).json({ message: "Assigned third-party contractor not found" });
+        }
+
+        // Create a new employee using the data in the request body
+        const newEmployee = new Employee({
+            full_name: req.body.full_name,
+            date_of_birth: req.body.date_of_birth,
+            date_of_hire: req.body.date_of_hire,
+            job_title: req.body.job_title,
+            payment_rate_per_hour: req.body.payment_rate_per_hour,
+            contact_information: req.body.contact_information,
+            assigned_collection_route: req.body.assigned_collection_route,
+            assigned_manager_id: user._id,
+            assigned_sts: contractor.designated_sts // from the third-party contractor model
+        });
+
+        // Save the new employee to the database
+        await newEmployee.save();
+
+        // Send a response back to the client
+        res.status(201).json({
+            message: "Employee successfully created",
+            employee: newEmployee
+        });
+    } catch (error) {
+        console.error('Failed to create a new employee:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        res.status(500).json({
+            message: "Failed to create employee due to server error",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+// get all employess of the current managers
+exports.getEmployeesByManager = async (req, res) => {
+    try {
+        // Extract token from the query params
+        const { token } = req.params;
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if the user role is 'Contract Manager'
+        if (user.role !== 'Contractor Manager') {
+            return res.status(403).json({ message: "User is not a contract manager" });
+        }
+
+
+        // Find all employees where the assigned_manager_id matches the user's ID
+        const employees = await Employee.find({ assigned_manager_id: user._id });
+        
+        // Send a response with the fetched employees
+        res.status(200).json({
+            message: "Employees retrieved successfully",
+            employees: employees
+        });
+    } catch (error) {
+        console.error('Failed to retrieve employees:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        res.status(500).json({
+            message: "Failed to retrieve employees due to server error",
+            error: error.message
+        });
+    }
 };

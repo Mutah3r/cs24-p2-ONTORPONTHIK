@@ -28,7 +28,11 @@ const employeeSchema = new mongoose.Schema({
        required: true
     },
 
-    assigned_collection_route: { // show all sts here to select
+    assigned_collection_route: { 
+        type: String,
+        required: true
+    },
+    assigned_sts: { // get sts from 
         type: Number,
         required: true
     },
