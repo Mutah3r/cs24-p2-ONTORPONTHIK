@@ -62,6 +62,29 @@ exports.addThirdPartyContractor = async (req, res) => {
         }
 };
 
+// get all thirdparty company
+exports.getAllThirdPartyCompanyNames = async (req, res) => {
+    try {
+        // Find all contractors but only return the name and _id fields
+        const contractors = await ThirdPartyCnt.find({}, 'name_of_the_company _id');
+
+        // Create a simplified list of company names and IDs
+        const companyList = contractors.map(contractor => ({
+            objectId: contractor._id,
+            name_of_the_company: contractor.name_of_the_company
+        }));
+
+        // Return the list in the response
+        res.status(200).json(companyList);
+    } catch (error) {
+        console.error('Failed to retrieve company names:', error);
+        res.status(500).json({
+            message: "Failed to retrieve data due to server error",
+            error: error.message
+        });
+    }
+};
+
 
 
 // add new third party managers
@@ -115,7 +138,7 @@ exports.Registration = async (req, res) => {
           token: '',  // Assuming token is cleared or handled differently post-registration
           date_of_account_creation: new Date(),  // Set the creation date to current date
           contact_number,
-          assigned_contractor_company,
+          assigned_contractor_company, // contact id
           access_level,
           username
         });
