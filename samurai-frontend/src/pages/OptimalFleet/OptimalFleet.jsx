@@ -6,7 +6,7 @@ const OptimalFleet = () => {
     const [availableFleet, setAvailableFleet] = useState(null);
     const [selectedFleets, setSelectedFleets] = useState(null);
     const [optimalFleetResult, setOptimalFleetResult] = useState(null);
-
+    const [showOptimalResult, setShowOptimalResult] = useState(false);
 
     useEffect(() => {
         axios.get('http://localhost:8000/vehicle/fleetview')
@@ -35,6 +35,8 @@ const OptimalFleet = () => {
     }
 
     const handleRequestOptimalFleets = () => {
+        setShowOptimalResult(false);
+        
         const params = {
             token: JSON.parse(localStorage.getItem('user')),
             Dump_Truck: selectedFleets?.dump_truck? 'Dump Truck': "",
@@ -46,10 +48,10 @@ const OptimalFleet = () => {
         axios.get('http://localhost:8000/vehicle/fleetoptimized', {params})
         .then(res => {
             setOptimalFleetResult(res.data);
-            console.log(res.data);
-            // show on frontend
+            setShowOptimalResult(true);
         })
         .catch(error => {
+            setShowOptimalResult(false);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -87,27 +89,27 @@ const OptimalFleet = () => {
                 <button onClick={handleRequestOptimalFleets} className="btn btn-success">Get Optimal Result</button>
             </div>
 
-            <div className="mt-8 mb-6 p-6">
+            <div className={`mt-8 mb-6 p-6 text-center ${showOptimalResult? "block" : "hidden"}`}>
                 <h2 className="text-2xl font-semibold mb-4 text-center">Required Vehicles For Optimal Result</h2>
 
-                {(optimalFleetResult?.open_truck && optimalFleetResult?.open_truck != 0) && <div>
-                    <h3>Open Truck: {optimalFleetResult.open_truck}</h3>
+                {(optimalFleetResult && optimalFleetResult?.open_truck != 0) && <div>
+                    <h3 className="bg-gray-300 px-4 py-6 my-4 rounded-lg font-semibold">Open Truck: {optimalFleetResult.open_truck}</h3>
                 </div>}
 
-                {(optimalFleetResult?.dump_truck && optimalFleetResult?.dump_truck != 0) && <div>
-                    <h3>Dump Truck: {optimalFleetResult.dump_truck}</h3>
+                {(optimalFleetResult && optimalFleetResult?.dump_truck != 0) && <div>
+                    <h3 className="bg-gray-300 px-4 py-6 my-4 rounded-lg font-semibold">Dump Truck: {optimalFleetResult.dump_truck}</h3>
                 </div>}
 
-                {(optimalFleetResult?.compactor && optimalFleetResult?.compactor != 0) && <div>
-                    <h3>Compactor: {optimalFleetResult.compactor}</h3>
+                {(optimalFleetResult&& optimalFleetResult?.compactor != 0) && <div>
+                    <h3 className="bg-gray-300 px-4 py-6 my-4 rounded-lg font-semibold">Compactor: {optimalFleetResult.compactor}</h3>
                 </div>}
 
-                {(optimalFleetResult?.container_carrier && optimalFleetResult?.container_carrier != 0) && <div>
-                    <h3>Container Carrier: {optimalFleetResult.container_carrier}</h3>
+                {(optimalFleetResult && optimalFleetResult?.container_carrier != 0) && <div>
+                    <h3 className="bg-gray-300 px-4 py-6 my-4 rounded-lg font-semibold">Container Carrier: {optimalFleetResult.container_carrier}</h3>
                 </div>}
 
                 {optimalFleetResult?.total_cost_per_km && <div>
-                    <h3>Total Cost Per Km. : {optimalFleetResult.total_cost_per_km}</h3>
+                    <h3 className="bg-gray-300 px-4 py-6 my-4 rounded-lg font-semibold text-violet-700">Total Cost Per Km : {optimalFleetResult.total_cost_per_km}</h3>
                 </div>}
             </div>
         </div>
