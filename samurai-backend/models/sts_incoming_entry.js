@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Define the STS Incoming Entry Log schema
 const stsIncomingEntryLogSchema = new mongoose.Schema({
-    contractor_id: {
+    contractor_id: {    // company ID
         type: String,
         required: true
     },    
@@ -11,7 +11,7 @@ const stsIncomingEntryLogSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    amount_of_waste_collected: { // get it from third_party_contractor schema
+    amount_of_waste_collected: { 
         type: Number,
         required: true,
     },
@@ -19,6 +19,10 @@ const stsIncomingEntryLogSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['Domestic', 'Plastic', 'Construction Waste'], //just from drop down box
+    },
+    designated_sts_for_deposit: {
+        type: Number,
+        required: true
     },
     vehicle_used_for_transportation: { // this is from doorstep to sts, so enter by name, like rikshaw, or thela gari
         type: String,

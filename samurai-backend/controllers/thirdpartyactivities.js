@@ -256,11 +256,28 @@ exports.createEmployee = async (req, res) => {
 
 // get the name of company and sts from manager id
 exports.getCompanyInfoByManagerId = async (req, res) => {
-    const { managerId } = req.params;
+    // Decode the token to find the user
+    const { token } = req.params;
+
+    if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+    }
 
     try {
+        // Fetch the user details using the token
+        const user = await userModel.findOne({ token });
+
+        if (!user) {
+            return res.status(404).json({ message: "Invalid token" });
+        }
+
+        // Check if the user role is 'Contract Manager'
+        if (user.role !== 'Contractor Manager') {
+            return res.status(403).json({ message: "User is not a contract manager" });
+        }
+
         // Find the company information based on the assigned manager ID
-        const companyInfo = await ThirdPartyCnt.findOne({ assigned_manager_id: managerId });
+        const companyInfo = await ThirdPartyCnt.findOne({ assigned_manager_id: user._id });
 
         if (!companyInfo) {
             return res.status(404).json({ message: "Company information not found for the provided manager ID" });
