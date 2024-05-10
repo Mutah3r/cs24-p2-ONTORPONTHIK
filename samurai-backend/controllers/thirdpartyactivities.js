@@ -188,13 +188,8 @@ exports.createEmployee = async (req, res) => {
             return res.status(401).json({ message: "No token provided" });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        if (!decoded || !decoded.id) {
-            return res.status(401).json({ message: "Invalid token" });
-        }
-
         // Fetch the user details using the ID from the decoded token
-        const user = await userModel.findById(decoded.id);
+        const user = await userModel.findOne({ token });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -213,8 +208,8 @@ exports.createEmployee = async (req, res) => {
         // Create a new employee using the data in the request body
         const newEmployee = new Employee({
             full_name: req.body.full_name,
-            date_of_birth: new Date(req.body.date_of_birth),
-            date_of_hire: new Date(req.body.date_of_hire),
+            date_of_birth: req.body.date_of_birth,
+            date_of_hire: req.body.date_of_hire,
             job_title: req.body.job_title,
             payment_rate_per_hour: req.body.payment_rate_per_hour,
             contact_information: req.body.contact_information,
@@ -238,6 +233,50 @@ exports.createEmployee = async (req, res) => {
         }
         res.status(500).json({
             message: "Failed to create employee due to server error",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+// get all employess of the current managers
+exports.getEmployeesByManager = async (req, res) => {
+    try {
+        // Extract token from the query params
+        const { token } = req.params;
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if the user role is 'Contract Manager'
+        if (user.role !== 'Contractor Manager') {
+            return res.status(403).json({ message: "User is not a contract manager" });
+        }
+
+
+        // Find all employees where the assigned_manager_id matches the user's ID
+        const employees = await Employee.find({ assigned_manager_id: user._id });
+        
+        // Send a response with the fetched employees
+        res.status(200).json({
+            message: "Employees retrieved successfully",
+            employees: employees
+        });
+    } catch (error) {
+        console.error('Failed to retrieve employees:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        res.status(500).json({
+            message: "Failed to retrieve employees due to server error",
             error: error.message
         });
     }
