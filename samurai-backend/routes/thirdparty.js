@@ -11,7 +11,7 @@ router.post('/thirdparty', Controller.addThirdPartyContractor);
 //post [create new manager user]
 router.post('/addnewmanager', Controller.Registration);
 //get all third party company name and id
-router.get('/allcompany/:token', Controller.getAllThirdPartyCompanyNames);
+router.get('/allcompany', Controller.getAllThirdPartyCompanyNames);
 
 
 
