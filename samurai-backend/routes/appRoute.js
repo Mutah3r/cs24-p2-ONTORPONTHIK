@@ -7,5 +7,6 @@ router.post('/feedback', authController.addFeedback);
 router.post('/post_social', authController.addPostSocial);
 router.post('/volunteering', authController.addVolunteering);
 router.get('/resource',authController.Resource);
+router.get('/post',authController.post)
 
 module.exports = router;
