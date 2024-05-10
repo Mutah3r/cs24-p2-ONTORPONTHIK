@@ -19,12 +19,7 @@ const feedbackSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
-  },
-  photos: [{
-    url: {
-      type: String,
-    }
-  }]
+  }
 });
 
 // Create model
