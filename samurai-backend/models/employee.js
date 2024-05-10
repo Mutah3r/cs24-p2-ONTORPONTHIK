@@ -31,6 +31,10 @@ const employeeSchema = new mongoose.Schema({
     assigned_collection_route: { // show all sts here to select
         type: Number,
         required: true
+    },
+    assigned_manager_id: { // the manager who shall create the employee id shall be send here
+        type: String,
+        required: true
     }
 });
 

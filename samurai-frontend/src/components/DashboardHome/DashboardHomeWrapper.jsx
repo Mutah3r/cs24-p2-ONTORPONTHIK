@@ -3,6 +3,7 @@ import DashboardHome from "./DashboardHome";
 import DashboardStat from "./DashboardStat";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
+import ThirdPartyDashboard from "./ThirdPartyDashboard";
 
 // DashboardHomeWrapper serves as a conditional wrapper component that decides which dashboard view to display based on the user's role.
 const DashboardHomeWrapper = () => {
@@ -28,6 +29,9 @@ const DashboardHomeWrapper = () => {
   if (!loading && user) {
     if (user.role === "System admin") {
       return <DashboardHome />; // Render DashboardHome if the user is a system admin
+    }
+    else if(user.role === "Contractor Manager"){
+      return <ThirdPartyDashboard />
     } else {
       return <DashboardStat user={user} />; // Render DashboardStat for other roles, passing user data as a prop
     }
