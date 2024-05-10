@@ -9,7 +9,7 @@ import {
 } from "recharts";
 
 const ThirdPartyChart = ({ latestData }) => {
-  const result = latestData
+  let result = latestData
     ? Object.keys(latestData).map((date) => {
         return {
           name: date,
@@ -18,6 +18,14 @@ const ThirdPartyChart = ({ latestData }) => {
         };
       })
     : [];
+
+  result = result.sort((a, b) => {
+    const dateA = new Date(a.name);
+    const dateB = new Date(b.name);
+    return dateA - dateB;
+  });
+
+  console.log(result);
 
   return (
     <div style={{ width: "100%", height: "300px" }}>
