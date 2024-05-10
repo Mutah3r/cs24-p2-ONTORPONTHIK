@@ -184,46 +184,21 @@ const ManageThirdParty = () => {
                             return (
                                 <tr key={idx}>
                                     <th>{idx + 1}</th>
-                                    <td>Reg-No:19</td>
-                                    <td>5/10/2024</td>
-                                    <td>5214789652</td>
-                                    <td>0176666666</td>
-                                    <td>250</td>
-                                    <td>150 Tk</td>
-                                    <td>2 Ton</td>
-                                    <td>5 years</td>
-                                    <td>Dhaka Uttara</td>
-                                    <td>10</td>
+                                    <td>{party.name_of_the_company}</td>
+                                    <td>{party.registration_id}</td>
+                                    <td>{party.registration_date}</td>
+                                    <td>{party.tin_of_the_company}</td>
+                                    <td>{party.contact_number}</td>
+                                    <td>{party.workforce_size}</td>
+                                    <td>{party.payment_per_tonnage_of_waste}</td>
+                                    <td>{party.required_amount_of_waste_per_day}</td>
+                                    <td>{party.contract_duration}</td>
+                                    <td>{party.area_of_collection}</td>
+                                    <td>{party.designated_sts}</td>
                                 </tr>
                             )
                         })
                     }
-                    <tr>
-                        <th>1</th>
-                        <td>Reg-No:19</td>
-                        <td>5/10/2024</td>
-                        <td>5214789652</td>
-                        <td>0176666666</td>
-                        <td>250</td>
-                        <td>150 Tk</td>
-                        <td>2 Ton</td>
-                        <td>5 years</td>
-                        <td>Dhaka Uttara</td>
-                        <td>10</td>
-                    </tr>
-                    <tr>
-                        <th>2</th>
-                        <td>Reg-No:15</td>
-                        <td>5/10/2024</td>
-                        <td>5214789652</td>
-                        <td>0176666666</td>
-                        <td>250</td>
-                        <td>150 Tk</td>
-                        <td>2 Ton</td>
-                        <td>5 years</td>
-                        <td>Dhaka Uttara</td>
-                        <td>10</td>
-                    </tr>
                 </tbody>
                 </table>
             </div>
