@@ -9,6 +9,7 @@ const ThirdPartyCnt = require('../models/third_party_contractor');
 const Employee = require('../models/employee');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
+const EmployeeLog = require('../models/employee_log');
 
 
 // /thirdparties/allthirdparties [get all thirdparty contact]
@@ -294,3 +295,141 @@ exports.getEmployeesByManager = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+
+// Employee log 
+exports.createEmployeeLog = async (req, res) => {
+    try {
+        const {
+            employee_id,
+            log_in_time,
+            log_out_time,
+            waste_carried
+        } = req.body;
+
+        // Fetch employee details to get the payment rate per hour
+        const employee = await Employee.findById(employee_id);
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
+
+        // Calculate total hours worked
+        const startTime = new Date(log_in_time);
+        const endTime = new Date(log_out_time);
+        const duration = (endTime - startTime) / 3600000; // Duration in hours
+
+        // Calculate waste in tons
+        const wasteInTons = waste_carried / 1000;
+
+        // Calculate total payment
+        const totalPayment = duration * employee.payment_rate_per_hour;
+
+        // Create a new log entry
+        const newLog = new EmployeeLog({
+            employee_id,
+            date: new Date(), // default to current date, can also be passed from front-end
+            log_in_time: startTime,
+            log_out_time: endTime,
+            total_hours_worked: duration,
+            waste_carried: wasteInTons,
+            total_payment: totalPayment
+        });
+
+        // Save the new employee log to the database
+        await newLog.save();
+
+        // Send a response back to the client
+        res.status(201).json({
+            message: "Employee log successfully created",
+            log: newLog
+        });
+    } catch (error) {
+        console.error('Failed to create a new employee log:', error);
+        res.status(500).json({
+            message: "Failed to create employee log due to server error",
+            error: error.message
+        });
+    }
+};
+
+
+
+// Get Employes entries
+exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
+    const { token } = req.params;
+    const { is_today } = req.query; // Expect 'is_today' to be a query parameter
+
+    if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+
+    // Find the user by token
+    const user = await userModel.findOne({ token });
+    if (!user) {
+        return res.status(404).json({ message: "Invalid token" });
+    }
+
+    // Check if the user role is 'Contractor Manager'
+    if (user.role !== 'Contractor Manager') {
+        return res.status(403).json({ message: "User is not a contract manager" });
+    }
+
+    try {
+        // Fetch all employees under this manager's ID
+        const employees = await Employee.find({ assigned_manager_id: user._id });
+        if (!employees.length) {
+            return res.status(404).json({ message: "No employees found under this manager." });
+        }
+
+        // Extract employee IDs
+        const employeeIds = employees.map(emp => emp._id);
+
+        // Construct the query for logs
+        const query = { employee_id: { $in: employeeIds } };
+        if (is_today === 'true') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            query.date = { $gte: today, $lt: tomorrow };
+        }
+
+        // Find all logs for these employees
+        const logs = await EmployeeLog.find(query);
+
+        if (!logs.length) {
+            return res.status(404).json({ message: "No logs found for employees under this manager." });
+        }
+
+        // Calculate the sum of waste carried and total payment
+        const totalWasteCarried = logs.reduce((sum, log) => sum + log.waste_carried, 0);
+        const totalPayment = logs.reduce((sum, log) => sum + log.total_payment, 0);
+
+        // Convert kg to tons for the sum of waste carried
+        const totalWasteCarriedTons = totalWasteCarried / 1000;
+
+        // Respond with the logs and summary data
+        res.status(200).json({
+            message: "Logs retrieved successfully",
+            logs: logs,
+            summary: {
+                totalWasteCarriedTons,
+                totalPayment
+            }
+        });
+    } catch (error) {
+        console.error('Failed to retrieve employee logs:', error);
+        res.status(500).json({
+            message: "Failed to retrieve logs due to server error",
+            error: error.message
+        });
+    }
+};
+
+
+//Get employess information for last 7 days
+

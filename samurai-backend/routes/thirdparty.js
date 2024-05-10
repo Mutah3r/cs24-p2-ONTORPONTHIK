@@ -17,8 +17,11 @@ router.post('/addnewemployee', Controller.createEmployee);
 // get employes for specific managers
 router.get('/getemployees/:token', Controller.getEmployeesByManager);
 
+// post employee log for a specific manager
+router.post('/createemployeelog', Controller.createEmployeeLog);
 
-
+// get employe log for a specific manager
+router.get('/getemployeelogs/:token', Controller.getEmployeeLogsByManagerFromToken);
 
 
 module.exports = router;
