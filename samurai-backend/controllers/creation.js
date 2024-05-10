@@ -338,6 +338,13 @@ exports.checkUserAssignment = async (req, res) => {
                 return res.status(403).json({ message: "Unauthorized" });
             }
 
+
+            const sts = await STS.findOne({ assigned_managers_id: user._id });
+
+            if (!sts) {
+                return res.status(404).json({ message: "No STS assigned to this manager" });
+            }
+
             // Proceed with STS log creation
             const vehicle = await Vehicle.findOne({ registration_number });
 
@@ -358,10 +365,10 @@ exports.checkUserAssignment = async (req, res) => {
                             left_from_sts: true,
                             left_from_landfill: false,
                             destination_landfill: to,
-                            carrying_weight: capacity
+                            carrying_weight: capacity,
+                            from_sts: sts.ward_number
                         }
                     },
-                    { new: true }  // Returns the updated document
                 );
             
                 if (!updatedVehicle) {
