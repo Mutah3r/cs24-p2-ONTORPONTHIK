@@ -11,7 +11,7 @@ const OptimalFleet = () => {
     useEffect(() => {
         axios.get('http://localhost:8000/vehicle/fleetview')
         .then(res => {
-            console.log(res.data);
+        
             setAvailableFleet(res.data);
         })
     },[]);
@@ -28,10 +28,7 @@ const OptimalFleet = () => {
                 ...selectedFleets,
                 [fleetName]: true
             });
-        }
-
-
-        console.log(selectedFleets);
+        }    
     }
 
     const handleRequestOptimalFleets = () => {
