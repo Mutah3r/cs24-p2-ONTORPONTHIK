@@ -23,5 +23,7 @@ router.post('/createemployeelog', Controller.createEmployeeLog);
 // get employe log for a specific manager
 router.get('/getemployeelogs/:token', Controller.getEmployeeLogsByManagerFromToken);
 
+// get employe log for last seven days with value and day name
+router.get('/getemployeelogsforlast/:token', Controller.getTotalWasteAndBillLastSevenDaysSeparatedByDay);
 
 module.exports = router;

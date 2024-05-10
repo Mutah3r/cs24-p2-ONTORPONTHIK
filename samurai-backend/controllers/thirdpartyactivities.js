@@ -10,7 +10,7 @@ const Employee = require('../models/employee');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
 const EmployeeLog = require('../models/employee_log');
-
+const moment = require('moment');
 
 // /thirdparties/allthirdparties [get all thirdparty contact]
 exports.getAllThirdPartyContractors = async (req, res) => { // contactor companies
@@ -431,5 +431,81 @@ exports.getEmployeeLogsByManagerFromToken = async (req, res) => {
 };
 
 
-//Get employess information for last 7 days
 
+//Get employess information for last 7 days
+exports.getTotalWasteAndBillLastSevenDaysSeparatedByDay = async (req, res) => {
+    const { token } = req.params;
+
+    if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+
+    // Find the user by token
+    const user = await userModel.findOne({ token });
+    if (!user) {
+        return res.status(404).json({ message: "Invalid token" });
+    }
+
+    // Check if the user role is 'Contractor Manager'
+    if (user.role !== 'Contractor Manager') {
+        return res.status(403).json({ message: "User is not a contract manager" });
+    }
+
+    try {
+        // Fetch all employees under this manager's ID
+        const employees = await Employee.find({ assigned_manager_id: user._id });
+        if (!employees.length) {
+            return res.status(404).json({ message: "No employees found under this manager." });
+        }
+
+        // Extract employee IDs
+        const employeeIds = employees.map(emp => emp._id);
+
+        // Calculate the date 7 days ago
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        // Construct the query for logs in the last seven days
+        const query = {
+            employee_id: { $in: employeeIds },
+            date: { $gte: sevenDaysAgo }
+        };
+
+        // Find all logs for these employees in the last seven days
+        const logs = await EmployeeLog.find(query);
+
+        if (!logs.length) {
+            return res.status(404).json({ message: "No logs found for employees under this manager in the last seven days." });
+        }
+
+        // Initialize an object to store total waste collected and total bill separated by day
+        const totalsSeparatedByDay = {};
+
+        // Loop through each log and calculate totals separated by day
+        logs.forEach(log => {
+            const date = log.date.toDateString();
+
+            // Calculate total waste collected and total bill for the log entry
+            const totalWaste = totalsSeparatedByDay[date] ? totalsSeparatedByDay[date].totalWaste + log.waste_carried : log.waste_carried;
+            const totalBill = totalsSeparatedByDay[date] ? totalsSeparatedByDay[date].totalBill + log.total_payment : log.total_payment;
+
+            // Update the totals for the day
+            totalsSeparatedByDay[date] = {
+                totalWaste,
+                totalBill
+            };
+        });
+
+        // Respond with the totals separated by day
+        res.status(200).json({
+            message: "Total waste collected and total bill retrieved successfully for the last seven days, separated by day",
+            totalsSeparatedByDay: totalsSeparatedByDay
+        });
+    } catch (error) {
+        console.error('Failed to retrieve total waste collected and total bill for the last seven days:', error);
+        res.status(500).json({
+            message: "Failed to retrieve totals for the last seven days due to server error",
+            error: error.message
+        });
+    }
+};
