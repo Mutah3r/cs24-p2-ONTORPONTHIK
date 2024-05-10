@@ -46,6 +46,10 @@ const vehicleSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         required: false
+    },
+    from_sts: {
+        type: String,
+        require: false
     }
 
 });
