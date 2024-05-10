@@ -33,3 +33,4 @@ app.use("/sts", require("./routes/creation"));
 app.use("/landfill", require("./routes/creation"));
 app.use("/vehicle",require("./routes/creation"));
 app.use("/billing" , require("./routes/creation"));
+app.use("/app",require("./routes/appRoute"));

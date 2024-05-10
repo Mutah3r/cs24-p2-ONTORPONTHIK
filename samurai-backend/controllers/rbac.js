@@ -1,6 +1,6 @@
 const Role = require('../models/role'); // Assuming your role model file is named 'roleModel.js'
 const jwt = require("jsonwebtoken")
-const userModel = require('../models/user_accounts')
+const userModel = require('../models/user_accounts');
 
 exports.getAllRoles = async (req, res) => {
   try {
