@@ -7,7 +7,8 @@ const middleware = require("../middlewars/authentcation")
 router.get('/allthirdparties', Controller.getAllThirdPartyContractors);
 //post [create new third party] 
 router.post('/thirdparty', Controller.addThirdPartyContractor);
-
+// get name of the company and sts from manager id
+router.post('/getcompanyname/:token', Controller.getCompanyInfoByManagerId);
 //post [create new manager user]
 router.post('/addnewmanager', Controller.Registration);
 //get all third party company name and id

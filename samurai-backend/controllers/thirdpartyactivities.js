@@ -254,6 +254,33 @@ exports.createEmployee = async (req, res) => {
 
 
 
+// get the name of company and sts from manager id
+exports.getCompanyInfoByManagerId = async (req, res) => {
+    const { managerId } = req.params;
+
+    try {
+        // Find the company information based on the assigned manager ID
+        const companyInfo = await ThirdPartyCnt.findOne({ assigned_manager_id: managerId });
+
+        if (!companyInfo) {
+            return res.status(404).json({ message: "Company information not found for the provided manager ID" });
+        }
+
+        // Extract the name of the company and designated STS
+        const { name_of_the_company, designated_sts } = companyInfo;
+
+        // Respond with the company information
+        res.status(200).json({
+            name_of_the_company,
+            designated_sts
+        });
+    } catch (error) {
+        console.error('Failed to retrieve company information:', error);
+        res.status(500).json({ message: "Failed to retrieve company information due to server error" });
+    }
+};
+
+
 // get all employess of the current managers
 exports.getEmployeesByManager = async (req, res) => {
     try {
