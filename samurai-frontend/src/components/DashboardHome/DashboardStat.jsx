@@ -387,7 +387,7 @@ const DashboardStat = ({ user }) => {
               <thead>
                 <tr>
                   <th></th>
-                  <th>Contractor ID</th>
+                  <th>Company Name</th>
                   <th>Time and Date of Collection</th>
                   <th>Collected Waste Amount</th>
                   <th>Collected Waste Type</th>
@@ -398,12 +398,21 @@ const DashboardStat = ({ user }) => {
               <tbody>
                     <tr>
                       <th>1</th>
-                      <td>A</td>
-                      <td>B</td>
-                      <td>C</td>
-                      <td>D</td>
-                      <td>E</td>
-                      <td>F</td>
+                      <td>Eco</td>
+                      <td>Saturday, March 23, 2024 at 8:22:00 PM</td>
+                      <td>50 ton</td>
+                      <td>Solid</td>
+                      <td>Saturday, March 23, 2024 at 10:30:00 PM</td>
+                      <td>5</td>
+                    </tr>
+                    <tr>
+                      <th>1</th>
+                      <td>Eco</td>
+                      <td>Saturday, March 23, 2024 at 8:22:00 PM</td>
+                      <td>50 ton</td>
+                      <td>Solid</td>
+                      <td>Saturday, March 23, 2024 at 10:30:00 PM</td>
+                      <td>5</td>
                     </tr>
               </tbody>
               </table>

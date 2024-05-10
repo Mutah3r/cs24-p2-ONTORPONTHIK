@@ -43,7 +43,7 @@ const ThirdPartyContractorSchema = new mongoose.Schema({
         required: true
     },
     designated_sts: {
-        type: number,  // ward number
+        type: Number,  // ward number
         required: true
     },
     assigned_manager_id: { // the manager who shall create the employee id shall be send here

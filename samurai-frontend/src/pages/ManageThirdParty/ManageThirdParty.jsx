@@ -133,30 +133,31 @@ const ManageThirdParty = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* {vehicles &&
-                    vehicles.map((vehicle, idx) => (
-                        <tr key={vehicle._id}>
-                        <th>{idx + 1}</th>
-                        <td>{vehicle.registration_number}</td>
-                        <td>{vehicle.type}</td>
-                        <td>{vehicle.capacity + " ton"}</td>
-                        <td>{vehicle.fuel_cost_per_km_loaded + " BDT"}</td>
-                        <td>{vehicle.fuel_cost_per_km_unloaded + " BDT"}</td>
-                        </tr>
-                    ))} */}
                     <tr>
                         <th>1</th>
-                        <td>A</td>
-                        <td>B</td>
-                        <td>C</td>
-                        <td>D</td>
-                        <td>E</td>
-                        <td>A</td>
-                        <td>B</td>
-                        <td>C</td>
-                        <td>D</td>
-                        <td>E</td>
-                        <td>A</td>
+                        <td>Reg-No:19</td>
+                        <td>5/10/2024</td>
+                        <td>5214789652</td>
+                        <td>0176666666</td>
+                        <td>250</td>
+                        <td>150 Tk</td>
+                        <td>2 Ton</td>
+                        <td>5 years</td>
+                        <td>Dhaka Uttara</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td>Reg-No:15</td>
+                        <td>5/10/2024</td>
+                        <td>5214789652</td>
+                        <td>0176666666</td>
+                        <td>250</td>
+                        <td>150 Tk</td>
+                        <td>2 Ton</td>
+                        <td>5 years</td>
+                        <td>Dhaka Uttara</td>
+                        <td>10</td>
                     </tr>
                 </tbody>
                 </table>
