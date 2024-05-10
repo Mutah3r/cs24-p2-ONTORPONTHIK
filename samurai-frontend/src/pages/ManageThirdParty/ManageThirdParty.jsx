@@ -12,15 +12,13 @@ const ManageThirdParty = () => {
         setIsLoading(true);
         axios.get('http://localhost:8000/thirdparties/allthirdparties')
         .then(res => {
-            console.log(res.data);
             setThirdParties(res.data);
             setIsLoading(false);
         })
-        .catch(error => {
-            console.log(error);
+        .catch(() => {
             setIsLoading(false);
         })
-    },[]);
+    },[refetch]);
 
 
     const handleAddContractor = () => {
@@ -90,10 +88,8 @@ const ManageThirdParty = () => {
         }).then((result) => {
           if (result.isConfirmed) {
             setIsLoading(true);
-            console.log(result);
 
             // make a network call in post method to update the information in the database
-            console.log(result);
             axios.post('http://localhost:8000/thirdparties/thirdparty',{
                 name_of_the_company: result.value.companyName,
                 registration_id: result.value.reg_id,
@@ -116,6 +112,7 @@ const ManageThirdParty = () => {
                       });
                 }
                 setIsLoading(false);
+                setRefetch(!refetch);
             })
             .catch(() => {
                 Swal.fire({
