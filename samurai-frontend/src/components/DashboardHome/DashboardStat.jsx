@@ -376,6 +376,44 @@ const DashboardStat = ({ user }) => {
         </div>
       )}
 
+      {/* Display Incoming Logs */}
+      {!loading && user.role === "STS manager" && stsLogs && (
+          <>
+            <div className="border-2 rounded-lg my-4 pb-5">
+              <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+                Incoming Logs
+              </h2>
+              <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Contractor ID</th>
+                  <th>Time and Date of Collection</th>
+                  <th>Collected Waste Amount</th>
+                  <th>Collected Waste Type</th>
+                  <th>Time of Arrival</th>
+                  <th>Vehicles Used</th>
+                </tr>
+              </thead>
+              <tbody>
+                    <tr>
+                      <th>1</th>
+                      <td>A</td>
+                      <td>B</td>
+                      <td>C</td>
+                      <td>D</td>
+                      <td>E</td>
+                      <td>F</td>
+                    </tr>
+              </tbody>
+              </table>
+            </div>
+
+          </>
+      )}
+
+      
+
       {/* Error handling: Displays message if there is an error in fetching logs */}
       {error && (
         <h1 className="text-center text-red-500 font-semibold">
