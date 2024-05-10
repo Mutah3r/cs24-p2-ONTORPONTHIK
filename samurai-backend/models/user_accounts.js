@@ -26,6 +26,26 @@ const userSchema = new mongoose.Schema({
     },
     token: {
         type: String
+    },
+    date_of_account_creation: {
+        type : Date,
+        required: false
+    },
+    contact_number: {
+        type: String,
+        required: false
+    },
+    assigned_contractor_company: {
+        type: String,  // for contract managers
+        required: false
+    },
+    access_level : {
+        type: String,
+        required: false
+    },
+    username: {
+        type: String,
+        required: false
     }
 });
 

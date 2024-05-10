@@ -306,16 +306,23 @@ exports.checkUserAssignment = async (req, res) => {
     }
   };
 
+
+
+  // [ASIF]
   exports.stsLog = async (req, res) => {
     try {
         const { 
             token, 
             registration_number, 
             capacity, 
+            carring_weight,
             time_of_arrival, 
             time_of_departure ,
             to
         } = req.body;
+
+        console.log(req.body);
+        // return;
 
         // Find the user by token
         const userId = await userModel.findOne({ token });
@@ -335,11 +342,51 @@ exports.checkUserAssignment = async (req, res) => {
                 return res.status(403).json({ message: "Unauthorized" });
             }
 
+
+            const sts = await STS.findOne({ assigned_managers_id: userId._id });
+
+            if (!sts) {
+                return res.status(404).json({ message: "No STS assigned to this manager" });
+            }
+
             // Proceed with STS log creation
             const vehicle = await Vehicle.findOne({ registration_number });
+
+            
             if (!vehicle) {
                 return res.status(404).send({ message: 'Vehicle not found' });
             }
+
+
+
+            // Updated the vehicle [ASIF]
+
+            console.log(carring_weight);
+            try {
+                const updatedVehicle = await Vehicle.findOneAndUpdate(
+                    { registration_number },
+                    {
+                        $set: {
+                            left_from_sts: true,
+                            left_from_landfill: false,
+                            destination_landfill: to,
+                            // carrying_weight: capacity,
+                            carring_weight: carring_weight,
+                            from_sts: sts.ward_number
+                        }
+                    },
+                );
+            
+                if (!updatedVehicle) {
+                    console.log('No document found with that registration number.');
+                } else {
+                    console.log('Update successful:', updatedVehicle);
+                }
+            } catch (error) {
+                console.error('Error updating the vehicle:', error);
+            }
+
+            // console.log(type)
 
             const stsDocument = await STS.findOne({ assigned_managers_id: userId._id });
 
@@ -351,7 +398,7 @@ exports.checkUserAssignment = async (req, res) => {
             const newSTSEntry = new STSEntry({
                 sts_id: stsDocument._id, 
                 vehicle_registration: registration_number,
-                weight_of_waste: capacity,
+                weight_of_waste: carring_weight,
                 time_of_arrival: new Date(time_of_arrival),
                 time_of_departure: new Date(time_of_departure),
                 to
@@ -426,6 +473,7 @@ exports.getSTSEntriesForManager = async (req, res) => {
         return res.status(500).send({ message: 'Error fetching STSEntries', error: error.toString() });
     }
 };
+
 
 exports.getAllSTS = async (req, res) => {
     try {
@@ -543,10 +591,37 @@ exports.createLandfillEntry = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        const vehicle = await Vehicle.findOne({ registration_number:vehicle_registration });
+        const vehicle = await Vehicle.findOne({ registration_number: vehicle_registration });
         if (!vehicle) {
             return res.status(404).send({ message: 'Vehicle not found' });
         }
+
+
+
+        // Updated the vehicle [ASIF]
+        try {
+            const updatedVehicle = await Vehicle.findOneAndUpdate(
+                { vehicle_registration },
+                {
+                    $set: {
+                        left_from_sts: false,
+                        left_from_landfill: true,
+                        destination_landfill: "None",
+                        carrying_weight: 0,
+                        from_sts: "None"
+                    }
+                },
+            );
+        
+            if (!updatedVehicle) {
+                console.log('No document found with that registration number.');
+            } else {
+                console.log('Update successful:', updatedVehicle);
+            }
+        } catch (error) {
+            console.error('Error updating the vehicle:', error);
+        }
+
 
         // Check if the user is assigned as a manager to any landfill
         const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
@@ -664,6 +739,8 @@ exports.getLandfillEntriesAdmin = async (req, res) => {
     }
 };
 
+
+
 exports.getAllVehicle = async(req,res)=>{
     try{
 
@@ -674,6 +751,235 @@ exports.getAllVehicle = async(req,res)=>{
         return res.status(500).send({ message: 'Internal Server Error'});
     }
 }
+
+
+
+
+
+
+
+
+
+
+// [ASIF]
+exports.getAvailableVehicleForSTS = async(req, res) => {
+    try {
+        const vehicles = await Vehicle.find({ left_from_landfill: true });
+
+        return res.status(200).send({ message: 'Available vehicles', vehicles });
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+// [ASIF] [ASIF]
+exports.getAvailableVehicleForSTSFleetView = async(req, res) => {
+    try {
+        const vehicles = await Vehicle.find({ left_from_landfill: true });
+
+        // Initialize counts for each type of vehicle
+        let fleetComposition = {
+            open_truck: 0,
+            dump_truck: 0,
+            compactor: 0,
+            container_carrier: 0
+        };
+
+        // Tally up each vehicle type
+        vehicles.forEach(vehicle => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase(); // Normalize the type to match your fleetComposition keys
+            if (fleetComposition.hasOwnProperty(typeKey)) {
+                fleetComposition[typeKey]++;
+            }
+        });
+
+        // Send the response with vehicle counts
+        return res.status(200).send(fleetComposition);
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
+// [ASIF] [ASIF] [ASIF]
+exports.getAvailableVehicleForSTSFleetOptimized = async(req, res) => {
+    try {
+        // Extract parameters from the query string
+        const { token, Open_Truck = "None", Dump_Truck = "None", Compactor = "None", Container_Carrier = "None", total_waste } = req.query;
+
+        // Convert total_waste from string to number and validate
+        const waste = parseInt(total_waste, 10);
+        if (isNaN(waste)) {
+            return res.status(400).json({ message: "Invalid 'total_waste' parameter, must be a number." });
+        }
+
+        // Validate and authenticate the user
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Verify the token
+        try {
+            jwt.verify(token, process.env.JWT_SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ message: "Token verification failed" });
+        }
+
+        // Authorization check
+        if (user.role !== "STS manager") {
+            return res.status(403).json({ message: "Unauthorized access, user must be an STS manager" });
+        }
+
+        // Prepare dynamic query for vehicle types based on provided parameters
+        let typeConditions = [];
+        if (Open_Truck !== "None") typeConditions.push({ type: Open_Truck });
+        if (Dump_Truck !== "None") typeConditions.push({ type: Dump_Truck });
+        if (Compactor !== "None") typeConditions.push({ type: Compactor });
+        if (Container_Carrier !== "None") typeConditions.push({ type: Container_Carrier });
+
+        const vehicles = await Vehicle.find({
+            left_from_landfill: true,
+            ...(typeConditions.length > 0 && {$or: typeConditions})
+        });
+
+        if (!vehicles.length) {
+            return res.status(404).json({ message: 'No available vehicles match the selected types' });
+        }
+
+        // Check if total capacity meets required waste clearance
+        const totalCapacity = vehicles.reduce((sum, vehicle) => sum + vehicle.capacity, 0);
+        if (totalCapacity < waste) {
+            return res.status(400).json({ message: 'Available fleet cannot clear out all the waste' });
+        }
+
+        // Compute average costs per vehicle type
+        let typeCosts = {};
+        vehicles.forEach(vehicle => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase();
+            typeCosts[typeKey] = typeCosts[typeKey] || { sum: 0, count: 0 };
+            const cost = (vehicle.fuel_cost_per_km_loaded + vehicle.fuel_cost_per_km_unloaded) / 2;
+            typeCosts[typeKey].sum += cost;
+            typeCosts[typeKey].count++;
+        });
+
+        Object.keys(typeCosts).forEach(type => {
+            typeCosts[type] = typeCosts[type].sum / typeCosts[type].count;
+        });
+
+        // Initialize DP arrays
+        let dp = Array(200).fill(Infinity); // Adjust size according to your needs
+        let id = Array.from({ length: 200 }, () => []);
+        dp[0] = 0;
+
+        vehicles.forEach((vehicle, index) => {
+            const typeKey = vehicle.type.replace(/\s+/g, '_').toLowerCase();
+            const cost = typeCosts[typeKey];
+            for (let j = 199; j >= vehicle.capacity; j--) {
+                if (dp[j] > dp[j - vehicle.capacity] + cost) {
+                    dp[j] = dp[j - vehicle.capacity] + cost;
+                    id[j] = [...id[j - vehicle.capacity]];
+                    id[j].push(index);
+                }
+            }
+        });
+
+        let modified_total_waste = waste;
+        let mn = dp[modified_total_waste];
+        let ans_wer = modified_total_waste;
+        for(; modified_total_waste <= totalCapacity; modified_total_waste++) {
+            if (mn > dp[modified_total_waste]) {
+                ans_wer = modified_total_waste;
+                mn = dp[modified_total_waste];
+            }
+        }
+
+        modified_total_waste = ans_wer;
+
+        // Extract the fleet composition
+        let fleetComposition = {
+            open_truck: 0,
+            dump_truck: 0,
+            compactor: 0,
+            container_carrier: 0
+        };
+        id[modified_total_waste].forEach(idx => {
+            const type = vehicles[idx].type.replace(/\s+/g, '_').toLowerCase();  // Convert 'Open Truck' to 'open_truck'
+            fleetComposition[type]++;
+        });
+
+        // Final response with specific format
+        return res.status(200).send({
+            message: 'Optimal total cost per kilometer: ' + dp[modified_total_waste],
+            total_cost_per_km: dp[modified_total_waste],
+            open_truck: fleetComposition.open_truck,
+            dump_truck: fleetComposition.dump_truck,
+            compactor: fleetComposition.compactor,
+            container_carrier: fleetComposition.container_carrier
+        });
+
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
+
+
+
+
+// [ASIF]
+exports.getAvailableVehicleForLandfill = async(req, res) => {
+    try {
+        const token = req.params.token;
+
+        
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        
+        try {
+            jwt.verify(token, process.env.JWT_SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        if (user.role !== "Landfill manager") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        
+        const landfill = await Landfill.findOne({ assigned_managers_id: user._id });
+
+        if (!landfill) {
+            return res.status(404).send({ message: 'No Landfill assigned to the manager' });
+        }
+        const vehicles = await Vehicle.find({
+            left_from_sts: true,
+            destination_landfill: landfill.name
+        });
+
+        return res.status(200).send({ message: 'Available vehicles for landfill', vehicles });
+    } catch (error) {
+        console.error('Error retrieving available vehicles:', error);
+        return res.status(500).send({ message: 'Internal Server Error', error: error.toString() });
+    }
+};
+
+
+
+
+
 
 exports.getBillingInfo = async (req, res) => {
     try {

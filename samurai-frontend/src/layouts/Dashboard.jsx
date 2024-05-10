@@ -12,6 +12,7 @@ import { GrScheduleNew } from "react-icons/gr";
 import { GiMoneyStack } from "react-icons/gi";
 import { useEffect, useState } from "react";
 import { MdCancel } from "react-icons/md";
+import { ImTruck } from "react-icons/im";
 import axios from "axios";
 import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
@@ -236,6 +237,20 @@ const Dashboard = () => {
                           to="/dashboard/billing"
                         >
                           <GiMoneyStack /> <span>Billing</span>
+                        </Link>
+                      </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {user.role === "STS manager" ? (
+                      <li>
+                        <Link
+                          className="flex items-center gap-2"
+                          to="/dashboard/optimal-fleet"
+                        >
+                          <ImTruck /> <span>Optimal Fleet</span>
                         </Link>
                       </li>
                     ) : (

@@ -13,6 +13,7 @@ import VehicleEntry from "../pages/VehicleEntry/VehicleEntry";
 import Billing from "../pages/Billing/Billing";
 import ResetPassword from "../pages/RestPassword/ResetPassword";
 import ConfirmReset from "../pages/RestPassword/ConfirmReset";
+import OptimalFleet from "../pages/OptimalFleet/OptimalFleet";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
       {
         path: "billing",
         element: <Billing />,
+      },
+      {
+        path: "optimal-fleet",
+        element: <OptimalFleet />,
       },
     ],
   },

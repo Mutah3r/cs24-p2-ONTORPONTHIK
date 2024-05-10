@@ -24,7 +24,34 @@ const vehicleSchema = new mongoose.Schema({
     fuel_cost_per_km_unloaded: {
         type: Number,
         required: true
+    },
+
+    left_from_sts: {
+        type : Boolean,
+        default: false,
+        require: false
+    },
+
+    left_from_landfill: {
+        type: Boolean,
+        default: true,
+        require:false
+    },
+
+    destination_landfill: {
+        type: String,
+        required: false
+    },
+    carring_weight: {
+        type: Number,
+        default: 0,
+        required: false
+    },
+    from_sts: {
+        type: String,
+        require: false
     }
+
 });
 
 // Create model
