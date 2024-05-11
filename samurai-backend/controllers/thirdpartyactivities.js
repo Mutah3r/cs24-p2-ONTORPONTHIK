@@ -628,6 +628,9 @@ exports.createSTSIncomingEntryLog = async (req, res) => {
 
 
 
+
+
+
 // get all company for a sts
 exports.getContractorsBySTS = async (req, res) => {
     try {
@@ -698,7 +701,17 @@ exports.getSTSIncomingEntryLogsByToken = async (req, res) => {
         // Find all STS incoming entry logs matching the STS ward number
         const entryLogs = await STSIncomingEntryLog.find({ designated_sts_for_deposit: sts.ward_number });
 
-        res.status(200).json({ message: "STS incoming entry logs retrieved successfully", entryLogs });
+        // Fetch contractor details for each entry log to get the company name
+        const logsWithCompanyName = await Promise.all(entryLogs.map(async (entry) => {
+            const contractor = await ThirdPartyCnt.findOne({ _id: entry.contractor_id });
+            if (contractor) {
+                return { ...entry.toObject(), contractor_name: contractor.name_of_the_company };
+            } else {
+                return entry;
+            }
+        }));
+
+        res.status(200).json({ message: "STS incoming entry logs retrieved successfully", entryLogs: logsWithCompanyName });
     } catch (error) {
         console.error('Failed to retrieve STS incoming entry logs:', error);
         res.status(500).json({ message: "Failed to retrieve STS incoming entry logs due to server error", error: error.message });
