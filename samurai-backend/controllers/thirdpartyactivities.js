@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
 const EmployeeLog = require('../models/employee_log');
 const STSIncomingEntryLog = require('../models/sts_incoming_entry');
+const Feedback = require('../models/feedback');
 
 // /thirdparties/allthirdparties [get all thirdparty contact]
 exports.getAllThirdPartyContractors = async (req, res) => { // contactor companies
@@ -755,3 +756,25 @@ exports.getOutgoingEntryLogsByToken = async (req, res) => {
 };
 
 
+
+// change feed back seen status
+exports.updateFeedbackSeenStatus = async (req, res) => {
+    try {
+        const { feedbackId } = req.params; // Assuming feedbackId is passed in the URL params
+
+        // Find the feedback entry by ID
+        const feedback = await Feedback.findById(feedbackId);
+        if (!feedback) {
+            return res.status(404).json({ message: "Feedback entry not found" });
+        }
+
+        // Update the seen_status
+        feedback.seen_status = true;
+        await feedback.save();
+
+        res.status(200).json({ message: "Feedback seen status updated successfully", feedback });
+    } catch (error) {
+        console.error('Failed to update feedback seen status:', error);
+        res.status(500).json({ message: "Failed to update feedback seen status due to server error", error: error.message });
+    }
+};

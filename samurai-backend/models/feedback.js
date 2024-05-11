@@ -19,6 +19,11 @@ const feedbackSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
+  },
+  seen_status: {
+    type : Boolean,
+    required: true,
+    default:false
   }
 });
 
