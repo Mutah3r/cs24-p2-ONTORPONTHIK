@@ -25,8 +25,6 @@ const ThirdPartyChart = ({ latestData }) => {
     return dateA - dateB;
   });
 
-  console.log(result);
-
   return (
     <div style={{ width: "100%", height: "300px" }}>
       <ResponsiveContainer width="100%" height="100%">

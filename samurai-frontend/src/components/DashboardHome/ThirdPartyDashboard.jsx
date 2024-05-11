@@ -9,6 +9,14 @@ const ThirdPartyDashboard = () => {
   const [refetch, setRefetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [lastWeekData, setLastWeekData] = useState([]);
+  const [company, setCompany] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/thirdparties/getcompanyname/${JSON.parse(localStorage.getItem('user'))}`)
+    .then(res => {
+      setCompany(res.data);
+    })
+  },[])
 
   useEffect(() => {
     setIsLoading(true);
@@ -64,6 +72,11 @@ const ThirdPartyDashboard = () => {
         Third-Party Contractor Dashboard
       </h1>
 
+      <div>
+        <h3>Company Name: {company?.name_of_the_company || ""}</h3>
+        <h3>Designated STS Ward: {company?.designated_sts || ""}</h3>
+      </div>
+
       {isLoading && (
         <div className="flex items-center w-full justify-center py-3">
           <ClipLoader
@@ -85,6 +98,7 @@ const ThirdPartyDashboard = () => {
         </>
       )}
 
+      {/* employee logs */}
       {!isLoading && (
         <div className="overflow-x-auto">
           <h1 className="text-center font-semibold my-6">Employee Logs</h1>
@@ -123,6 +137,49 @@ const ThirdPartyDashboard = () => {
                     <td>{log.full_name}</td>
                     <td>{formatTimeToHumanReadable(log.log_in_time)}</td>
                     <td>{formatTimeToHumanReadable(log.log_out_time)}</td>
+                    <td>{log.total_hours_worked}</td>
+                    <td>{parseFloat(log.waste_carried) * 1000} kg</td>
+                    <td>{log.total_payment} BDT</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* outgoing logs */}
+      {!isLoading && (
+        <div className="overflow-x-auto">
+          <h1 className="text-center font-semibold my-6">Outgoing Logs</h1>
+
+          <div className="flex justify-between items-center my-3">
+            <div className="flex flex-col gap-1 text-green-500 font-semibold">
+              <span>Total Payment: {logs?.summary?.totalPayment} BDT</span>
+              <span>
+                Total Waste:{" "}
+                {parseFloat(logs?.summary?.totalWasteCarriedTons) * 1000} kg
+              </span>
+            </div>
+          </div>
+          
+          <table className="table table-zebra my-4">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Date</th>
+                <th>Waste Amount</th>
+                <th>Vehicles Used</th>
+                <th>Fine</th>
+                <th>Total Bill Received</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs &&
+                logs.logs.map((log, idx) => (
+                  <tr key={log._id}>
+                    <th>{idx + 1}</th>
+                    <td>{log.full_name}</td>
+                    <td>{formatTimeToHumanReadable(log.log_in_time)}</td>
                     <td>{log.total_hours_worked}</td>
                     <td>{parseFloat(log.waste_carried) * 1000} kg</td>
                     <td>{log.total_payment} BDT</td>
