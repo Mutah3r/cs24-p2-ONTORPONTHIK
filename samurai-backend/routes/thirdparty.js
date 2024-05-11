@@ -40,7 +40,7 @@ router.get('/getstsincominglog/:token', Controller.getSTSIncomingEntryLogsByToke
 // get outgoing logs for contract managers
 router.get('/outgoinglogs/:token', Controller.getOutgoingEntryLogsByToken);
 
-// change the feedback status
-router.get('/changeseenstatus/:feedbackId', Controller.updateFeedbackSeenStatus);
+// post api for status update
+router.post('/changeseenstatus', Controller.updateFeedbackSeenStatus);
 
 module.exports = router;

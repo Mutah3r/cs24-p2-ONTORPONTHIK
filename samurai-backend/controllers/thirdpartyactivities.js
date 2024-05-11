@@ -760,7 +760,7 @@ exports.getOutgoingEntryLogsByToken = async (req, res) => {
 // change feed back seen status
 exports.updateFeedbackSeenStatus = async (req, res) => {
     try {
-        const { feedbackId } = req.params; // Assuming feedbackId is passed in the URL params
+        const { feedbackId } = req.body; // Assuming feedbackId is passed in the URL params
 
         // Find the feedback entry by ID
         const feedback = await Feedback.findById(feedbackId);
