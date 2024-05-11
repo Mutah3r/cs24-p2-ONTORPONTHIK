@@ -130,4 +130,14 @@ exports.volunteering = async (req, res) => {
   }
 }
 
+exports.getFeedback = async (req, res) => {
+  try {
+      const feeds = await Feedback.find(); // Sort by time in descending order
+      res.status(200).json(feeds);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
+  }
+}
+
   

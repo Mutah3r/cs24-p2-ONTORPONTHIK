@@ -9,5 +9,6 @@ router.post('/volunteering', authController.addVolunteering);
 router.get('/resource',authController.Resource);
 router.get('/post',authController.post)
 router.get('/volunteering',authController.volunteering);
+router.get('/feedback',authController.getFeedback);
 
 module.exports = router;
