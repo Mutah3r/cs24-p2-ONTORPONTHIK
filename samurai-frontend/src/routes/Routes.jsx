@@ -17,6 +17,7 @@ import OptimalFleet from "../pages/OptimalFleet/OptimalFleet";
 import ManageThirdParty from "../pages/ManageThirdParty/ManageThirdParty";
 import ManageThirdPartyEmployees from "../pages/ManageThirdPartyEmployees/ManageThirdPartyEmployees";
 import ThirdPartyEmployeeLogs from "../pages/ThirdPartyEmployeeLogs/ThirdPartyEmployeeLogs";
+import IncomingWasteLogEntry from "../pages/IncomingWasteLogEntry/IncomingWasteLogEntry";
 
 const router = createBrowserRouter([
   {
@@ -91,6 +92,10 @@ const router = createBrowserRouter([
         path: "employee-log",
         element: <ThirdPartyEmployeeLogs />
       },
+      {
+        path: "incoming-waste-log-entry",
+        element: <IncomingWasteLogEntry />
+      }
     ],
   },
 ]);

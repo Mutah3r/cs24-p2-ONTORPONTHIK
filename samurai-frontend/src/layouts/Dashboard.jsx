@@ -16,6 +16,7 @@ import { ImTruck } from "react-icons/im";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { MdManageAccounts } from "react-icons/md";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
+import { TbFileAnalytics } from "react-icons/tb";
 import axios from "axios";
 import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
@@ -245,6 +246,20 @@ const Dashboard = () => {
                           to="/dashboard/billing"
                         >
                           <GiMoneyStack /> <span>Billing</span>
+                        </Link>
+                      </li>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                  <>
+                    {user.role === "STS manager" ? (
+                      <li>
+                        <Link
+                          className="flex items-center gap-2"
+                          to="/dashboard/incoming-waste-log-entry"
+                        >
+                          <TbFileAnalytics /> <span>Incoming Waste Log Entry</span>
                         </Link>
                       </li>
                     ) : (
