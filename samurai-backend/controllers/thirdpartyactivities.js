@@ -577,7 +577,6 @@ exports.createSTSIncomingEntryLog = async (req, res) => {
             amount_of_waste_collected, // in kilograms
             type_of_waste_collected,
             vehicle_used_for_transportation,
-            contract_manager_id
         } = req.body;
 
         // Fetch contract details to get payment_per_tonnage_of_waste and required_amount_of_waste_per_day
@@ -608,7 +607,7 @@ exports.createSTSIncomingEntryLog = async (req, res) => {
             type_of_waste_collected,
             designated_sts_for_deposit: contractor.designated_sts, // ward_no
             vehicle_used_for_transportation,
-            contract_manager_id,
+            contract_manager_id : contractor.assigned_manager_id,
             payment_per_tonnage_of_waste,
             required_amount_of_waste_per_day,
             basic_pay,
