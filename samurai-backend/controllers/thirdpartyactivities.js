@@ -660,7 +660,8 @@ exports.getContractorsBySTS = async (req, res) => {
         // Respond with the company information of all contractors
         const companies = contractors.map(contractor => ({
             name_of_the_company: contractor.name_of_the_company,
-            designated_sts: contractor.designated_sts
+            designated_sts: contractor.designated_sts,
+            contract_id : contractor._id
         }));
 
         res.status(200).json(companies);
