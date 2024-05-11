@@ -5,18 +5,20 @@ import Swal from "sweetalert2";
 import { BiMap } from "react-icons/bi";
 import { formatTimeToHumanReadable } from "../../utils/timeUtils";
 import STSLogsChart from "./STSLogsChart";
+import { FaDownload } from "react-icons/fa6";
 import LandfillLogsChart from "./LandfillLogsChart";
 
 // Component to display different types of log data based on user role
 const DashboardStat = ({ user }) => {
   // State variables for managing data and UI states
-  const [loading, setLoading] = useState(true);  // Overall loading state for the component
-  const [logsLoading, setLogsLoading] = useState(true);  // Specific loading state for log data
-  const [stsLogs, setStsLogs] = useState(null);  // Store STS logs
-  const [filteredStsLogs, setFilteredStsLogs] = useState([]);  // Store filtered STS logs
-  const [landfillLogs, setLandfillLogs] = useState(null);  // Store landfill logs
-  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]);  // Store filtered landfill logs
-  const [error, setError] = useState(false);  // Error state
+  const [loading, setLoading] = useState(true); // Overall loading state for the component
+  const [logsLoading, setLogsLoading] = useState(true); // Specific loading state for log data
+  const [stsLogs, setStsLogs] = useState(null); // Store STS logs
+  const [filteredStsLogs, setFilteredStsLogs] = useState([]); // Store filtered STS logs
+  const [landfillLogs, setLandfillLogs] = useState(null); // Store landfill logs
+  const [filteredLandfillLogs, setFilteredLandfillLogs] = useState([]); // Store filtered landfill logs
+  const [error, setError] = useState(false); // Error state
+  const [incomingLogs, setIncomingLogs] = useState([]);
 
   // fetch data based on user role
   useEffect(() => {
@@ -58,6 +60,130 @@ const DashboardStat = ({ user }) => {
         });
     }
   }, []);
+
+  useState(() => {
+    setLoading(true);
+    axios
+      .get(
+        `http://localhost:8000/thirdparties/getstsincominglog/${JSON.parse(
+          localStorage.getItem("user")
+        )}`
+      )
+      .then((res) => {
+        console.log(res.data?.entryLogs);
+        setIncomingLogs(res.data?.entryLogs);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  }, []);
+
+  const createAndDownloadPDF = async (log) => {
+    try {
+      // Create a new PDF document
+      const pdfDoc = await PDFLib.PDFDocument.create();
+
+      // Add a new page to the document
+      const page = pdfDoc.addPage([350, 240]);
+
+      // Add some text to the page
+      const helveticaFont = await pdfDoc.embedFont(
+        PDFLib.StandardFonts.Helvetica
+      );
+      const textSize = 24;
+
+      page.drawText("EcoSync", {
+        x: 3,
+        y: page.getHeight() - 10,
+        size: 10,
+        font: helveticaFont,
+      });
+
+      page.drawText("Billing Slip", {
+        x: 120,
+        y: page.getHeight() - 45,
+        size: textSize,
+        font: helveticaFont,
+      });
+
+      page.drawText(`Company Name : ${log.contractor_name}`, {
+        x: 10,
+        y: page.getHeight() - 70,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      page.drawText(
+        `Time & Date of Collection: ${formatTimeToHumanReadable(log.time_and_date_of_collection)}`,
+        {
+          x: 10,
+          y: page.getHeight() - 90,
+          size: 11,
+          font: helveticaFont,
+        }
+      );
+
+      page.drawText(`Amount of Waste: ${log.amount_of_waste_collected} ton`, {
+        x: 10,
+        y: page.getHeight() - 110,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      page.drawText(`Type of Waste: ${log.type_of_waste_collected}`, {
+        x: 10,
+        y: page.getHeight() - 130,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      page.drawText(`Basic Pay: ${log.basic_pay}`, {
+        x: 10,
+        y: page.getHeight() - 150,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      page.drawText(`Fine: ${log.fine} BDT`, {
+        x: 10,
+        y: page.getHeight() - 170,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      page.drawText(`Bill: ${log.total_bill} BDT`, {
+        x: 10,
+        y: page.getHeight() - 200,
+        size: 11,
+        font: helveticaFont,
+      });
+
+      // Serialize the PDF document to bytes
+      const pdfBytes = await pdfDoc.save();
+
+      // Convert bytes to Blob
+      const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(pdfBlob);
+
+      // Create a link element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "billing slip.pdf";
+
+      // Append the link to the body and trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up by revoking the URL object
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error creating and downloading PDF:", error);
+    }
+  };
 
   // Handlers for form submissions to filter logs based on the selected time range
   const handleTimeSubmitSTS = (event) => {
@@ -138,7 +264,10 @@ const DashboardStat = ({ user }) => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Dashboard {(stsLogs && stsLogs[0])? ` - ${stsLogs[0].sts_name}` : ""} {(landfillLogs && landfillLogs[0])? ` - ${landfillLogs[0].name}` : ""}</h1>
+      <h1 className="text-2xl font-semibold mb-4">
+        Dashboard {stsLogs && stsLogs[0] ? ` - ${stsLogs[0].sts_name}` : ""}{" "}
+        {landfillLogs && landfillLogs[0] ? ` - ${landfillLogs[0].name}` : ""}
+      </h1>
 
       {/* Show loader while fetching data */}
       {loading && (
@@ -159,7 +288,7 @@ const DashboardStat = ({ user }) => {
           {/* Week Summary */}
           <div className="border-2 rounded-lg my-4 pb-5">
             <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
-                Week Summary
+              Week Summary
             </h2>
             <div>
               <STSLogsChart logsData={stsLogs} />
@@ -276,7 +405,7 @@ const DashboardStat = ({ user }) => {
           {/* Week Summary */}
           <div className="border-2 rounded-lg my-4 pb-5">
             <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
-                Week Summary
+              Week Summary
             </h2>
             <div>
               <LandfillLogsChart logsData={landfillLogs} />
@@ -378,50 +507,53 @@ const DashboardStat = ({ user }) => {
 
       {/* Display Incoming Logs */}
       {!loading && user.role === "STS manager" && stsLogs && (
-          <>
-            <div className="border-2 rounded-lg my-4 pb-5">
-              <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
-                Incoming Logs
-              </h2>
-              <table className="table table-zebra">
+        <>
+          <div className="border-2 rounded-lg my-4 pb-5">
+            <h2 className="text-lg font-semibold mt-6 mx-auto text-center mb-3">
+              Incoming Logs
+            </h2>
+            <table className="table table-zebra">
               <thead>
                 <tr>
                   <th></th>
                   <th>Company Name</th>
-                  <th>Time and Date of Collection</th>
-                  <th>Collected Waste Amount</th>
-                  <th>Collected Waste Type</th>
-                  <th>Time of Arrival</th>
-                  <th>Vehicles Used</th>
+                  <th>Time & Date of Collection</th>
+                  <th>Amount of Waste</th>
+                  <th>Type of Waste</th>
+                  <th>Basic Pay</th>
+                  <th>Fine</th>
+                  <th>Bill</th>
+                  <th>Download Slip</th>
                 </tr>
               </thead>
               <tbody>
-                    <tr>
-                      <th>1</th>
-                      <td>Eco</td>
-                      <td>Saturday, March 23, 2024 at 8:22:00 PM</td>
-                      <td>50 ton</td>
-                      <td>Solid</td>
-                      <td>Saturday, March 23, 2024 at 10:30:00 PM</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <th>1</th>
-                      <td>Eco</td>
-                      <td>Saturday, March 23, 2024 at 8:22:00 PM</td>
-                      <td>50 ton</td>
-                      <td>Solid</td>
-                      <td>Saturday, March 23, 2024 at 10:30:00 PM</td>
-                      <td>5</td>
-                    </tr>
+                {incomingLogs &&
+                  incomingLogs.map((log, idx) => {
+                    return (
+                      <tr key={log._id}>
+                        <th>{idx + 1}</th>
+                        <td>{log.contractor_name}</td>
+                        <td>{log.time_and_date_of_collection}</td>
+                        <td>{log.amount_of_waste_collected}</td>
+                        <td>{log.type_of_waste_collected}</td>
+                        <td>{log.basic_pay}</td>
+                        <td>{log.fine}</td>
+                        <td>{log.total_bill}</td>
+                        <td className="flex justify-center">
+                          {/* Download icon with onClick event to trigger PDF creation */}
+                          <FaDownload
+                            onClick={() => createAndDownloadPDF(log)}
+                            className="cursor-pointer text-[20px]"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
-              </table>
-            </div>
-
-          </>
+            </table>
+          </div>
+        </>
       )}
-
-      
 
       {/* Error handling: Displays message if there is an error in fetching logs */}
       {error && (
