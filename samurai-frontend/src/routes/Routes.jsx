@@ -18,6 +18,7 @@ import ManageThirdParty from "../pages/ManageThirdParty/ManageThirdParty";
 import ManageThirdPartyEmployees from "../pages/ManageThirdPartyEmployees/ManageThirdPartyEmployees";
 import ThirdPartyEmployeeLogs from "../pages/ThirdPartyEmployeeLogs/ThirdPartyEmployeeLogs";
 import IncomingWasteLogEntry from "../pages/IncomingWasteLogEntry/IncomingWasteLogEntry";
+import Notifications from "../pages/Notifications/Notifications";
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
       {
         path: "incoming-waste-log-entry",
         element: <IncomingWasteLogEntry />
+      },
+      {
+        path: "notifications",
+        element: <Notifications />
       }
     ],
   },

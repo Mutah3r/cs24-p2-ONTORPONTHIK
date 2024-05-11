@@ -17,6 +17,7 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { MdManageAccounts } from "react-icons/md";
 import { TbDeviceDesktopAnalytics } from "react-icons/tb";
 import { TbFileAnalytics } from "react-icons/tb";
+import { FaBell } from "react-icons/fa";
 import axios from "axios";
 import useSessionCheck from "../hooks/useSessionCheck";
 import { showAlert } from "../utils/alerts";
@@ -59,6 +60,11 @@ const Dashboard = () => {
       title: "Third-Party Management",
       icon: FaPeopleGroup,
       to: "third-party-management",
+    },
+    {
+      title: "Notifications",
+      icon: FaBell,
+      to: "notifications",
     }
   ];
 
