@@ -10,13 +10,22 @@ const ThirdPartyDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastWeekData, setLastWeekData] = useState([]);
   const [company, setCompany] = useState(null);
+  const [outgoingLogs, setOutgoingLogs] = useState([]);
 
   useEffect(() => {
     axios.get(`http://localhost:8000/thirdparties/getcompanyname/${JSON.parse(localStorage.getItem('user'))}`)
     .then(res => {
       setCompany(res.data);
     })
-  },[])
+  },[]);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8000/thirdparties/outgoinglogs/${JSON.parse(localStorage.getItem('user'))}`)
+    .then(res => {
+      console.log(res.data);
+      setOutgoingLogs(res.data?.entryLogs);
+    })
+  }, [])
 
   useEffect(() => {
     setIsLoading(true);
@@ -151,38 +160,28 @@ const ThirdPartyDashboard = () => {
       {!isLoading && (
         <div className="overflow-x-auto">
           <h1 className="text-center font-semibold my-6">Outgoing Logs</h1>
-
-          <div className="flex justify-between items-center my-3">
-            <div className="flex flex-col gap-1 text-green-500 font-semibold">
-              <span>Total Payment: {logs?.summary?.totalPayment} BDT</span>
-              <span>
-                Total Waste:{" "}
-                {parseFloat(logs?.summary?.totalWasteCarriedTons) * 1000} kg
-              </span>
-            </div>
-          </div>
           
           <table className="table table-zebra my-4">
             <thead>
               <tr>
                 <th></th>
-                <th>Date</th>
-                <th>Waste Amount</th>
+                <th>Date & Time of Collection</th>
+                <th>Amount of Waste Collected</th>
                 <th>Vehicles Used</th>
                 <th>Fine</th>
                 <th>Total Bill Received</th>
               </tr>
             </thead>
             <tbody>
-              {logs &&
-                logs.logs.map((log, idx) => (
+              {outgoingLogs &&
+                outgoingLogs.map((log, idx) => (
                   <tr key={log._id}>
                     <th>{idx + 1}</th>
-                    <td>{log.full_name}</td>
-                    <td>{formatTimeToHumanReadable(log.log_in_time)}</td>
-                    <td>{log.total_hours_worked}</td>
-                    <td>{parseFloat(log.waste_carried) * 1000} kg</td>
-                    <td>{log.total_payment} BDT</td>
+                    <td>{formatTimeToHumanReadable(log.time_and_date_of_collection)}</td>
+                    <td>{log.amount_of_waste_collected}</td>
+                    <td>{log.vehicle_used_for_transportation}</td>
+                    <td>{log.fine}</td>
+                    <td>{log.total_bill} BDT</td>
                   </tr>
                 ))}
             </tbody>
