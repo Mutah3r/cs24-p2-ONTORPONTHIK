@@ -27,4 +27,17 @@ router.get('/getemployeelogs/:token', Controller.getEmployeeLogsByManagerFromTok
 // get employe log for last seven days with value and day name
 router.get('/getemployeelogsforlast/:token', Controller.getTotalWasteAndBillLastSevenDaysSeparatedByDay);
 
+
+
+// get company for sts
+router.get('/getcompanyforsts/:token', Controller.getContractorsBySTS);
+// post incomming sts entry
+router.post('/incomingstsentry', Controller.createSTSIncomingEntryLog);
+
+// get sts incoming logs
+router.get('/getstsincominglog/:token', Controller.getSTSIncomingEntryLogsByToken);
+
+// get outgoing logs for contract managers
+router.get('/outgoinglogs/:token', Controller.getOutgoingEntryLogsByToken);
+
 module.exports = router;

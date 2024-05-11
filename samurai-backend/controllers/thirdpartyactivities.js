@@ -10,6 +10,7 @@ const Employee = require('../models/employee');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer'); 
 const EmployeeLog = require('../models/employee_log');
+const STSIncomingEntryLog = require('../models/sts_incoming_entry');
 
 // /thirdparties/allthirdparties [get all thirdparty contact]
 exports.getAllThirdPartyContractors = async (req, res) => { // contactor companies
@@ -562,3 +563,182 @@ exports.getTotalWasteAndBillLastSevenDaysSeparatedByDay = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+// post incoming and out going logs
+exports.createSTSIncomingEntryLog = async (req, res) => {
+    try {
+        const {
+            contractor_id,
+            time_and_date_of_collection,
+            amount_of_waste_collected, // in kilograms
+            type_of_waste_collected,
+            vehicle_used_for_transportation,
+            contract_manager_id
+        } = req.body;
+
+        // Fetch contract details to get payment_per_tonnage_of_waste and required_amount_of_waste_per_day
+        const contractor = await ThirdPartyCnt.findOne({ _id: contractor_id });
+        if (!contractor) {
+            return res.status(404).json({ message: "Contractor not found" });
+        }
+
+        const { payment_per_tonnage_of_waste, required_amount_of_waste_per_day } = contractor;
+
+        // Convert amount_of_waste_collected from kilograms to tons
+        const amount_of_waste_collected_tons = amount_of_waste_collected / 1000;
+
+        // Calculate basic_pay: Wc * Pt
+        const basic_pay = amount_of_waste_collected_tons * payment_per_tonnage_of_waste;
+
+        // Calculate fine: (Wr - Wc) * Pt
+        const fine = (required_amount_of_waste_per_day - amount_of_waste_collected_tons) * payment_per_tonnage_of_waste;
+
+        // Calculate total_bill: basic_pay - fine
+        const total_bill = basic_pay - fine;
+
+        // Create a new STS Incoming Entry Log entry
+        const newEntryLog = new STSIncomingEntryLog({
+            contractor_id,
+            time_and_date_of_collection,
+            amount_of_waste_collected: amount_of_waste_collected_tons,
+            type_of_waste_collected,
+            designated_sts_for_deposit: contractor.designated_sts, // ward_no
+            vehicle_used_for_transportation,
+            contract_manager_id,
+            payment_per_tonnage_of_waste,
+            required_amount_of_waste_per_day,
+            basic_pay,
+            fine,
+            total_bill
+        });
+
+        // Save the new entry log to the database
+        await newEntryLog.save();
+
+        // Respond with success message
+        res.status(201).json({ message: "STS Incoming Entry Log successfully created", entryLog: newEntryLog });
+    } catch (error) {
+        console.error('Failed to create a new STS Incoming Entry Log:', error);
+        res.status(500).json({ message: "Failed to create STS Incoming Entry Log due to server error", error: error.message });
+    }
+};
+
+
+
+// get all company for a sts
+exports.getContractorsBySTS = async (req, res) => {
+    try {
+        // Extract token from the query params
+        const { token } = req.params;
+
+        // Check if token exists
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Find the user by token
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "Invalid token" });
+        }
+
+        // Find the STS details based on the user's ID
+        const sts = await STS.findOne({ assigned_managers_id: user._id });
+        if (!sts) {
+            return res.status(404).json({ message: "STS details not found for the provided manager ID" });
+        }
+
+        // Fetch contractor details using designated_sts
+        const contractors = await ThirdPartyCnt.find({ designated_sts: sts.ward_number });
+        if (!contractors || contractors.length === 0) {
+            return res.status(404).json({ message: "Contractors not found for the designated STS" });
+        }
+
+        // Respond with the company information of all contractors
+        const companies = contractors.map(contractor => ({
+            name_of_the_company: contractor.name_of_the_company,
+            designated_sts: contractor.designated_sts
+        }));
+
+        res.status(200).json(companies);
+    } catch (error) {
+        console.error('Failed to retrieve contractors by STS:', error);
+        res.status(500).json({ message: "Failed to retrieve contractors by STS due to server error", error: error.message });
+    }
+};
+
+
+// get sts incoming long
+exports.getSTSIncomingEntryLogsByToken = async (req, res) => {
+    try {
+        // Extract token from the query params
+        const { token } = req.params;
+
+        // Check if token exists
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Find the user by token
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "Invalid token" });
+        }
+
+        // Find the STS details based on the user's ID
+        const sts = await STS.findOne({ assigned_managers_id: user._id });
+        if (!sts) {
+            return res.status(404).json({ message: "STS details not found for the provided manager ID" });
+        }
+
+        // Find all STS incoming entry logs matching the STS ward number
+        const entryLogs = await STSIncomingEntryLog.find({ designated_sts_for_deposit: sts.ward_number });
+
+        res.status(200).json({ message: "STS incoming entry logs retrieved successfully", entryLogs });
+    } catch (error) {
+        console.error('Failed to retrieve STS incoming entry logs:', error);
+        res.status(500).json({ message: "Failed to retrieve STS incoming entry logs due to server error", error: error.message });
+    }
+};
+
+
+
+// get outgoing logs for contractor managers
+exports.getOutgoingEntryLogsByToken = async (req, res) => {
+    try {
+        // Extract token from the query params
+        const { token } = req.params;
+
+        // Check if token exists
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Find the user by token
+        const user = await userModel.findOne({ token });
+        if (!user) {
+            return res.status(404).json({ message: "Invalid token" });
+        }
+
+        let entryLogs;
+
+        // Check if the user is a Contractor Manager
+        if (user.role === 'Contractor Manager') {
+            // Find STS incoming entry logs based on the contract manager ID
+            entryLogs = await STSIncomingEntryLog.find({ contract_manager_id: user._id });
+        } else {
+            return res.status(403).json({ message: "User is not authorized to access this resource" });
+        }
+
+        res.status(200).json({ message: "STS incoming entry logs retrieved successfully", entryLogs });
+    } catch (error) {
+        console.error('Failed to retrieve STS incoming entry logs:', error);
+        res.status(500).json({ message: "Failed to retrieve STS incoming entry logs due to server error", error: error.message });
+    }
+};
+
+
