@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Define volunteer schema
 const volunteerSchema = new mongoose.Schema({
-  email: {
+  name: {
     type: String,
     required: true
   },
