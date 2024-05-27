@@ -14,34 +14,40 @@
 
 ### Frontend
 
--   ![HTML](https://img.icons8.com/color/48/000000/html-5.png) **HTML**
--   ![CSS](https://img.icons8.com/color/48/000000/css3.png) **CSS**
--   ![Tailwind](https://img.icons8.com/color/48/000000/tailwindcss.png) **Tailwind CSS**
--   ![JavaScript](https://img.icons8.com/color/48/000000/javascript.png) **JavaScript**
--   ![React](https://img.icons8.com/color/48/000000/react-native.png) **React**
--   ![React Router](https://i.ibb.co/19d5sDG/react-router-svg.png) **React Router**
--   ![React Spinners](https://i.ibb.co/zZjmmYQ/image.png) **React Spinners**
--   ![Recharts](https://i.ibb.co/KmJfYmC/image-2.png) **Recharts**
--   ![Animate.css](https://i.ibb.co/9pnq1vN/image-3.png) **Animate.css**
--   ![SweetAlert2](https://i.ibb.co/mbm8r3X/image-4.png) **SweetAlert2**
--   ![React Google reCAPTCHA](https://i.ibb.co/9pM5QY4/image-7.png) **React Google reCAPTCHA**
+-   ![HTML](https://img.icons8.com/color/48/000000/html-5.png) **HTML**: To structure the web content.
+-   ![CSS](https://img.icons8.com/color/48/000000/css3.png) **CSS**: For styling the web project.
+-   ![Tailwind](https://img.icons8.com/color/48/000000/tailwindcss.png) **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+-   ![JavaScript](https://img.icons8.com/color/48/000000/javascript.png) **JavaScript**: For adding interactivity to the web project.
+-   ![React](https://img.icons8.com/color/48/000000/react-native.png) **React**: To build the frontend of the web project.
+-   ![React Router](https://i.ibb.co/19d5sDG/react-router-svg.png) **React Router**: For declarative routing in React applications.
+-   ![React Spinners](https://i.ibb.co/zZjmmYQ/image.png) **React Spinners**: A collection of loading spinners for React.
+-   ![Recharts](https://i.ibb.co/KmJfYmC/image-2.png) **Recharts**: A composable charting library built on React components.
+-   ![Animate.css](https://i.ibb.co/9pnq1vN/image-3.png) **Animate.css**: A library of ready-to-use, cross-browser animations for use in web projects.
+-   ![SweetAlert2](https://i.ibb.co/mbm8r3X/image-4.png) **SweetAlert2**: A beautiful, responsive, customizable, and accessible replacement for JavaScript's popup boxes.
+-   ![React Google reCAPTCHA](https://i.ibb.co/9pM5QY4/image-7.png) **React Google reCAPTCHA**: For integrating Google's reCAPTCHA to enhance security.
 
 ### Backend
 
--   ![Node.js](https://img.icons8.com/color/48/000000/nodejs.png) **Node.js**
--   ![Express.js](https://cdn.icon-icons.com/icons2/2699/PNG/48/expressjs_logo_icon_169185.png) **Express.js**
+-   ![Node.js](https://img.icons8.com/color/48/000000/nodejs.png) **Node.js**: To manage the backend and API calls.
+-   ![Express.js](https://cdn.icon-icons.com/icons2/2699/PNG/48/expressjs_logo_icon_169185.png) **Express.js**: For building the backend services and APIs.
+-   ![dotenv](https://i.ibb.co/myKkQ4t/image-8.png) **dotenv**: For loading environment variables.
+-   ![cors](https://i.ibb.co/44PvKWw/image.jpg) **cors**: For enabling cross-origin resource sharing.
+-   ![express-rate-limit](https://i.ibb.co/2hfbCSP/image-9.png) **express-rate-limit**: For rate limiting to enhance security.
+-   ![nodemailer](https://i.ibb.co/KzyKbvM/image-10.png) **nodemailer**: For sending emails.
 
 ### Database
 
--   ![MongoDB](https://img.icons8.com/color/48/000000/mongodb.png) **MongoDB**
+-   ![MongoDB](https://img.icons8.com/color/48/000000/mongodb.png) **MongoDB**: To manage the database system.
+-   ![Mongoose](https://img.icons8.com/color/48/000000/mongoose.png) **Mongoose**: For object data modeling (ODM) with MongoDB.
 
 ### Authentication
 
--   ![JWT](https://img.icons8.com/?size=48&id=rHpveptSuwDz&format=png) **JSON Web Token (JWT)**
+-   ![bcryptjs](https://i.ibb.co/gM8Kn7Q/image-11.png) **bcryptjs**: For hashing passwords.
+-   ![JWT](https://img.icons8.com/?size=48&id=rHpveptSuwDz&format=png) **JSON Web Token (JWT)**: For secure authorization.
 
 ### Utilities
 
--   ![Axios](https://i.ibb.co/PwYcWwj/image-5.png) **Axios**
+-   ![Axios](https://i.ibb.co/PwYcWwj/image-5.png) **Axios**: For making HTTP requests from the frontend.
 
 ## Key Features ✨
 
