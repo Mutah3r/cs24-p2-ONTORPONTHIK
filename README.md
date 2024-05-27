@@ -15,6 +15,8 @@
 -   **Unayes Ahmed Khan** [![Email](https://img.shields.io/badge/email-unayeskhan.0808@gmail.com-blue)](mailto:unayeskhan.0808@gmail.com)
 -   **Mutaher Ahmed Shakil** [![Email](https://img.shields.io/badge/email-mutaher.shakil@gmail.com-blue)](mailto:mutaher.shakil@gmail.com)
 
+[![Meet Our Team](https://i.ibb.co/64Dz6kB/Green-Yellow-Professional-Gardening-Presentation-2.png)](https://ibb.co/GVCygqT)
+
 ## Technologies Used 💻
 
 ### Frontend
@@ -202,6 +204,10 @@ Here are some vehicle's information you can use:
 ### Backend Workflow
 
 [![Backend Workflow](https://i.ibb.co/jwMYY87/Bankend-workflow-diagram-1.png)](https://ibb.co/vdPWWc2)
+
+### Project Architecture
+
+[![Project Architecture](https://i.ibb.co/r5ZnbCK/Green-Yellow-Professional-Gardening-Presentation-3.png)](https://ibb.co/XFzmyhf)
 
 ## Screenshots 📸
 
