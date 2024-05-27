@@ -4,6 +4,8 @@
 
 ![Logo](https://i.ibb.co/Wksyt54/EcoSync.png)
 
+> EcoSync is a comprehensive solution designed to tackle the challenges of domestic solid waste management in Dhaka, Bangladesh. As the city rapidly expands into a megacity, efficient waste management has become crucial. Our project focuses on enhancing the waste collection process, improving the quality of services, and raising community awareness. EcoSync offers a user-friendly, responsive web application with features like real-time data visualization, secure authentication, and role-based access control. Key functionalities include the registration and management of third-party contractors, workforce tracking, waste collection monitoring, bill generation, and optimized collection plans. By leveraging modern technologies and ensuring seamless coordination among various stakeholders, EcoSync aims to transform waste management practices, contributing to a cleaner and healthier urban environment.
+
 ## Live Links 🌐
 
 -   [EcoSync Link - 1](https://ecosync-e57c2.web.app/)
