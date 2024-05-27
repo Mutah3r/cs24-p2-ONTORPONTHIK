@@ -19,6 +19,11 @@
 -   ![Tailwind](https://img.icons8.com/color/48/000000/tailwindcss.png) **Tailwind CSS**
 -   ![JavaScript](https://img.icons8.com/color/48/000000/javascript.png) **JavaScript**
 -   ![React](https://img.icons8.com/color/48/000000/react-native.png) **React**
+-   ![React Router](https://i.ibb.co/19d5sDG/react-router-svg.png) **React Router**
+-   ![React Spinners](https://i.ibb.co/zZjmmYQ/image.png) **React Spinners**
+-   ![Recharts](https://i.ibb.co/KmJfYmC/image-2.png) **Recharts**
+-   ![Animate.css](https://i.ibb.co/9pnq1vN/image-3.png) **Animate.css**
+-   ![SweetAlert2](https://i.ibb.co/mbm8r3X/image-4.png) **SweetAlert2**
 
 ### Backend
 
@@ -32,6 +37,10 @@
 ### Authentication
 
 -   ![JWT](https://img.icons8.com/?size=48&id=rHpveptSuwDz&format=png) **JSON Web Token (JWT)**
+
+### Utilities
+
+-   ![Axios](https://i.ibb.co/PwYcWwj/image-5.png) **Axios**
 
 ## Getting Started 🚀
 
