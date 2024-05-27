@@ -106,3 +106,13 @@ Here are some vehicle's information you can use:
 ## Preferred Browser: 🌐
 
 -   Chrome
+
+## Diagrams and Workflows 📊
+
+## Entity Relationship Diagram
+
+![Alt text](https://i.ibb.co/Bj44W8c/ecosync-erd.png)
+
+## Backend Workflow
+
+![Alt text](https://i.ibb.co/jwMYY87/Bankend-workflow-diagram-1.png)
