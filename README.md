@@ -10,6 +10,29 @@
 -   **Unayes Ahmed Khan** [![Email](https://img.shields.io/badge/email-unayeskhan.0808@gmail.com-blue)](mailto:unayeskhan.0808@gmail.com)
 -   **Mutaher Ahmed Shakil** [![Email](https://img.shields.io/badge/email-mutaher.shakil@gmail.com-blue)](mailto:mutaher.shakil@gmail.com)
 
+## Technologies Used 💻
+
+### Frontend
+
+-   ![HTML](https://img.icons8.com/color/48/000000/html-5.png) **HTML**
+-   ![CSS](https://img.icons8.com/color/48/000000/css3.png) **CSS**
+-   ![Tailwind](https://img.icons8.com/color/48/000000/tailwindcss.png) **Tailwind CSS**
+-   ![JavaScript](https://img.icons8.com/color/48/000000/javascript.png) **JavaScript**
+-   ![React](https://img.icons8.com/color/48/000000/react-native.png) **React**
+
+### Backend
+
+-   ![Node.js](https://img.icons8.com/color/48/000000/nodejs.png) **Node.js**
+-   ![Express.js](https://cdn.icon-icons.com/icons2/2699/PNG/48/expressjs_logo_icon_169185.png) **Express.js**
+
+### Database
+
+-   ![MongoDB](https://img.icons8.com/color/48/000000/mongodb.png) **MongoDB**
+
+### Authentication
+
+-   ![JWT](https://img.icons8.com/?size=48&id=rHpveptSuwDz&format=png) **JSON Web Token (JWT)**
+
 ## Getting Started 🚀
 
 ### Using Docker 🐳
