@@ -202,3 +202,96 @@ Here are some vehicle's information you can use:
 ### Backend Workflow
 
 [![Backend Workflow](https://i.ibb.co/jwMYY87/Bankend-workflow-diagram-1.png)](https://ibb.co/vdPWWc2)
+
+## Screenshots 📸
+
+### Homepage
+
+[![Homepage](https://i.ibb.co/CQqybZX/Screenshot-2024-05-27-231842.png)](https://ibb.co/1T3Nr5p)
+
+### Login Page
+
+[![Login Page](https://i.ibb.co/sQc0Qvt/Screenshot-2024-05-27-232959.png)](https://ibb.co/Cv4kv5W)
+
+### Admin Dashboard
+
+[![Admin Dashboard](https://i.ibb.co/r4189C1/Screenshot-2024-05-27-233204.png)](https://ibb.co/2gfVJDf)
+[![Admin Dashboard](https://i.ibb.co/sFRTFnX/Screenshot-2024-05-27-233223.png)](https://ibb.co/qRjHRK2)
+
+### Admin Sidebar
+
+[![Admin Sidebar](https://i.ibb.co/445fm7M/image.png)](https://ibb.co/XFv42bp)
+
+### User & Role Management (Admin)
+
+[![User & Role Management](https://i.ibb.co/Gk7Npg7/image.png)](https://ibb.co/XpXMLmX)
+[![User & Role Management](https://i.ibb.co/P9qY2YR/image.png)](https://ibb.co/ZYqJQJ3)
+[![User & Role Management](https://i.ibb.co/MgJWNbF/image.png)](https://ibb.co/dfH1KS8)
+
+### Roles & Permissions (Admin)
+
+[![Roles & Permissions](https://i.ibb.co/xCwy36G/Screenshot-2024-05-27-234457.png)](https://ibb.co/p0NgndZ)
+[![Roles & Permissions](https://i.ibb.co/m8GQnN3/Screenshot-2024-05-27-234508.png)](https://ibb.co/PQNB2Dd)
+[![Roles & Permissions](https://i.ibb.co/K0zKwTP/Screenshot-2024-05-27-234518.png")](https://ibb.co/qyFJ5TS)
+
+### Facilities Management (Admin)
+
+[![Facilities Management](https://i.ibb.co/mSmqW2T/image.png)](https://ibb.co/1b3qWPQ)
+[![Facilities Management](https://i.ibb.co/D4K2VBX/image.png)](https://ibb.co/rkyr7BP)
+[![Facilities Management](https://i.ibb.co/QmZH3TF/image.png)](https://ibb.co/3hwF9jy)
+
+### Vehicle Management (Admin)
+
+[![Vehicle Management](https://i.ibb.co/VV9Qh7T/image.png)](https://ibb.co/dBML3dD)
+[![Vehicle Management](https://i.ibb.co/RG8pMSt/image.png)](https://ibb.co/WNCWd37)
+
+### Third Party Management (Admin)
+
+[![Third Party Management](https://i.ibb.co/7pmfZB5/image.png)](https://ibb.co/6tCMTGx)
+
+### STS Manager Dashboard
+
+[![STS Manager Dashboard](https://i.ibb.co/LJ39Xn7/image.png)](https://ibb.co/hZS2JDz)
+[![STS Manager Dashboard](https://i.ibb.co/jWh9bqy/image.png)](https://ibb.co/MGnyZKc)
+
+### STS Manager Sidebar
+
+[![STS Manager Sidebar](https://i.ibb.co/7b92bvp/image.png)](https://ibb.co/N74Z7xN)
+
+### Vehicle Entry (STS Manager)
+
+[![Vehicle Entry](https://i.ibb.co/wZH2g9v/image.png)](https://ibb.co/Y49VQzr)
+
+### Incoming Waste Entry (STS Manager)
+
+[![Incoming Waste Entry](https://i.ibb.co/FJhPyBf/image.png)](https://ibb.co/xG24BMc)
+
+### Optimal Fleet View (STS Manager)
+
+[![Optimal Fleet View](https://i.ibb.co/Nj68xVT/image.png)](https://ibb.co/2t7DqnZ)
+
+### Landfill Manager Dashboard
+
+[![Landfill Manager Dashboard](https://i.ibb.co/sw2spwf/image.png)](https://ibb.co/HzVGLzS)
+[![Landfill Manager Dashboard](https://i.ibb.co/YbhjRYr/image.png)](https://ibb.co/vDkzwgt)
+
+### Landfill Manager Sidebar
+
+[![Landfill Manager Sidebar](https://i.ibb.co/DgNy20Y/image.png)](https://ibb.co/jZd2Xnz)
+
+### Vehicle Entry (Landfill Manager)
+
+[![Vehicle Entry](https://i.ibb.co/x7RjbVP/image.png)](https://ibb.co/RDV0KLZ)
+
+### Billing (Landfill Manager)
+
+[![Billing](https://i.ibb.co/qNfgcyM/image.png)](https://ibb.co/n7v1Ygs)
+[![Billing](https://i.ibb.co/93q3Wfs/image.png)](https://ibb.co/bRrRXyz)
+
+### Profile
+
+[![Profile](https://i.ibb.co/QNjjrWF/Screenshot-2024-05-27-233456.png)](https://ibb.co/58xxBQW)
+
+### Profile Info Update
+
+[![Profile Info Update](https://i.ibb.co/rmL8hzR/Screenshot-2024-05-27-233633.png)](https://ibb.co/Y3KnS1F)
