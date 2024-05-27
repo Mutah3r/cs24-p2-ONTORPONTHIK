@@ -66,9 +66,13 @@
 
 11. **Bill Generation** 💵: STS managers can generate bills for third-party contractors based on the percentage of required waste collected and deposited to the STS, including calculations for basic pay, deficit, fine, and total bill.
 
-12. **User-friendly Interface** 💻: With a clean and intuitive user interface, EcoSync ensures a smooth user experience, making it easy for users to navigate and access information.
+12. **Fleet Optimization** 🚚: EcoSync optimizes the fleet of waste collection vehicles to ensure efficient routes and minimal fuel consumption, reducing operational costs and environmental impact.
 
-13. **Responsive Design** 📱: Built with responsive design principles, EcoSync is accessible across devices of all sizes, providing a seamless experience on desktops, tablets, and mobile phones.
+13. **Optimal Routes for Waste Collection** 🗺️: Using Google Map, EcoSync calculates the most efficient routes for waste collection, ensuring timely and cost-effective waste management operations.
+
+14. **User-friendly Interface** 💻: With a clean and intuitive user interface, EcoSync ensures a smooth user experience, making it easy for users to navigate and access information.
+
+15. **Responsive Design** 📱: Built with responsive design principles, EcoSync is accessible across devices of all sizes, providing a seamless experience on desktops, tablets, and mobile phones.
 
 ## Role-based Access Control 🚪
 
