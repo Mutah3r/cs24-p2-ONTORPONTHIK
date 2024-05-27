@@ -24,6 +24,7 @@
 -   ![Recharts](https://i.ibb.co/KmJfYmC/image-2.png) **Recharts**
 -   ![Animate.css](https://i.ibb.co/9pnq1vN/image-3.png) **Animate.css**
 -   ![SweetAlert2](https://i.ibb.co/mbm8r3X/image-4.png) **SweetAlert2**
+-   ![React Google reCAPTCHA](https://i.ibb.co/9pM5QY4/image-7.png) **React Google reCAPTCHA**
 
 ### Backend
 
