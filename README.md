@@ -109,10 +109,10 @@ Here are some vehicle's information you can use:
 
 ## Diagrams and Workflows 📊
 
-## Entity Relationship Diagram
+### Entity Relationship Diagram
 
-![Alt text](https://i.ibb.co/Bj44W8c/ecosync-erd.png)
+[![Entity Relationship Diagram](https://i.ibb.co/Bj44W8c/ecosync-erd.png)](https://ibb.co/4MssvBK)
 
-## Backend Workflow
+### Backend Workflow
 
-![Alt text](https://i.ibb.co/jwMYY87/Bankend-workflow-diagram-1.png)
+[![Backend Workflow](https://i.ibb.co/jwMYY87/Bankend-workflow-diagram-1.png)](https://ibb.co/vdPWWc2)
