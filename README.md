@@ -23,7 +23,7 @@ docker-compose up --build
 -   Frontend: Runs on port `5173`
 -   Backend: Runs on port `8000`
 
-### Manual Setup
+### Manual Setup 🧑‍💻
 
 If Docker isn't working, run the system manually:
 
