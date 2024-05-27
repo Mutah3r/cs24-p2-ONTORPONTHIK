@@ -42,6 +42,44 @@
 
 -   ![Axios](https://i.ibb.co/PwYcWwj/image-5.png) **Axios**
 
+## Key Features ✨
+
+1. **Secure Authentication** 🔒: EcoSync employs JSON Web Token (JWT) for secure authentication, ensuring that user data is protected and accessible only to authorized individuals.
+
+2. **Registration of STS Manager** 🛠️: Administrators can create and manage user accounts for STS managers, enabling them to oversee STS operations and monitor waste collection activities.
+
+3. **Registration of Landfill Manager** 🌍: Administrators can create and manage user accounts for landfill managers, allowing them to oversee landfill operations and ensure environmental compliance.
+
+4. **Registration of 3rd Party Contractors** 🏗️: Administrators can register and manage third-party contractors, including essential information such as company details, contact information, workforce size, and contract duration.
+
+5. **Creation of Contractor Manager User** 👤: Administrators can create user accounts for contractor managers, allowing them to manage workforce registration, collection plans, and monitor daily activities.
+
+6. **Workforce Registration** 👷: Contractor managers can handle the registration of employees, including essential details such as employee ID, contact information, job title, and assigned collection route.
+
+7. **Create a Collection Plan** 🗓️: Contractor managers can create schedules for domestic solid waste collection plans, including details such as area of collection, collection start time, duration, number of laborers, number of vans, and expected weight of daily solid waste.
+
+8. **Real-time Data Visualization** 📊: EcoSync provides real-time data visualization through interactive charts and graphs, allowing users to easily analyze and understand environmental data.
+
+9. **Monitoring Transported Waste by Contractors** 🚛: STS managers can track waste collection activities by third-party contractors, including details such as time/date of collection, amount of waste collected, type of waste, and designated STS for deposit.
+
+10. **Monitoring Logged Working Hours** ⏰: Contractor managers can track the working hours of their teams, including daily log-in/out times, total hours worked, overtime hours, and absences/leaves.
+
+11. **Bill Generation** 💵: STS managers can generate bills for third-party contractors based on the percentage of required waste collected and deposited to the STS, including calculations for basic pay, deficit, fine, and total bill.
+
+12. **User-friendly Interface** 💻: With a clean and intuitive user interface, EcoSync ensures a smooth user experience, making it easy for users to navigate and access information.
+
+13. **Responsive Design** 📱: Built with responsive design principles, EcoSync is accessible across devices of all sizes, providing a seamless experience on desktops, tablets, and mobile phones.
+
+## Role-based Access Control 🚪
+
+EcoSync implements role-based access control (RBAC) to manage user permissions effectively:
+
+-   **Administrator**: Has full access to all features and functionalities of the system, including user management, contractor registration, and billing.
+-   **STS Manager**: Can track waste collection activities, generate bills, and manage STS operations, with restricted access to administrative functions.
+-   **Landfill Manager**: Responsible for overseeing landfill operations, including waste disposal, environmental compliance, and safety protocols.
+-   **Contractor Manager**: Can manage workforce registration, collection plans, and monitor daily activities, but does not have access to administrative features.
+-   **Regular User**: Limited access to view data and reports, without permission to perform any administrative or managerial tasks.
+
 ## Getting Started 🚀
 
 ### Using Docker 🐳
