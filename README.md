@@ -4,6 +4,11 @@
 
 ![Logo](https://i.ibb.co/Wksyt54/EcoSync.png)
 
+## Live Links 🌐
+
+-   [EcoSync Link - 1](https://ecosync-e57c2.web.app/)
+-   [EcoSync Link - 2](https://ecosync-e57c2.firebaseapp.com/)
+
 ## Team Members 👥
 
 -   **Arfatul Islam Asif** [![Email](https://img.shields.io/badge/email-awakicde@gmail.com-blue)](mailto:awakicde@gmail.com)
