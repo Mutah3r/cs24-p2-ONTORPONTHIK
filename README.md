@@ -1,4 +1,4 @@
-# ONTORPONTHIK
+# TEAM ONTORPONTHIK
 
 ## Project - EcoSync 🌍
 
